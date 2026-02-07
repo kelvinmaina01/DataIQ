@@ -128,15 +128,15 @@ export function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden selection:bg-primary/10 selection:text-primary">
-            {/* Background Grid Pattern - Made more visible at edges */}
+            {/* Background Grid Pattern - Made more visible to ensure it's "seen" */}
             <div
-                className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:48px_48px]"
+                className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#80808022_1px,transparent_1px),linear-gradient(to_bottom,#80808022_1px,transparent_1px)] bg-[size:48px_48px]"
                 aria-hidden="true"
             />
 
             {/* Radial Gradient to 'soften' the grid in the center/content area - Fades near text */}
             <div
-                className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,rgba(255,255,255,0)_70%)]"
+                className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,rgba(255,255,255,0)_80%)]"
                 aria-hidden="true"
             />
 
@@ -321,8 +321,8 @@ export function FAQPage() {
                     </div>
                 </div>
 
-                {/* CTA Section - Book a 1-on-1 onboarding */}
-                <div className="flex flex-col items-center justify-center text-center animate-slide-up max-w-4xl mx-auto mb-20 md:mb-28" style={{ animationDelay: '0.2s' }}>
+                {/* CTA Section - Book a 1-on-1 onboarding - Increased top margin for balance */}
+                <div className="flex flex-col items-center justify-center text-center animate-slide-up max-w-4xl mx-auto mt-24 md:mt-40 mb-20 md:mb-28" style={{ animationDelay: '0.2s' }}>
                     <div className="space-y-6">
                         <h3 className="text-3xl lg:text-5xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
                         <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
@@ -341,8 +341,8 @@ export function FAQPage() {
 
             </main>
 
-            {/* Clear Separator and Spacing before Footer */}
-            <div className="w-full border-t border-gray-100 my-12 md:my-16" />
+            {/* Clear Separator and Spacing before Footer - Balanced and visible */}
+            <div className="w-full border-t border-gray-200 my-10 md:my-12" />
 
             <Footer />
         </div>
