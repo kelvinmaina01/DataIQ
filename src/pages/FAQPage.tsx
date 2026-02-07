@@ -99,21 +99,21 @@ const faqs = [
 ];
 
 const integrations = [
-    { name: "Supabase", logo: "https://svgl.app/library/supabase.svg" },
-    { name: "Databricks", logo: "https://svgl.app/library/databricks.svg" },
-    { name: "Airtable", logo: "https://svgl.app/library/airtable.svg" },
+    { name: "Supabase", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/supabase.svg" },
+    { name: "Databricks", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/databricks.svg" },
+    { name: "Airtable", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/airtable.svg" },
     { name: "MotherDuck", logo: "https://motherduck.com/favicon.ico" },
-    { name: "Google Ads", logo: "https://svgl.app/library/google-ads.svg" },
-    { name: "Google Analytics", logo: "https://svgl.app/library/google-analytics.svg" },
-    { name: "Google Sheets", logo: "https://svgl.app/library/google-sheets.svg" },
-    { name: "Slack", logo: "https://svgl.app/library/slack.svg" },
-    { name: "PostgreSQL", logo: "https://svgl.app/library/postgresql.svg" },
-    { name: "BigQuery", logo: "https://svgl.app/library/google-cloud.svg" },
-    { name: "Amazon Redshift", logo: "https://svgl.app/library/aws.svg" },
-    { name: "Snowflake", logo: "https://svgl.app/library/snowflake.svg" },
-    { name: "Stripe", logo: "https://svgl.app/library/stripe.svg" },
-    { name: "PostHog", logo: "https://svgl.app/library/posthog.svg" },
-    { name: "HubSpot", logo: "https://svgl.app/library/hubspot.svg" }
+    { name: "Google Ads", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/googleads.svg" },
+    { name: "Google Analytics", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/googleanalytics.svg" },
+    { name: "Google Sheets", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/googlesheets.svg" },
+    { name: "Slack", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/slack.svg" },
+    { name: "PostgreSQL", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/postgresql.svg" },
+    { name: "BigQuery", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/googlecloud.svg" },
+    { name: "Amazon Redshift", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/amazonredshift.svg" },
+    { name: "Snowflake", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/snowflake.svg" },
+    { name: "Stripe", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/stripe.svg" },
+    { name: "PostHog", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/posthog.svg" },
+    { name: "HubSpot", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hubspot.svg" }
 ];
 
 export function FAQPage() {
@@ -322,7 +322,7 @@ export function FAQPage() {
                 </div>
 
                 {/* CTA Section - Book a 1-on-1 onboarding */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center bg-transparent animate-slide-up max-w-6xl mx-auto mb-32 md:mb-48" style={{ animationDelay: '0.2s' }}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center bg-transparent animate-slide-up max-w-6xl mx-auto mb-48 md:mb-64" style={{ animationDelay: '0.2s' }}>
                     {/* Left Side: Text - Occupying 50% */}
                     <div className="space-y-6 text-center lg:text-left">
                         <h3 className="text-3xl lg:text-4xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
@@ -345,14 +345,14 @@ export function FAQPage() {
                             {/* Column 1: Just Bottom */}
                             <div className="flex flex-col">
                                 <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
-                                    <img src="https://images.unsplash.com/photo-1551288049-bbdac8a28a1e?auto=format&fit=crop&q=80&w=400" alt="Data Analytics" className="w-full h-full object-cover" />
+                                    <img src="https://images.unsplash.com/photo-1551288049-bbda6465fba1?auto=format&fit=crop&q=80&w=400" alt="Data Analytics" className="w-full h-full object-cover" />
                                 </div>
                             </div>
 
                             {/* Column 2: Middle + Bottom */}
                             <div className="flex flex-col gap-3 md:gap-4">
                                 <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
-                                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400" alt="AI Interface" className="w-full h-full object-cover" />
+                                    <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=400" alt="Tech Visual" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
                                     <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400" alt="Dashboard" className="w-full h-full object-cover" />
@@ -362,7 +362,7 @@ export function FAQPage() {
                             {/* Column 3: Highest + Bottom */}
                             <div className="flex flex-col gap-3 md:gap-4">
                                 <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500 -translate-y-8 md:-translate-y-12">
-                                    <img src="https://images.unsplash.com/photo-1558483300-384356a816ac?auto=format&fit=crop&q=80&w=400" alt="Tech Visual" className="w-full h-full object-cover" />
+                                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400" alt="Hardware" className="w-full h-full object-cover" />
                                 </div>
                                 <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
                                     <img src="https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&q=80&w=400" alt="Graph" className="w-full h-full object-cover" />
