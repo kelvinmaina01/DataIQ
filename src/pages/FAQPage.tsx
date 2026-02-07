@@ -128,15 +128,15 @@ export function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden selection:bg-primary/10 selection:text-primary">
-            {/* Background Grid Pattern - Fainter and further apart */}
+            {/* Background Grid Pattern - Made more visible at edges */}
             <div
-                className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:48px_48px]"
+                className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:48px_48px]"
                 aria-hidden="true"
             />
 
-            {/* Radial Gradient to 'soften' the grid in the center/content area - Stronger white patch */}
+            {/* Radial Gradient to 'soften' the grid in the center/content area - Fades near text */}
             <div
-                className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,transparent_100%)] md:bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,transparent_60%)]"
+                className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,rgba(255,255,255,0)_70%)]"
                 aria-hidden="true"
             />
 
