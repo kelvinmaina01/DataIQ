@@ -99,21 +99,21 @@ const faqs = [
 ];
 
 const integrations = [
-    { name: "Supabase", logo: "https://logo.clearbit.com/supabase.com" },
-    { name: "Databricks", logo: "https://logo.clearbit.com/databricks.com" },
-    { name: "Airtable", logo: "https://logo.clearbit.com/airtable.com" },
-    { name: "MotherDuck", logo: "https://logo.clearbit.com/motherduck.com" },
-    { name: "Google Ads", logo: "https://logo.clearbit.com/ads.google.com" },
-    { name: "Google Analytics", logo: "https://logo.clearbit.com/analytics.google.com" },
-    { name: "Google Sheets", logo: "https://logo.clearbit.com/google.com" },
-    { name: "Slack", logo: "https://logo.clearbit.com/slack.com" },
-    { name: "PostgreSQL", logo: "https://logo.clearbit.com/postgresql.org" },
-    { name: "BigQuery", logo: "https://logo.clearbit.com/google.com" },
-    { name: "Amazon Redshift", logo: "https://logo.clearbit.com/aws.amazon.com" },
-    { name: "Snowflake", logo: "https://logo.clearbit.com/snowflake.com" },
-    { name: "Stripe", logo: "https://logo.clearbit.com/stripe.com" },
-    { name: "PostHog", logo: "https://logo.clearbit.com/posthog.com" },
-    { name: "HubSpot", logo: "https://logo.clearbit.com/hubspot.com" }
+    { name: "Supabase", logo: "https://svgl.app/library/supabase.svg" },
+    { name: "Databricks", logo: "https://svgl.app/library/databricks.svg" },
+    { name: "Airtable", logo: "https://svgl.app/library/airtable.svg" },
+    { name: "MotherDuck", logo: "https://motherduck.com/favicon.ico" },
+    { name: "Google Ads", logo: "https://svgl.app/library/google-ads.svg" },
+    { name: "Google Analytics", logo: "https://svgl.app/library/google-analytics.svg" },
+    { name: "Google Sheets", logo: "https://svgl.app/library/google-sheets.svg" },
+    { name: "Slack", logo: "https://svgl.app/library/slack.svg" },
+    { name: "PostgreSQL", logo: "https://svgl.app/library/postgresql.svg" },
+    { name: "BigQuery", logo: "https://svgl.app/library/google-cloud.svg" },
+    { name: "Amazon Redshift", logo: "https://svgl.app/library/aws.svg" },
+    { name: "Snowflake", logo: "https://svgl.app/library/snowflake.svg" },
+    { name: "Stripe", logo: "https://svgl.app/library/stripe.svg" },
+    { name: "PostHog", logo: "https://svgl.app/library/posthog.svg" },
+    { name: "HubSpot", logo: "https://svgl.app/library/hubspot.svg" }
 ];
 
 export function FAQPage() {
@@ -322,7 +322,7 @@ export function FAQPage() {
                 </div>
 
                 {/* CTA Section - Book a 1-on-1 onboarding */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center bg-transparent animate-slide-up max-w-6xl mx-auto" style={{ animationDelay: '0.2s' }}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center bg-transparent animate-slide-up max-w-6xl mx-auto mb-32 md:mb-48" style={{ animationDelay: '0.2s' }}>
                     {/* Left Side: Text - Occupying 50% */}
                     <div className="space-y-6 text-center lg:text-left">
                         <h3 className="text-3xl lg:text-4xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
