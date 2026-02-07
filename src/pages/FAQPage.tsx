@@ -130,15 +130,15 @@ export function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden selection:bg-primary/10 selection:text-primary">
-            {/* Background Grid Pattern - Softened for a premium, subtle look */}
+            {/* Background Grid Pattern - Even fainter for maximum subtlety */}
             <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
                     backgroundImage: `linear-gradient(to right, #94a3b8 1px, transparent 1px), linear-gradient(to bottom, #94a3b8 1px, transparent 1px)`,
                     backgroundSize: '40px 40px',
-                    opacity: 0.1,
-                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 100%)',
-                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 100%)'
+                    opacity: 0.03,
+                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,1) 100%)',
+                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,1) 100%)'
                 }}
                 aria-hidden="true"
             />
@@ -283,42 +283,16 @@ export function FAQPage() {
                             </div>
                         </div>
 
-                        {/* Right Side: Visual */}
+                        {/* Right Side: Visual - Using user-provided security map */}
                         <div className="relative flex justify-center lg:justify-end">
-                            <div className="relative w-full max-w-lg aspect-square bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex items-center justify-center p-8 group">
-                                {/* Decorative Grid in visual */}
-                                <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-
-                                {/* Animated Security Icons */}
-                                <div className="relative z-10 flex items-center gap-6">
-                                    <div className="flex flex-col items-center gap-3 animate-pulse">
-                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-green-50 rounded-2xl flex items-center justify-center border border-green-200 shadow-inner">
-                                            <Shield className="h-8 w-8 md:h-10 md:w-10 text-green-600" />
-                                        </div>
-                                        <span className="bg-black text-white text-[10px] uppercase font-bold px-3 py-1 rounded-md tracking-tighter">Secure</span>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-3">
-                                        <div className="w-20 h-24 md:w-24 md:h-32 bg-red-500 rounded-3xl flex items-center justify-center shadow-2xl transform -translate-y-4 hover:scale-110 transition-transform duration-500">
-                                            <Lock className="h-10 w-10 md:h-12 md:w-12 text-white" />
-                                        </div>
-                                        <span className="bg-black text-white text-[10px] uppercase font-bold px-3 py-1 rounded-md tracking-tighter">Restricted</span>
-                                    </div>
-                                    <div className="flex flex-col items-center gap-3 animate-pulse" style={{ animationDelay: '0.5s' }}>
-                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-blue-50 rounded-2xl flex items-center justify-center border border-blue-200 shadow-inner">
-                                            <User className="h-8 w-8 md:h-10 md:w-10 text-primary" />
-                                        </div>
-                                        <span className="bg-black text-white text-[10px] uppercase font-bold px-3 py-1 rounded-md tracking-tighter">Private</span>
-                                    </div>
-                                </div>
-
-                                {/* Floating Eye icon as seen in screenshot */}
-                                <div className="absolute top-1/4 right-1/4 animate-bounce duration-[3000ms]">
-                                    <div className="bg-white p-3 rounded-xl shadow-lg border border-gray-100">
-                                        <div className="h-6 w-10 border-2 border-primary rounded-full relative flex items-center justify-center">
-                                            <div className="h-3 w-3 bg-primary rounded-full"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div className="relative w-full max-w-lg aspect-square bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 group transition-transform duration-700 hover:scale-[1.02]">
+                                <img
+                                    src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&q=80&w=800"
+                                    alt="Security & Compliance Diagram"
+                                    className="w-full h-full object-cover p-4 md:p-8"
+                                />
+                                {/* Glass Overlay to make it feel premium */}
+                                <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
                             </div>
                         </div>
                     </div>
