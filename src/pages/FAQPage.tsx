@@ -322,7 +322,7 @@ export function FAQPage() {
                 </div>
 
                 {/* CTA Section - Book a 1-on-1 onboarding */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center bg-transparent animate-slide-up max-w-6xl mx-auto mb-48 md:mb-64" style={{ animationDelay: '0.2s' }}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center bg-transparent animate-slide-up max-w-6xl mx-auto mb-20 md:mb-28" style={{ animationDelay: '0.2s' }}>
                     {/* Left Side: Text - Occupying 50% */}
                     <div className="space-y-6 text-center lg:text-left">
                         <h3 className="text-3xl lg:text-4xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
@@ -375,7 +375,7 @@ export function FAQPage() {
             </main>
 
             {/* Clear Separator and Spacing before Footer */}
-            <div className="w-full border-t border-gray-100 my-24 md:my-32" />
+            <div className="w-full border-t border-gray-100 my-12 md:my-16" />
 
             <Footer />
         </div>
