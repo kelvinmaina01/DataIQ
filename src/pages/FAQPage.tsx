@@ -130,15 +130,15 @@ export function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden selection:bg-primary/10 selection:text-primary">
-            {/* Background Grid Pattern - Made more visible to ensure it's "seen" */}
+            {/* Background Grid Pattern - Significantly more visible for high-res screens */}
             <div
-                className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#80808022_1px,transparent_1px),linear-gradient(to_bottom,#80808022_1px,transparent_1px)] bg-[size:48px_48px]"
+                className="absolute inset-0 pointer-events-none bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:40px_40px] opacity-40"
                 aria-hidden="true"
             />
 
-            {/* Radial Gradient to 'soften' the grid in the center/content area - Fades near text */}
+            {/* Radial Gradient to 'soften' the grid in content area - More targeted masking */}
             <div
-                className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,rgba(255,255,255,0)_80%)]"
+                className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,white_0%,transparent_90%)]"
                 aria-hidden="true"
             />
 
@@ -330,13 +330,13 @@ export function FAQPage() {
                         <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                             Get up and running as fast as possible with a personalized onboarding call. We'll show you how everything works and how you can get started with DataIQ.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-6 pt-6 justify-center">
-                            <Button variant="outline" size="lg" className="rounded-full px-12 h-16 text-lg font-bold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-105 transition-all duration-300 flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row gap-8 pt-8 justify-center items-center w-full">
+                            <Button variant="outline" size="lg" className="rounded-full px-14 h-18 text-xl font-bold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-105 transition-all duration-300 flex items-center gap-4 min-w-[240px]">
                                 Learn more
-                                <ArrowRight className="h-5 w-5" />
+                                <ArrowRight className="h-6 w-6" />
                             </Button>
-                            <Button size="lg" className="rounded-full px-12 h-16 text-lg font-bold bg-primary hover:bg-primary/90 text-white hover:scale-105 hover:shadow-2xl transition-all duration-300 shadow-xl flex items-center gap-3">
-                                <Calendar className="h-5 w-5" />
+                            <Button size="lg" className="rounded-full px-14 h-18 text-xl font-bold bg-primary hover:bg-primary/90 text-white hover:scale-105 hover:shadow-2xl transition-all duration-300 shadow-xl flex items-center gap-4 min-w-[240px]">
+                                <Calendar className="h-6 w-6" />
                                 Book 30 minutes
                             </Button>
                         </div>
@@ -346,7 +346,7 @@ export function FAQPage() {
             </main>
 
             {/* Clear Separator and Spacing before Footer - Balanced and visible */}
-            <div className="w-full border-t border-gray-200 mt-20 md:mt-32 mb-10 md:mb-12" />
+            <div className="w-full border-t border-gray-200 mt-32 md:mt-48 mb-16 md:mb-20" />
 
             <Footer />
         </div>
