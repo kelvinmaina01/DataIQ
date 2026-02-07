@@ -98,6 +98,24 @@ const faqs = [
     }
 ];
 
+const integrations = [
+    { name: "Supabase", logo: "https://sbp_f2b0acb6327d8d5c7ea44113460cc6da9194b57f.cdn.brandfetch.io/supabase.com/icon/1710182400000" },
+    { name: "Databricks", logo: "https://brandfetch.io/databricks.com/icon/1710182400000" },
+    { name: "Airtable", logo: "https://brandfetch.io/airtable.com/icon/1710182400000" },
+    { name: "MotherDuck", logo: "https://motherduck.com/favicon.ico" },
+    { name: "Google Ads", logo: "https://brandfetch.io/ads.google.com/icon/1710182400000" },
+    { name: "Google Analytics", logo: "https://brandfetch.io/analytics.google.com/icon/1710182400000" },
+    { name: "Google Sheets", logo: "https://brandfetch.io/sheets.google.com/icon/1710182400000" },
+    { name: "Slack", logo: "https://brandfetch.io/slack.com/icon/1710182400000" },
+    { name: "PostgreSQL", logo: "https://brandfetch.io/postgresql.org/icon/1710182400000" },
+    { name: "BigQuery", logo: "https://brandfetch.io/cloud.google.com/icon/1710182400000" },
+    { name: "Amazon Redshift", logo: "https://brandfetch.io/aws.amazon.com/icon/1710182400000" },
+    { name: "Snowflake", logo: "https://brandfetch.io/snowflake.com/icon/1710182400000" },
+    { name: "Stripe", logo: "https://brandfetch.io/stripe.com/icon/1710182400000" },
+    { name: "PostHog", logo: "https://brandfetch.io/posthog.com/icon/1710182400000" },
+    { name: "HubSpot", logo: "https://brandfetch.io/hubspot.com/icon/1710182400000" }
+];
+
 export function FAQPage() {
     const [visibleCount, setVisibleCount] = useState(7);
 
