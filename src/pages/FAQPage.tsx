@@ -374,6 +374,9 @@ export function FAQPage() {
 
             </main>
 
+            {/* Clear Separator and Spacing before Footer */}
+            <div className="w-full border-t border-gray-100 my-24 md:my-32" />
+
             <Footer />
         </div>
     );
