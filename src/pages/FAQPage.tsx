@@ -322,52 +322,19 @@ export function FAQPage() {
                 </div>
 
                 {/* CTA Section - Book a 1-on-1 onboarding */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center bg-transparent animate-slide-up max-w-6xl mx-auto mb-20 md:mb-28" style={{ animationDelay: '0.2s' }}>
-                    {/* Left Side: Text - Occupying 50% */}
-                    <div className="space-y-6 text-center lg:text-left">
-                        <h3 className="text-3xl lg:text-4xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
-                        <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0">
+                <div className="flex flex-col items-center justify-center text-center animate-slide-up max-w-4xl mx-auto mb-20 md:mb-28" style={{ animationDelay: '0.2s' }}>
+                    <div className="space-y-6">
+                        <h3 className="text-3xl lg:text-5xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
+                        <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
                             Get up and running as fast as possible with a personalized onboarding call. We'll show you how everything works and how you can get started with DataIQ.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4 pt-2 justify-center lg:justify-start">
-                            <Button variant="outline" size="lg" className="rounded-full px-8 font-semibold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-105 transition-all duration-300 h-12">
+                        <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
+                            <Button variant="outline" size="lg" className="rounded-full px-10 h-14 font-semibold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-105 transition-all duration-300">
                                 Learn more
                             </Button>
-                            <Button size="lg" className="rounded-full px-8 font-semibold bg-primary hover:bg-primary/90 text-white hover:scale-105 hover:shadow-xl transition-all duration-300 h-12 shadow-md">
+                            <Button size="lg" className="rounded-full px-10 h-14 font-semibold bg-primary hover:bg-primary/90 text-white hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-md">
                                 Book 30 minutes
                             </Button>
-                        </div>
-                    </div>
-
-                    {/* Right Side: Avatars Grid - Staggered Portrait Layout (3 Cols) */}
-                    <div className="flex justify-center lg:justify-end">
-                        <div className="grid grid-cols-3 gap-3 md:gap-4 items-end max-w-md">
-                            {/* Column 1: Just Bottom */}
-                            <div className="flex flex-col">
-                                <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
-                                    <img src="https://images.unsplash.com/photo-1551288049-bbda6465fba1?auto=format&fit=crop&q=80&w=400" alt="Data Analytics" className="w-full h-full object-cover" />
-                                </div>
-                            </div>
-
-                            {/* Column 2: Middle + Bottom */}
-                            <div className="flex flex-col gap-3 md:gap-4">
-                                <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
-                                    <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=400" alt="Tech Visual" className="w-full h-full object-cover" />
-                                </div>
-                                <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
-                                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400" alt="Dashboard" className="w-full h-full object-cover" />
-                                </div>
-                            </div>
-
-                            {/* Column 3: Highest + Bottom */}
-                            <div className="flex flex-col gap-3 md:gap-4">
-                                <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500 -translate-y-8 md:-translate-y-12">
-                                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400" alt="Hardware" className="w-full h-full object-cover" />
-                                </div>
-                                <div className="w-24 h-32 md:w-28 md:h-40 rounded-xl overflow-hidden shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-500">
-                                    <img src="https://images.unsplash.com/photo-1543286386-713bdd548da4?auto=format&fit=crop&q=80&w=400" alt="Graph" className="w-full h-full object-cover" />
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
