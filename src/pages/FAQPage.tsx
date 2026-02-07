@@ -213,7 +213,7 @@ export function FAQPage() {
                         <div className="flex gap-8 animate-marquee whitespace-nowrap min-w-full items-center">
                             {[...integrations, ...integrations].map((item, i) => (
                                 <div key={i} className="flex items-center gap-3 bg-white/50 backdrop-blur-sm border border-gray-100 rounded-2xl px-6 py-4 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300 group">
-                                    <div className="w-10 h-10 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500">
+                                    <div className="w-10 h-10 flex items-center justify-center transition-all duration-500">
                                         <img src={item.logo} alt={item.name} className="max-w-full max-h-full object-contain" />
                                     </div>
                                     <span className="font-bold text-[#101828] text-lg tracking-tight">{item.name}</span>
