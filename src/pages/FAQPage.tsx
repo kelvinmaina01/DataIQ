@@ -130,14 +130,15 @@ export function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden selection:bg-primary/10 selection:text-primary">
-            {/* Background Grid Pattern - Significantly more visible */}
+            {/* Background Grid Pattern - Softened for a premium, subtle look */}
             <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                    backgroundImage: `linear-gradient(to right, #e2e8f0 2px, transparent 2px), linear-gradient(to bottom, #e2e8f0 2px, transparent 2px)`,
+                    backgroundImage: `linear-gradient(to right, #94a3b8 1px, transparent 1px), linear-gradient(to bottom, #94a3b8 1px, transparent 1px)`,
                     backgroundSize: '40px 40px',
-                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 80%)',
-                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 80%)'
+                    opacity: 0.1,
+                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 100%)',
+                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 100%)'
                 }}
                 aria-hidden="true"
             />
