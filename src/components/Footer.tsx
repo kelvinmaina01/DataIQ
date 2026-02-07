@@ -1,9 +1,34 @@
 import logoImage from 'figma:asset/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
+import { Link } from 'react-router-dom';
 
 export function Footer() {
-  const productLinks = ["Dashboard", "Upload Data", "Datasets", "Experiments", "AI Models", "Automation"];
-  const featuresLinks = ["Analytics", "AI Insights", "AI Assistant", "Collaboration", "Reports", "Pricing"];
-  const companyLinks = ["About Us", "Blog", "Careers", "Contact", "Privacy Policy", "Terms of Service"];
+  const productLinks = [
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Upload Data", href: "/upload" },
+    { name: "Datasets", href: "/datasets" },
+    { name: "Experiments", href: "/experiments" },
+    { name: "AI Models", href: "/models" },
+    { name: "Automation", href: "/automation" }
+  ];
+
+  const featuresLinks = [
+    { name: "Analytics", href: "#" },
+    { name: "AI Insights", href: "#" },
+    { name: "AI Assistant", href: "#" },
+    { name: "Collaboration", href: "#" },
+    { name: "Reports", href: "#" },
+    { name: "Pricing", href: "#" }
+  ];
+
+  const companyLinks = [
+    { name: "About Us", href: "#" },
+    { name: "Blog", href: "#" },
+    { name: "Careers", href: "#" },
+    { name: "FAQ", href: "/faq" },
+    { name: "Contact", href: "#" },
+    { name: "Privacy Policy", href: "#" },
+    { name: "Terms of Service", href: "#" }
+  ];
 
   return (
     <footer className="bg-background border-t border-border relative overflow-hidden transition-colors duration-300">
@@ -56,9 +81,15 @@ export function Footer() {
             <ul className="space-y-2">
               {productLinks.map((link, index) => (
                 <li key={index}>
-                  <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {link}
-                  </a>
+                  {link.href.startsWith('/') ? (
+                    <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -69,9 +100,15 @@ export function Footer() {
             <ul className="space-y-2">
               {featuresLinks.map((link, index) => (
                 <li key={index}>
-                  <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {link}
-                  </a>
+                  {link.href.startsWith('/') ? (
+                    <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -82,9 +119,15 @@ export function Footer() {
             <ul className="space-y-2">
               {companyLinks.map((link, index) => (
                 <li key={index}>
-                  <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {link}
-                  </a>
+                  {link.href.startsWith('/') ? (
+                    <Link to={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
