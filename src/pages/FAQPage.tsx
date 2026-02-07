@@ -22,7 +22,9 @@ import {
     ChevronDown,
     Plus,
     Shield,
-    Lock
+    Lock,
+    ArrowRight,
+    Calendar
 } from 'lucide-react';
 
 const faqs = [
@@ -321,18 +323,20 @@ export function FAQPage() {
                     </div>
                 </div>
 
-                {/* CTA Section - Book a 1-on-1 onboarding - Increased top margin for balance */}
-                <div className="flex flex-col items-center justify-center text-center animate-slide-up max-w-4xl mx-auto mt-24 md:mt-40 mb-20 md:mb-28" style={{ animationDelay: '0.2s' }}>
-                    <div className="space-y-6">
-                        <h3 className="text-3xl lg:text-5xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
-                        <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                {/* CTA Section - Book a 1-on-1 onboarding - Enlarged buttons and icons */}
+                <div className="flex flex-col items-center justify-center text-center animate-slide-up max-w-4xl mx-auto mt-24 md:mt-40 mb-32 md:mb-48" style={{ animationDelay: '0.2s' }}>
+                    <div className="space-y-8">
+                        <h3 className="text-4xl lg:text-6xl font-bold text-[#101828] tracking-tight">Book a 1-on-1 onboarding</h3>
+                        <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                             Get up and running as fast as possible with a personalized onboarding call. We'll show you how everything works and how you can get started with DataIQ.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center">
-                            <Button variant="outline" size="lg" className="rounded-full px-10 h-14 font-semibold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-105 transition-all duration-300">
+                        <div className="flex flex-col sm:flex-row gap-6 pt-6 justify-center">
+                            <Button variant="outline" size="lg" className="rounded-full px-12 h-16 text-lg font-bold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-105 transition-all duration-300 flex items-center gap-3">
                                 Learn more
+                                <ArrowRight className="h-5 w-5" />
                             </Button>
-                            <Button size="lg" className="rounded-full px-10 h-14 font-semibold bg-primary hover:bg-primary/90 text-white hover:scale-105 hover:shadow-xl transition-all duration-300 shadow-md">
+                            <Button size="lg" className="rounded-full px-12 h-16 text-lg font-bold bg-primary hover:bg-primary/90 text-white hover:scale-105 hover:shadow-2xl transition-all duration-300 shadow-xl flex items-center gap-3">
+                                <Calendar className="h-5 w-5" />
                                 Book 30 minutes
                             </Button>
                         </div>
@@ -342,7 +346,7 @@ export function FAQPage() {
             </main>
 
             {/* Clear Separator and Spacing before Footer - Balanced and visible */}
-            <div className="w-full border-t border-gray-200 my-10 md:my-12" />
+            <div className="w-full border-t border-gray-200 mt-20 md:mt-32 mb-10 md:mb-12" />
 
             <Footer />
         </div>
