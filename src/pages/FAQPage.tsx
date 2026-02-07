@@ -130,14 +130,14 @@ export function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden selection:bg-primary/10 selection:text-primary">
-            {/* Background Grid Pattern - High Contrast for visibility */}
+            {/* Background Grid Pattern - Significantly more visible */}
             <div
-                className="absolute inset-0 pointer-events-none opacity-[0.15]"
+                className="absolute inset-0 pointer-events-none"
                 style={{
-                    backgroundImage: `linear-gradient(to right, #64748b 1px, transparent 1px), linear-gradient(to bottom, #64748b 1px, transparent_1px)`,
-                    backgroundSize: '48px 48px',
-                    maskImage: 'radial-gradient(circle at center, transparent 0%, black 100%)',
-                    WebkitMaskImage: 'radial-gradient(circle at center, transparent 0%, black 100%)'
+                    backgroundImage: `linear-gradient(to right, #e2e8f0 2px, transparent 2px), linear-gradient(to bottom, #e2e8f0 2px, transparent 2px)`,
+                    backgroundSize: '40px 40px',
+                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 80%)',
+                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.1) 0%, rgba(0,0,0,1) 80%)'
                 }}
                 aria-hidden="true"
             />
@@ -330,13 +330,13 @@ export function FAQPage() {
                         <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto">
                             Get up and running as fast as possible with a personalized onboarding call. We'll show you how everything works and how you can get started with DataIQ.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-10 pt-10 justify-center items-center w-full">
-                            <Button variant="outline" size="lg" className="rounded-full px-16 h-16 text-xl font-bold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-105 transition-all duration-300 flex items-center gap-4 min-w-[260px] whitespace-nowrap">
+                        <div className="flex flex-col sm:flex-row gap-8 md:gap-12 pt-12 justify-center items-center w-full">
+                            <Button variant="outline" size="lg" className="rounded-full px-16 h-20 text-2xl font-bold border-2 border-primary text-primary hover:bg-blue-50 hover:text-primary hover:scale-110 hover:shadow-xl transition-all duration-500 flex items-center gap-5 min-w-[280px] whitespace-nowrap group">
                                 Learn more
-                                <ArrowRight className="h-6 w-6" />
+                                <ArrowRight className="h-7 w-7 group-hover:translate-x-2 transition-transform" />
                             </Button>
-                            <Button size="lg" className="rounded-full px-16 h-16 text-xl font-bold bg-primary hover:bg-primary/90 text-white hover:scale-105 hover:shadow-2xl transition-all duration-300 shadow-xl flex items-center gap-4 min-w-[260px] whitespace-nowrap">
-                                <Calendar className="h-6 w-6" />
+                            <Button size="lg" className="rounded-full px-16 h-20 text-2xl font-bold bg-primary hover:bg-primary/90 text-white hover:scale-110 hover:shadow-2xl transition-all duration-500 shadow-xl flex items-center gap-5 min-w-[300px] whitespace-nowrap active:scale-95">
+                                <Calendar className="h-7 w-7" />
                                 Book 30 minutes
                             </Button>
                         </div>
