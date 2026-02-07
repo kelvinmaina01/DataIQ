@@ -201,7 +201,7 @@ export function FAQPage() {
                 <div className="mb-24 md:mb-32 overflow-hidden py-10 relative">
                     <div className="text-center mb-10">
                         <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-primary/60 mb-2">Powering your entire stack</h2>
-                        <p className="text-2xl font-bold text-[#101828]">Seamlessly connect with your favorite tools</p>
+                        <p className="text-2xl font-bold text-primary">Seamlessly connect with your favorite tools</p>
                     </div>
 
                     {/* Marquee Container */}
