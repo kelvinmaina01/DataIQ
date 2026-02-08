@@ -1,6 +1,6 @@
 # DataIQ: AI-Powered Data Intelligence Platform 🚀
 
-![DataIQ Pipeline Architecture](src/assets/data-pipeline-architecture.png)
+![DataIQ Platform Preview](src/assets/dataiq-landing-preview.png)
 
 ## 🌟 The Vision
 DataIQ is more than just a data tool—it's a comprehensive **AI-Powered Data Intelligence Startup** designed to transform how organizations interact with their data. From seamless ingestion to predictive analysis and automated workflows, DataIQ is built to be the central nervous system for your data-driven decision-making.
@@ -11,6 +11,8 @@ DataIQ is more than just a data tool—it's a comprehensive **AI-Powered Data In
 
 ### 🔌 Intelligent Data Connectors
 Seamlessly connect to your entire stack. Whether it's **Cloud Platforms** (Google Drive, S3), **Databases** (PostgreSQL, Snowflake, BigQuery), or **IoT Streams**, DataIQ ingests and profiles your data automatically.
+
+![DataIQ Pipeline Architecture](src/assets/data-pipeline-architecture.png)
 
 ### 🧠 AI-Driven Analysis
 Go beyond simple summaries. DataIQ uses frontier AI models (GPT-4o, Claude 3.5) to perform deep research, detect anomalies, and generate insights that drive real business value.
