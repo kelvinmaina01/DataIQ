@@ -10,14 +10,14 @@ export function Navigation() {
         <div className="flex items-center justify-between gap-4">
           {/* Logo & Brand (Left) */}
           <div className="flex items-center flex-shrink-0">
-            <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <Link to="/" className="flex items-center gap-3 group cursor-pointer transition-transform hover:scale-105 active:scale-95">
               <img
                 src={logoImage}
                 alt="DataIQ Logo"
                 className="h-16 sm:h-20 w-auto object-contain transition-transform group-hover:scale-110"
               />
               <span className="font-bold text-xl sm:text-2xl text-primary">DataIQ</span>
-            </div>
+            </Link>
           </div>
 
           {/* Navigation Links (Center) */}
@@ -27,8 +27,8 @@ export function Navigation() {
             <a href="#connectors" className="text-muted-foreground hover:text-primary transition-colors font-medium whitespace-nowrap">Connectors</a>
             <a href="#security" className="text-muted-foreground hover:text-primary transition-colors font-medium whitespace-nowrap">Security</a>
             <a href="#solutions" className="text-muted-foreground hover:text-primary transition-colors font-medium whitespace-nowrap">Solutions</a>
-            <a href="#pricing" className="text-muted-foreground hover:text-primary transition-colors font-medium whitespace-nowrap">Pricing</a>
-            <a href="#faq" className="text-muted-foreground hover:text-primary transition-colors font-medium whitespace-nowrap">FAQ</a>
+            <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors font-medium whitespace-nowrap">Pricing</Link>
+            <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors font-medium whitespace-nowrap">FAQ</Link>
           </div>
 
           {/* Action Buttons (Right) */}

@@ -16,7 +16,17 @@ import { ScrollToTop } from '../components/ScrollToTop';
 
 export function LandingPage() {
     return (
-        <div className="min-h-screen bg-transparent text-foreground transition-colors duration-300">
+        <div className="min-h-screen bg-transparent text-foreground transition-colors duration-300 relative overflow-hidden">
+            {/* Background Grid Pattern - Consistent with FAQ and Pricing pages */}
+            <div
+                className="absolute inset-0 pointer-events-none z-0"
+                style={{
+                    backgroundImage: `linear-gradient(to right, #1d4ed8 1px, transparent 1px), linear-gradient(to bottom, #1d4ed8 1px, transparent 1px)`,
+                    backgroundSize: '40px 40px',
+                    opacity: 0.08,
+                }}
+                aria-hidden="true"
+            />
             <Navigation />
             <HeroSection />
             <StudentBanner />

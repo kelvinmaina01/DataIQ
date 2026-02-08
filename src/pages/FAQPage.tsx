@@ -1,12 +1,17 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Navigation } from '../components/Navigation';
 import { Footer } from '../components/Footer';
+import { DataIQAssistant } from '../components/DataIQAssistant';
+import lobsterRobotImg from '../assets/lobster-robot.png';
+import logoImage from '../assets/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
+import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { Button } from '@/components/ui/button';
 import {
     Sparkles,
@@ -130,15 +135,13 @@ export function FAQPage() {
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden selection:bg-primary/10 selection:text-primary">
-            {/* Background Grid Pattern - Even fainter for maximum subtlety */}
+            {/* Background Grid Pattern - Synchronized with Pricing page for consistency */}
             <div
-                className="absolute inset-0 pointer-events-none"
+                className="absolute inset-0 pointer-events-none z-0"
                 style={{
-                    backgroundImage: `linear-gradient(to right, #94a3b8 1px, transparent 1px), linear-gradient(to bottom, #94a3b8 1px, transparent 1px)`,
+                    backgroundImage: `linear-gradient(to right, #1d4ed8 1px, transparent 1px), linear-gradient(to bottom, #1d4ed8 1px, transparent 1px)`,
                     backgroundSize: '40px 40px',
-                    opacity: 0.03,
-                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,1) 100%)',
-                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,1) 100%)'
+                    opacity: 0.08,
                 }}
                 aria-hidden="true"
             />
@@ -150,24 +153,29 @@ export function FAQPage() {
                 <div className="text-center mb-16 space-y-4 animate-fade-in relative">
                     <div className="flex justify-center mb-6">
                         <div className="bg-transparent p-0">
-                            <Sparkles className="h-8 w-8 text-[#101828]" fill="currentColor" />
+                            <img src={logoImage} alt="DataIQ Icon" className="h-14 w-auto object-contain" />
                         </div>
                     </div>
                     {/* Highlight 'questions' in primary color and stretch spacing */}
                     <h1 className="text-4xl md:text-5xl font-bold tracking-wider [word-spacing:4px] text-[#101828]">
                         Frequently asked <span className="text-primary">questions</span>
                     </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto tracking-wide [word-spacing:2px]">
-                        These are the most commonly asked questions about DataIQ and billing. <br className="hidden md:block" />
-                        Can't find what you're looking for? <a href="#" className="text-primary font-medium hover:underline underline-offset-4">Chat to our friendly team!</a>
+                    <p className="text-xl text-muted-foreground max-w-5xl mx-auto tracking-wide [word-spacing:2px]">
+                        These are the most commonly asked questions about DataIQ and billing.
+                        Can't find what you're looking for? <Link to="#" className="text-primary font-medium hover:underline underline-offset-4 ml-1">Chat to our friendly team!</Link>
                     </p>
                 </div>
 
-                {/* FAQ Accordion */}
-                <div className="max-w-3xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                    <Accordion type="single" collapsible className="w-full space-y-0">
+                {/* FAQ Accordion - Redesigned to Card Layout */}
+                <div className="max-w-4xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                    <Accordion type="single" collapsible className="w-full space-y-6">
                         {visibleFaqs.map((faq, index) => (
-                            <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-0 px-0">
+                            <AccordionItem
+                                key={index}
+                                value={`item-${index}`}
+                                className="bg-blue-50/40 backdrop-blur-sm border border-blue-100 rounded-2xl shadow-sm hover:shadow-md hover:bg-blue-50/60 transition-all duration-300 px-6 sm:px-8 overflow-hidden"
+                                style={{ border: '1px solid #dbeafe' }}
+                            >
                                 <AccordionTrigger className="hover:no-underline py-6 [&[data-state=open]]:text-primary transition-colors group">
                                     <div className="flex items-center gap-5 text-left w-full">
                                         {/* Updated icon color to blue theme */}
@@ -276,23 +284,23 @@ export function FAQPage() {
                                 </div>
                                 <div className="flex items-center gap-2 group">
                                     <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-gray-200 group-hover:border-primary/50 transition-colors">
-                                        <Lock className="h-5 w-5 text-gray-500 group-hover:text-primary" />
+                                        <div className="h-5 w-5 bg-gray-100 rounded-full animate-pulse-soft" />
                                     </div>
                                     <span className="font-semibold text-gray-600 group-hover:text-primary transition-colors">CCPA Ready</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Side: Visual - Using user-provided security map */}
-                        <div className="relative flex justify-center lg:justify-end">
-                            <div className="relative w-full max-w-lg aspect-square bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-gray-100 group transition-transform duration-700 hover:scale-[1.02]">
-                                <img
-                                    src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&q=80&w=800"
-                                    alt="Security & Compliance Diagram"
-                                    className="w-full h-full object-cover p-4 md:p-8"
+                        {/* Right Side: 3D Visuals Stack */}
+                        <div className="relative flex items-center justify-center py-10 lg:pl-10">
+                            {/* Lobster Robot - Main Visual (Increased Size) */}
+                            <div className="relative w-full max-w-2xl aspect-square transition-transform duration-700 hover:scale-105">
+                                <ImageWithFallback
+                                    src={lobsterRobotImg}
+                                    alt="DataIQ Lobster Assistant"
+                                    className="w-full h-full object-contain [filter:drop-shadow(0_20px_40px_rgba(29,78,216,0.25))]"
                                 />
-                                {/* Glass Overlay to make it feel premium */}
-                                <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none" />
+                                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-4/5 h-12 bg-black/5 blur-3xl rounded-[100%] transition-opacity duration-300 pointer-events-none" />
                             </div>
                         </div>
                     </div>
@@ -323,6 +331,7 @@ export function FAQPage() {
             {/* Clear Separator and Spacing before Footer - Balanced and visible */}
             <div className="w-full border-t border-gray-200 mt-32 md:mt-48 mb-16 md:mb-20" />
 
+            <DataIQAssistant />
             <Footer />
         </div>
     );
