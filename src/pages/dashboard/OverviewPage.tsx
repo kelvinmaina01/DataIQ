@@ -9,7 +9,8 @@ import {
     MoreVertical,
     Table as TableIcon,
     Circle,
-    AlertTriangle
+    AlertTriangle,
+    ChevronDown
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -68,7 +69,7 @@ export function OverviewPage() {
     return (
         <div className="max-w-[1600px] mx-auto animate-slide-up">
             {/* Welcome Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div className="text-left">
                     <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">
                         Welcome <span className="text-primary italic">John</span>
@@ -78,11 +79,16 @@ export function OverviewPage() {
                         Manage your data sources and AI insights from one central command center.
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button className="rounded-lg bg-primary text-white font-bold px-6 h-12 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Connect Dataset
-                    </Button>
+                <div className="flex items-center">
+                    <div className="flex items-stretch shadow-lg shadow-primary/20 rounded-lg overflow-hidden group hover:scale-[1.02] transition-transform">
+                        <Button className="rounded-none bg-primary text-white font-bold px-6 h-11 border-r border-white/20 hover:bg-primary/90">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Connect Dataset
+                        </Button>
+                        <Button className="rounded-none bg-primary text-white px-3 h-11 hover:bg-primary/90">
+                            <ChevronDown className="w-4 h-4" />
+                        </Button>
+                    </div>
                 </div>
             </div>
 
