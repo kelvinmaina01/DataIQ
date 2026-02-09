@@ -10,7 +10,8 @@ import {
     Table as TableIcon,
     Circle,
     AlertTriangle,
-    ChevronDown
+    ChevronDown,
+    Bot
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -92,7 +93,7 @@ export function OverviewPage() {
             </div>
 
             {/* Stats Cards Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
                 <StatCard
                     title="Total Rows Processed"
                     value="182.4M"
@@ -116,6 +117,14 @@ export function OverviewPage() {
                     trendType="up"
                     icon={Activity}
                     subtext="active syncing"
+                />
+                <StatCard
+                    title="Automations"
+                    value="12"
+                    trend="-1"
+                    trendType="down"
+                    icon={Bot}
+                    subtext="Limit"
                 />
                 <StatCard
                     title="System Latency"
