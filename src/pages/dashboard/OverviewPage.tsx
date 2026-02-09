@@ -68,8 +68,8 @@ export function OverviewPage() {
     return (
         <div className="max-w-[1600px] mx-auto animate-slide-up">
             {/* Welcome Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                <div>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+                <div className="text-left">
                     <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">
                         Welcome <span className="text-primary italic">John</span>
                     </h1>
@@ -79,12 +79,9 @@ export function OverviewPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button variant="outline" className="rounded-2xl border-2 border-primary text-primary font-bold px-6 hover:bg-primary/5">
-                        Compare Datasets
-                    </Button>
-                    <Button className="rounded-2xl bg-primary text-white font-bold px-6 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
-                        <Plus className="w-4 h-4" />
-                        New Ingestion
+                    <Button className="rounded-xl bg-primary text-white font-bold px-6 h-12 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Connect Dataset
                     </Button>
                 </div>
             </div>
