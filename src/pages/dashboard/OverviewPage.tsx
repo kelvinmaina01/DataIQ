@@ -79,7 +79,7 @@ export function OverviewPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Button className="rounded-xl bg-primary text-white font-bold px-6 h-12 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
+                    <Button className="rounded-lg bg-primary text-white font-bold px-6 h-12 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform">
                         <Plus className="w-4 h-4 mr-2" />
                         Connect Dataset
                     </Button>
