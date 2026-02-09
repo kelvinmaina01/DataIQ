@@ -11,7 +11,13 @@ import {
     Circle,
     AlertTriangle,
     ChevronDown,
-    Bot
+    Bot,
+    Telescope,
+    CheckCircle2,
+    RefreshCw,
+    Radio,
+    ShieldCheck,
+    ArrowRight
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -35,24 +41,134 @@ interface StatCardProps {
 
 function StatCard({ title, value, trend, trendType, icon: Icon, subtext }: StatCardProps) {
     return (
-        <div className="bg-white/80 backdrop-blur-sm border border-border/50 rounded-3xl p-6 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all group ring-1 ring-primary/5">
-            <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                    <Icon className="w-6 h-6 text-primary" />
+        <div className="bg-white/80 backdrop-blur-sm border border-border/50 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all group ring-1 ring-primary/5">
+            <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                    <Icon className="w-5 h-5 text-primary" />
                 </div>
-                <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${trendType === 'up' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${trendType === 'up' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
                     }`}>
-                    {trendType === 'up' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                    {trendType === 'up' ? <ArrowUpRight className="w-2.5 h-2.5" /> : <ArrowDownRight className="w-2.5 h-2.5" />}
                     {trend}
                 </div>
             </div>
             <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-                <div className="flex items-baseline gap-2">
-                    <h3 className="text-3xl font-bold text-foreground tracking-tight">{value}</h3>
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{subtext}</span>
+                <p className="text-[11px] font-semibold text-muted-foreground/80 mb-0.5">{title}</p>
+                <div className="flex items-baseline gap-1.5">
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">{value}</h3>
+                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">{subtext}</span>
                 </div>
             </div>
+        </div>
+    );
+}
+
+function IntelligenceCard({ title, subtitle, status, statusDesc, experiments, flow, icon: Icon, color }: any) {
+    return (
+        <div className="bg-white border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col h-full ring-1 ring-primary/5">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-full ${color === 'cyan' ? 'bg-cyan-50' : 'bg-emerald-50'} flex items-center justify-center`}>
+                        <Icon className={`w-6 h-6 ${color === 'cyan' ? 'text-cyan-600' : 'text-emerald-600'}`} />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-slate-900 text-lg flex items-center gap-1">
+                            {title}
+                            <div className="w-3 h-3 rounded-full border border-slate-300 flex items-center justify-center text-[8px] text-slate-400 font-bold">i</div>
+                        </h4>
+                        <p className="text-xs text-slate-500 font-medium">{subtitle}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="bg-slate-50 border border-slate-100 px-3 py-1 rounded-full flex items-center gap-2">
+                        <TrendingUp className="w-3 h-3 text-red-400 rotate-180" />
+                        <span className="text-[10px] font-bold text-slate-300">0 Active</span>
+                    </div>
+                    <RefreshCw className="w-4 h-4 text-slate-400 cursor-pointer hover:rotate-180 transition-transform duration-500" />
+                </div>
+            </div>
+
+            <div className="mb-8">
+                <div className="flex items-baseline gap-2 mb-1">
+                    <h2 className="text-4xl font-black text-slate-900 tracking-tight">{status}</h2>
+                    <span className="text-sm font-medium text-slate-400">{statusDesc}</span>
+                </div>
+            </div>
+
+            <div className="space-y-4 mb-8">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-slate-400">Experiment Velocity</span>
+                    <span className="text-emerald-500">{experiments}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-slate-400">Pipeline Flow</span>
+                    <span className="text-blue-500">{flow}</span>
+                </div>
+            </div>
+
+            <div className="mt-auto py-4 border-t border-slate-100 flex items-center gap-3">
+                <div className="w-6 h-6 rounded-full bg-cyan-50 flex items-center justify-center">
+                    <Zap className="w-3.5 h-3.5 text-cyan-600" />
+                </div>
+                <p className="text-xs text-slate-500 font-medium tracking-tight">
+                    Pipeline is clear. Ready to ingest new datasets.
+                </p>
+            </div>
+        </div>
+    );
+}
+
+function OptimizationCard({ title, subtitle, message, advice, icon: Icon }: any) {
+    return (
+        <div className="bg-white border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col h-full ring-1 ring-primary/5">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
+                        <Icon className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-slate-900 text-lg flex items-center gap-1">
+                            {title}
+                            <div className="w-3 h-3 rounded-full border border-slate-300 flex items-center justify-center text-[8px] text-slate-400 font-bold">i</div>
+                        </h4>
+                        <p className="text-xs text-slate-500 font-medium">{subtitle}</p>
+                    </div>
+                </div>
+                <RefreshCw className="w-4 h-4 text-slate-400 cursor-pointer hover:rotate-180 transition-transform duration-500" />
+            </div>
+
+            <div className="bg-emerald-50/30 border border-emerald-100/50 rounded-2xl p-5 mb-6">
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                    {message}
+                </p>
+            </div>
+
+            <div className="flex gap-3">
+                <CheckCircle2 className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
+                <p className="text-[13px] text-slate-500 font-medium leading-relaxed">
+                    {advice}
+                </p>
+            </div>
+        </div>
+    );
+}
+
+function FeatureCard({ title, subtitle, badge, icon: Icon, color }: any) {
+    return (
+        <div className={`bg-white border ${color === 'cyan' ? 'border-cyan-100' : 'border-purple-100'} rounded-3xl p-6 shadow-sm group hover:shadow-md transition-all`}>
+            <div className="flex items-center justify-between mb-6">
+                <div className={`w-14 h-14 rounded-2xl ${color === 'cyan' ? 'bg-cyan-50' : 'bg-purple-50'} flex items-center justify-center`}>
+                    <Icon className={`w-7 h-7 ${color === 'cyan' ? 'text-cyan-600' : 'text-purple-600'}`} />
+                </div>
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+            </div>
+
+            <h3 className="text-xl font-bold text-slate-900 mb-1">{title}</h3>
+            <p className="text-sm text-slate-500 font-medium mb-4">{subtitle}</p>
+
+            <span className={`inline-flex px-4 py-1.5 rounded-full text-xs font-bold text-white ${color === 'cyan' ? 'bg-purple-500/80' : 'bg-purple-500/80'}`}>
+                {badge}
+            </span>
         </div>
     );
 }
@@ -136,11 +252,32 @@ export function OverviewPage() {
                 />
             </div>
 
-            {/* Main Grid */}
+            {/* Dashboard Grid Row 1: IQ Insights */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                <IntelligenceCard
+                    title="Predictive Intelligence"
+                    subtitle="Operational Forecast"
+                    status="Standby"
+                    statusDesc="System Ready"
+                    experiments="0%"
+                    flow="100%"
+                    icon={Telescope}
+                    color="cyan"
+                />
+                <OptimizationCard
+                    title="Optimization Opportunity"
+                    subtitle="Detected Limiter"
+                    message="High query count may indicate inefficient queries or a large dataset."
+                    advice="Optimize queries by reindexing, redefining queries, and indexing columns used in WHERE and JOIN clauses."
+                    icon={CheckCircle2}
+                />
+            </div>
+
+            {/* Dashboard Grid Row 2: Recent Data & Features */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Table Section */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white/90 backdrop-blur-sm border border-border/50 rounded-[2rem] p-8 shadow-sm">
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="bg-white border border-border/50 rounded-[2rem] p-8 shadow-sm ring-1 ring-primary/5">
                         <div className="flex items-center justify-between mb-8">
                             <div className="flex items-center gap-3">
                                 <div className="p-2.5 bg-primary/10 rounded-xl">
@@ -199,91 +336,22 @@ export function OverviewPage() {
                     </div>
                 </div>
 
-                {/* Sidebar Widgets */}
+                {/* Spotlight Sidebar */}
                 <div className="space-y-8">
-                    {/* Analysis Widget */}
-                    <div className="bg-primary/5 border border-primary/10 rounded-[2rem] p-8 relative overflow-hidden group">
-                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors"></div>
-                        <h2 className="text-xl font-bold tracking-tight mb-2">Automated Insights</h2>
-                        <p className="text-sm text-muted-foreground/80 mb-6 font-medium leading-relaxed">
-                            Your data pipelines are healthy. 4 new anomalies were detected in Global Sales.
-                        </p>
-                        <div className="space-y-4">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="flex items-center gap-4 bg-white/60 p-4 rounded-2xl border border-primary/5 shadow-sm">
-                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">A{i}</div>
-                                    <div>
-                                        <p className="text-xs font-bold text-foreground">Outlier Detected</p>
-                                        <p className="text-[10px] text-muted-foreground">In Dataset "Marketing_Q4"</p>
-                                    </div>
-                                    <ArrowUpRight className="w-4 h-4 ml-auto text-primary opacity-40" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Live Sessions Widget */}
-                    <div className="bg-white/80 backdrop-blur-sm border border-border/50 rounded-[2rem] p-8 shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold tracking-tight">System Sessions</h2>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Live</span>
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between border-b border-border/30 pb-3">
-                                <span className="text-xs font-medium text-muted-foreground">Active Users</span>
-                                <span className="text-sm font-bold">1,204</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-muted-foreground">Response Time</span>
-                                <span className="text-sm font-bold text-primary">24ms</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Bottlenecks Widget */}
-                    <div className="bg-red-50/50 border border-red-100 rounded-[2rem] p-8 relative overflow-hidden group">
-                        <div className="absolute -right-4 -top-4 w-24 h-24 bg-red-500/5 rounded-full blur-3xl group-hover:bg-red-500/10 transition-colors"></div>
-                        <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-red-100 rounded-lg text-red-600">
-                                <AlertTriangle className="w-4 h-4" />
-                            </div>
-                            <h2 className="text-lg font-bold tracking-tight text-red-900">Bottlenecks</h2>
-                        </div>
-                        <div className="space-y-3">
-                            <div className="bg-white/60 p-3 rounded-2xl border border-red-200/50 flex items-center justify-between">
-                                <span className="text-[11px] font-bold text-red-800">S3 Connector Delay</span>
-                                <span className="text-[9px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">High</span>
-                            </div>
-                            <div className="bg-white/60 p-3 rounded-2xl border border-red-200/50 flex items-center justify-between">
-                                <span className="text-[11px] font-bold text-red-800">BigQuery Auth</span>
-                                <span className="text-[9px] font-bold bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full">Med</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Quick Connect Widget */}
-                    <div className="bg-white/80 backdrop-blur-sm border border-border/50 rounded-[2rem] p-8 shadow-sm">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-bold tracking-tight">System Health</h2>
-                            <Badge className="bg-green-100 text-green-700 hover:bg-green-100 text-[10px]">Operational</Badge>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-muted-foreground">Database Sync</span>
-                                <span className="text-primary">99.9%</span>
-                            </div>
-                            <div className="w-full h-1.5 bg-secondary/50 rounded-full overflow-hidden">
-                                <div className="w-[99.9%] h-full bg-primary rounded-full"></div>
-                            </div>
-                            <div className="flex items-center justify-between text-xs font-bold">
-                                <span className="text-muted-foreground">AI Queue</span>
-                                <span className="text-primary">Ready</span>
-                            </div>
-                        </div>
-                    </div>
+                    <FeatureCard
+                        title="Medical Device Streams"
+                        subtitle="Real-time IoT monitoring"
+                        badge="Pro Feature"
+                        icon={Radio}
+                        color="cyan"
+                    />
+                    <FeatureCard
+                        title="Data Anonymization"
+                        subtitle="PII/PHI detection pipeline"
+                        badge="Enterprise"
+                        icon={ShieldCheck}
+                        color="purple"
+                    />
                 </div>
             </div>
         </div>
