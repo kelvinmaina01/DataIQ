@@ -17,7 +17,13 @@ import {
     RefreshCw,
     Radio,
     ShieldCheck,
-    ArrowRight
+    ArrowRight,
+    ArrowUpRight,
+    ArrowDownRight,
+    Clock,
+    Users,
+    ClipboardPen,
+    AlertCircle
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
@@ -39,24 +45,38 @@ interface StatCardProps {
     subtext: string;
 }
 
-function StatCard({ title, value, trend, trendType, icon: Icon, subtext }: StatCardProps) {
+interface StatCardProps {
+    title: string;
+    value: string;
+    unit?: string;
+    trend: string;
+    trendType: 'up' | 'down' | 'neutral';
+    icon: any;
+    subtext: string;
+}
+
+function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext }: StatCardProps) {
     return (
-        <div className="bg-white border border-border/40 rounded-xl p-3 shadow-sm hover:shadow-md transition-all group overflow-hidden">
-            <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors shrink-0">
-                    <Icon className="w-4 h-4 text-primary" />
-                </div>
-                <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider truncate">{title}</p>
+        <div className="bg-white border border-slate-200/60 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col h-full ring-1 ring-slate-100/50">
+            <div className="flex items-center justify-between mb-8">
+                <p className="text-[13px] font-semibold text-slate-500">{title}</p>
+                <Icon className="w-5 h-5 text-slate-300 stroke-[1.5]" />
             </div>
-            <div className="flex items-end justify-between gap-2">
+            <div className="flex items-end justify-between mt-auto">
                 <div className="flex items-baseline gap-1.5">
-                    <h3 className="text-xl font-black text-slate-900 tracking-tight">{value}</h3>
-                    <span className="text-[9px] font-bold text-slate-400 truncate opacity-70 mb-0.5">{subtext}</span>
+                    <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{value}</h3>
+                    {unit && <span className="text-[11px] font-medium text-slate-400 mb-1">{unit}</span>}
                 </div>
-                <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black shrink-0 mb-0.5 ${trendType === 'up' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
-                    }`}>
-                    {trendType === 'up' ? <ArrowUpRight className="w-2.5 h-2.5" /> : <ArrowDownRight className="w-2.5 h-2.5" />}
-                    {trend}
+                <div className="flex flex-col items-end gap-1">
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold ${trendType === 'up' ? 'bg-emerald-50 text-emerald-600' :
+                            trendType === 'down' ? 'bg-red-50 text-red-600' :
+                                'bg-orange-50 text-orange-600'
+                        }`}>
+                        {trendType === 'up' ? <ArrowUpRight className="w-3 h-3" /> :
+                            trendType === 'down' ? <ArrowDownRight className="w-3 h-3" /> : null}
+                        {trend}
+                    </div>
+                    <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap">{subtext}</span>
                 </div>
             </div>
         </div>
@@ -186,69 +206,71 @@ export function OverviewPage() {
     return (
         <div className="max-w-[1600px] mx-auto animate-slide-up">
             {/* Welcome Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                <div className="text-left">
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+            <div className="flex flex-row items-start justify-between gap-6 mb-12">
+                <div className="text-left py-1">
+                    <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2">
                         Welcome John
                     </h1>
-                    <p className="text-slate-500 text-sm mt-1 font-medium">
-                        Manage your data sources and AI insights from one central command center.
+                    <p className="text-slate-500 text-base font-medium">
+                        Manage your patients and their account permissions here.
                     </p>
                 </div>
-                <div className="flex items-center">
-                    <div className="flex items-stretch shadow-sm rounded-lg overflow-hidden group hover:opacity-90 transition-opacity">
-                        <Button className="rounded-none bg-[#0277bd] text-white font-medium px-4 h-10 border-r border-white/10">
-                            <Plus className="w-3.5 h-3.5 mr-2" />
+                <div className="flex items-center pt-1">
+                    <div className="flex items-stretch shadow-md rounded-lg overflow-hidden group hover:opacity-90 transition-opacity">
+                        <Button className="rounded-none bg-[#1d70b8] text-white font-semibold px-5 h-12 border-r border-white/10 text-sm">
+                            <Plus className="w-4 h-4 mr-2" />
                             New Record
                         </Button>
-                        <Button className="rounded-none bg-[#0277bd] text-white px-2 h-10">
-                            <ChevronDown className="w-4 h-4" />
+                        <Button className="rounded-none bg-[#1d70b8] text-white px-3 h-12">
+                            <ChevronDown className="w-5 h-5" />
                         </Button>
                     </div>
                 </div>
             </div>
 
             {/* Stats Cards Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-14">
                 <StatCard
-                    title="Total Rows Processed"
-                    value="182.4M"
+                    title="Avg. Consultation Time"
+                    value="64"
+                    unit="mins"
                     trend="24%"
                     trendType="up"
-                    icon={Database}
+                    icon={Clock}
                     subtext="vs last month"
                 />
                 <StatCard
-                    title="AI Insights Generated"
-                    value="1,402"
+                    title="Patient Avg. Stay"
+                    value="4.3"
+                    unit="days"
                     trend="54%"
-                    trendType="up"
-                    icon={Zap}
+                    trendType="down"
+                    icon={Users}
                     subtext="vs last month"
                 />
                 <StatCard
-                    title="Active Connectors"
-                    value="12"
-                    trend="12%"
+                    title="Pending Reports"
+                    value="54"
+                    trend="79%"
                     trendType="up"
-                    icon={Activity}
-                    subtext="active syncing"
+                    icon={ClipboardPen}
+                    subtext="vs last month"
+                />
+                <StatCard
+                    title="Overdue Tasks"
+                    value="7"
+                    trend="32%"
+                    trendType="up"
+                    icon={AlertCircle}
+                    subtext="vs last month"
                 />
                 <StatCard
                     title="Automations"
                     value="12"
                     trend="-1"
-                    trendType="down"
+                    trendType="neutral"
                     icon={Bot}
                     subtext="Limit"
-                />
-                <StatCard
-                    title="System Latency"
-                    value="142ms"
-                    trend="8%"
-                    trendType="down"
-                    icon={TrendingUp}
-                    subtext="average speed"
                 />
             </div>
 
