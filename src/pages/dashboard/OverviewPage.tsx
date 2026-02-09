@@ -41,22 +41,22 @@ interface StatCardProps {
 
 function StatCard({ title, value, trend, trendType, icon: Icon, subtext }: StatCardProps) {
     return (
-        <div className="bg-white/80 backdrop-blur-sm border border-border/50 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all group ring-1 ring-primary/5">
-            <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                    <Icon className="w-5 h-5 text-primary" />
+        <div className="bg-white border border-border/40 rounded-xl p-3 shadow-sm hover:shadow-md transition-all group overflow-hidden">
+            <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors shrink-0">
+                    <Icon className="w-4 h-4 text-primary" />
                 </div>
-                <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${trendType === 'up' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+                <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider truncate">{title}</p>
+            </div>
+            <div className="flex items-end justify-between gap-2">
+                <div className="flex items-baseline gap-1.5">
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight">{value}</h3>
+                    <span className="text-[9px] font-bold text-slate-400 truncate opacity-70 mb-0.5">{subtext}</span>
+                </div>
+                <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[9px] font-black shrink-0 mb-0.5 ${trendType === 'up' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
                     }`}>
                     {trendType === 'up' ? <ArrowUpRight className="w-2.5 h-2.5" /> : <ArrowDownRight className="w-2.5 h-2.5" />}
                     {trend}
-                </div>
-            </div>
-            <div>
-                <p className="text-[11px] font-semibold text-muted-foreground/80 mb-0.5">{title}</p>
-                <div className="flex items-baseline gap-1.5">
-                    <h3 className="text-xl font-bold text-foreground tracking-tight">{value}</h3>
-                    <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">{subtext}</span>
                 </div>
             </div>
         </div>
