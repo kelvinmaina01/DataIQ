@@ -1,11 +1,10 @@
+import { useState, useEffect } from 'react';
 import {
     TrendingUp,
     Database,
     Zap,
     Activity,
     Plus,
-    ArrowUpRight,
-    ArrowDownRight,
     MoreVertical,
     Table as TableIcon,
     Circle,
@@ -39,15 +38,6 @@ import {
 interface StatCardProps {
     title: string;
     value: string;
-    trend: string;
-    trendType: 'up' | 'down';
-    icon: any;
-    subtext: string;
-}
-
-interface StatCardProps {
-    title: string;
-    value: string;
     unit?: string;
     trend: string;
     trendType: 'up' | 'down' | 'neutral';
@@ -56,11 +46,16 @@ interface StatCardProps {
 }
 
 function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext }: StatCardProps) {
+    if (!Icon) {
+        console.warn(`StatCard: Icon for "${title}" is undefined. Using AlerCircle fallback.`);
+    }
+    const SafeIcon = Icon || AlertCircle;
+
     return (
         <div className="bg-white border border-slate-200/60 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col h-full ring-1 ring-slate-100/50">
             <div className="flex items-center justify-between mb-8">
                 <p className="text-[13px] font-semibold text-slate-500">{title}</p>
-                <Icon className="w-5 h-5 text-slate-300 stroke-[1.5]" />
+                <SafeIcon className="w-5 h-5 text-slate-300 stroke-[1.5]" />
             </div>
             <div className="flex items-end justify-between mt-auto">
                 <div className="flex items-baseline gap-1.5">
@@ -69,8 +64,8 @@ function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext }:
                 </div>
                 <div className="flex flex-col items-end gap-1">
                     <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold ${trendType === 'up' ? 'bg-emerald-50 text-emerald-600' :
-                            trendType === 'down' ? 'bg-red-50 text-red-600' :
-                                'bg-orange-50 text-orange-600'
+                        trendType === 'down' ? 'bg-red-50 text-red-600' :
+                            'bg-orange-50 text-orange-600'
                         }`}>
                         {trendType === 'up' ? <ArrowUpRight className="w-3 h-3" /> :
                             trendType === 'down' ? <ArrowDownRight className="w-3 h-3" /> : null}
@@ -84,12 +79,13 @@ function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext }:
 }
 
 function IntelligenceCard({ title, subtitle, status, statusDesc, experiments, flow, icon: Icon, color }: any) {
+    const SafeIcon = Icon || AlertCircle;
     return (
         <div className="bg-white border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col h-full ring-1 ring-primary/5">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className={`w-12 h-12 rounded-full ${color === 'cyan' ? 'bg-cyan-50' : 'bg-emerald-50'} flex items-center justify-center`}>
-                        <Icon className={`w-6 h-6 ${color === 'cyan' ? 'text-cyan-600' : 'text-emerald-600'}`} />
+                        <SafeIcon className={`w-6 h-6 ${color === 'cyan' ? 'text-cyan-600' : 'text-emerald-600'}`} />
                     </div>
                     <div>
                         <h4 className="font-bold text-slate-900 text-lg flex items-center gap-1">
@@ -139,12 +135,13 @@ function IntelligenceCard({ title, subtitle, status, statusDesc, experiments, fl
 }
 
 function OptimizationCard({ title, subtitle, message, advice, icon: Icon }: any) {
+    const SafeIcon = Icon || AlertCircle;
     return (
         <div className="bg-white border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col h-full ring-1 ring-primary/5">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-emerald-600" />
+                        <SafeIcon className="w-6 h-6 text-emerald-600" />
                     </div>
                     <div>
                         <h4 className="font-bold text-slate-900 text-lg flex items-center gap-1">
@@ -174,11 +171,12 @@ function OptimizationCard({ title, subtitle, message, advice, icon: Icon }: any)
 }
 
 function FeatureCard({ title, subtitle, badge, icon: Icon, color }: any) {
+    const SafeIcon = Icon || AlertCircle;
     return (
         <div className={`bg-white border ${color === 'cyan' ? 'border-cyan-100' : 'border-purple-100'} rounded-3xl p-6 shadow-sm group hover:shadow-md transition-all`}>
             <div className="flex items-center justify-between mb-6">
                 <div className={`w-14 h-14 rounded-2xl ${color === 'cyan' ? 'bg-cyan-50' : 'bg-purple-50'} flex items-center justify-center`}>
-                    <Icon className={`w-7 h-7 ${color === 'cyan' ? 'text-cyan-600' : 'text-purple-600'}`} />
+                    <SafeIcon className={`w-7 h-7 ${color === 'cyan' ? 'text-cyan-600' : 'text-purple-600'}`} />
                 </div>
                 <ArrowRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
             </div>
@@ -202,7 +200,29 @@ const recentDatasets = [
 ];
 
 export function OverviewPage() {
+    const [hasError, setHasError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
+
+    useEffect(() => {
+        console.log("DataIQ: OverviewPage mounted successfully.");
+    }, []);
+
     console.log("DataIQ: OverviewPage rendering...");
+    console.log("Verified Icons:", {
+        Clock: !!Clock, Users: !!Users, ClipboardPen: !!ClipboardPen,
+        AlertCircle: !!AlertCircle, Bot: !!Bot, Telescope: !!Telescope,
+        CheckCircle2: !!CheckCircle2, Radio: !!Radio, ShieldCheck: !!ShieldCheck
+    });
+
+    if (hasError) {
+        return (
+            <div className="p-10 text-red-600 bg-red-50 rounded-2xl border border-red-200">
+                <h2 className="text-xl font-bold mb-2">Overview Page Error</h2>
+                <p className="font-mono text-sm">{errorMsg}</p>
+                <Button onClick={() => window.location.reload()} className="mt-4">Reload Page</Button>
+            </div>
+        );
+    }
     return (
         <div className="max-w-[1600px] mx-auto animate-slide-up">
             {/* Welcome Header */}
