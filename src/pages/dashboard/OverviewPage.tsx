@@ -71,21 +71,20 @@ export function OverviewPage() {
             {/* Welcome Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                 <div className="text-left">
-                    <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">
-                        Welcome <span className="text-primary italic">John</span>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                        Welcome John
                     </h1>
-                    <p className="text-muted-foreground text-sm font-medium flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <p className="text-slate-500 text-sm mt-1 font-medium">
                         Manage your data sources and AI insights from one central command center.
                     </p>
                 </div>
                 <div className="flex items-center">
-                    <div className="flex items-stretch shadow-lg shadow-primary/20 rounded-lg overflow-hidden group hover:scale-[1.02] transition-transform">
-                        <Button className="rounded-none bg-primary text-white font-bold px-6 h-11 border-r border-white/20 hover:bg-primary/90">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Connect Dataset
+                    <div className="flex items-stretch shadow-sm rounded-lg overflow-hidden group hover:opacity-90 transition-opacity">
+                        <Button className="rounded-none bg-[#0277bd] text-white font-medium px-4 h-10 border-r border-white/10">
+                            <Plus className="w-3.5 h-3.5 mr-2" />
+                            New Record
                         </Button>
-                        <Button className="rounded-none bg-primary text-white px-3 h-11 hover:bg-primary/90">
+                        <Button className="rounded-none bg-[#0277bd] text-white px-2 h-10">
                             <ChevronDown className="w-4 h-4" />
                         </Button>
                     </div>
