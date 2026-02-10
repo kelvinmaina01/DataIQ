@@ -13,6 +13,7 @@ import { BlankPage } from './pages/dashboard/BlankPage';
 import { SettingsPage } from './pages/dashboard/SettingsPage';
 import { ProfilePage } from './pages/dashboard/ProfilePage';
 import { NotificationsPage } from './pages/dashboard/NotificationsPage';
+import { DataIngestionPage } from './pages/dashboard/DataIngestionPage';
 import { Toaster } from 'sonner';
 import {
   LayoutGrid,
@@ -60,14 +61,14 @@ export default function App() {
             <Route index element={<OverviewPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="ingestion" element={<BlankPage title="Data Ingestion" icon={Import} />} />
+            <Route path="ingestion" element={<DataIngestionPage />} />
             <Route path="datasets" element={<BlankPage title="Datasets" icon={Database} />} />
             <Route path="notebook" element={<BlankPage title="AI Notebook" icon={BookOpen} />} />
             <Route path="auto-analysis" element={<BlankPage title="Auto Analysis" icon={Zap} />} />
             <Route path="chat" element={<BlankPage title="AI Chat" icon={MessagesSquare} />} />
             <Route path="pinned" element={<BlankPage title="Pinned Dashboards" icon={Files} />} />
             <Route path="reports" element={<BlankPage title="Reports" icon={FileText} />} />
-            <Route path="file-processor" element={<BlankPage title="File Processor" icon={FileSearch} />} />
+            <Route path="file-parser" element={<BlankPage title="File Parser" icon={FileSearch} />} />
             <Route path="my-files" element={<BlankPage title="My Files" icon={FolderOpen} />} />
             <Route path="models" element={<BlankPage title="AI Model Hub" icon={Cpu} />} />
             <Route path="security" element={<BlankPage title="Security & Audit" icon={ShieldCheck} />} />

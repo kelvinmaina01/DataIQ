@@ -53,7 +53,7 @@ const sidebarItems: SidebarItem[] = [
     { title: 'AI Chat', href: '/dashboard/chat', icon: MessagesSquare },
     { title: 'Pinned Dashboards', href: '/dashboard/pinned', icon: Files },
     { title: 'Reports', href: '/dashboard/reports', icon: FileText },
-    { title: 'File Processor', href: '/dashboard/file-processor', icon: FileSearch },
+    { title: 'File Parser', href: '/dashboard/file-parser', icon: FileSearch },
     { title: 'My Files', href: '/dashboard/my-files', icon: FolderOpen },
     { title: 'AI Model Hub', href: '/dashboard/models', icon: Cpu },
     { title: 'Security & Audit', href: '/dashboard/security', icon: ShieldCheck },

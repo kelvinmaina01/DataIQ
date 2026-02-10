@@ -1,6 +1,8 @@
 import { Wifi, CloudCog, ClipboardList, FolderUp, DatabaseZap, LineChart, Upload, Cloud, Link } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function ConnectData() {
+  const navigate = useNavigate();
   const sources = [
     {
       icon: Wifi,
@@ -94,15 +96,24 @@ export function ConnectData() {
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-6 sm:gap-8 mt-12 sm:mt-16 animate-slide-up px-4">
-          <button className="bg-primary text-primary-foreground px-8 py-4 text-base rounded-full hover:opacity-90 transition-all hover:scale-105 flex items-center justify-center gap-2 group font-bold shadow-lg active:scale-95">
+          <button
+            onClick={() => navigate('/dashboard/ingestion')}
+            className="bg-primary text-primary-foreground px-8 py-4 text-base rounded-full hover:opacity-90 transition-all hover:scale-105 flex items-center justify-center gap-2 group font-bold shadow-lg active:scale-95"
+          >
             <Upload className="size-5 transition-transform group-hover:-translate-y-0.5" />
             Upload Files
           </button>
-          <button className="border-2 border-border bg-background/50 backdrop-blur-sm px-8 py-4 text-base rounded-full hover:bg-accent hover:text-accent-foreground transition-all hover:scale-105 flex items-center justify-center gap-2 group font-bold active:scale-95 shadow-md">
+          <button
+            onClick={() => navigate('/dashboard/ingestion')}
+            className="border-2 border-border bg-background/50 backdrop-blur-sm px-8 py-4 text-base rounded-full hover:bg-accent hover:text-accent-foreground transition-all hover:scale-105 flex items-center justify-center gap-2 group font-bold active:scale-95 shadow-md"
+          >
             <Cloud className="size-5 text-primary" />
             Connect Cloud Sources
           </button>
-          <button className="border-2 border-border bg-background/50 backdrop-blur-sm px-8 py-4 text-base rounded-full hover:bg-accent hover:text-accent-foreground transition-all hover:scale-105 flex items-center justify-center gap-2 group font-bold active:scale-95 shadow-md">
+          <button
+            onClick={() => navigate('/dashboard/ingestion')}
+            className="border-2 border-border bg-background/50 backdrop-blur-sm px-8 py-4 text-base rounded-full hover:bg-accent hover:text-accent-foreground transition-all hover:scale-105 flex items-center justify-center gap-2 group font-bold active:scale-95 shadow-md"
+          >
             <Link className="size-5 text-primary" />
             Link Database
           </button>
