@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn } from './ui/utils';
-import logoImage from 'figma:asset/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
+import logoImage from '../assets/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
 
 export function DataIQAssistant() {
     const [isVisible, setIsVisible] = useState(false);

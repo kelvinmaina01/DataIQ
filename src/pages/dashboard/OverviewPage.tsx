@@ -22,10 +22,12 @@ import {
     Clock,
     Users,
     ClipboardPen,
-    AlertCircle
+    AlertCircle,
+    Crown
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
+import { cn } from '../../components/ui/utils';
 import {
     Table,
     TableBody,
@@ -43,150 +45,233 @@ interface StatCardProps {
     trendType: 'up' | 'down' | 'neutral';
     icon: any;
     subtext: string;
+    className?: string;
 }
 
-function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext }: StatCardProps) {
+function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext, className }: StatCardProps) {
     if (!Icon) {
-        console.warn(`StatCard: Icon for "${title}" is undefined. Using AlerCircle fallback.`);
+        console.warn(`StatCard: Icon for "${title}" is undefined. Using AlertCircle fallback.`);
     }
     const SafeIcon = Icon || AlertCircle;
+    const isRed = className?.includes('bg-[#FFF1F2]');
 
     return (
-        <div className="bg-white border border-slate-200/60 rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col h-full ring-1 ring-slate-100/50">
+        <div className={cn(
+            "border border-slate-100/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col h-full group",
+            className || "bg-white"
+        )}>
             <div className="flex items-center justify-between mb-8">
-                <p className="text-[13px] font-semibold text-slate-500">{title}</p>
-                <SafeIcon className="w-5 h-5 text-slate-300 stroke-[1.5]" />
+                <h4 className="text-[15px] font-bold text-slate-800 tracking-tight">{title}</h4>
+                <SafeIcon className={cn("w-5 h-5 stroke-[1.5]", isRed ? "text-rose-400" : "text-slate-400/60")} />
             </div>
+
             <div className="flex items-end justify-between mt-auto">
-                <div className="flex items-baseline gap-1.5">
-                    <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{value}</h3>
-                    {unit && <span className="text-[11px] font-medium text-slate-400 mb-1">{unit}</span>}
+                <div className="flex items-baseline gap-1">
+                    <span className={cn("text-4xl font-bold tracking-tighter", isRed ? "text-rose-600" : "text-[#0E50F6]")}>{value}</span>
+                    {unit && <span className="text-[11px] font-bold text-slate-400 mb-1.5">{unit}</span>}
                 </div>
+
                 <div className="flex flex-col items-end gap-1">
-                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold ${trendType === 'up' ? 'bg-emerald-50 text-emerald-600' :
-                        trendType === 'down' ? 'bg-red-50 text-red-600' :
-                            'bg-orange-50 text-orange-600'
-                        }`}>
-                        {trendType === 'up' ? <ArrowUpRight className="w-3 h-3" /> :
-                            trendType === 'down' ? <ArrowDownRight className="w-3 h-3" /> : null}
+                    <div className={cn(
+                        "flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold",
+                        trendType === 'up' ? 'bg-emerald-50 text-emerald-600' :
+                            trendType === 'down' ? 'bg-red-50 text-red-600' :
+                                'bg-orange-50 text-orange-600'
+                    )}>
+                        {trendType === 'up' && <ArrowUpRight className="w-3 h-3" />}
+                        {trendType === 'down' && <ArrowDownRight className="w-3 h-3" />}
                         {trend}
                     </div>
-                    <span className="text-[10px] font-medium text-slate-400 whitespace-nowrap">{subtext}</span>
+                    <span className="text-[10px] font-medium text-slate-400/80 tracking-wide text-right">
+                        {subtext}
+                    </span>
                 </div>
             </div>
         </div>
     );
 }
 
-function IntelligenceCard({ title, subtitle, status, statusDesc, experiments, flow, icon: Icon, color }: any) {
-    const SafeIcon = Icon || AlertCircle;
+function UsageCard({ title, value, max, unit, percent, plan, className }: any) {
     return (
-        <div className="bg-white border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col h-full ring-1 ring-primary/5">
+        <div className={cn(
+            "border border-slate-100/50 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-all flex flex-col h-full group ring-1 ring-[#0E50F6]/5",
+            className || "bg-white"
+        )}>
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-full ${color === 'cyan' ? 'bg-cyan-50' : 'bg-emerald-50'} flex items-center justify-center`}>
-                        <SafeIcon className={`w-6 h-6 ${color === 'cyan' ? 'text-cyan-600' : 'text-emerald-600'}`} />
+                <h4 className="text-2xl font-black text-slate-900 tracking-tighter">{title}</h4>
+                <div className="bg-[#0E50F6] text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+                    <Crown className="w-3.5 h-3.5 fill-current" />
+                    <span className="text-[10px] font-black uppercase tracking-wider">{plan}</span>
+                </div>
+            </div>
+
+            <div className="mb-6">
+                <p className="text-[15px] font-bold text-slate-400">
+                    <span className="text-slate-900">{value}</span> / {max} {unit}
+                </p>
+            </div>
+
+            <div className="mt-auto">
+                <div className="w-full bg-white/50 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200/50">
+                    <div
+                        className="bg-[#0E50F6] h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(14,80,246,0.5)]"
+                        style={{ width: `${percent}%` }}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function IntelligenceCard({ title, subtitle, status, statusDesc, experiments, flow, icon: Icon, priority }: any) {
+    const SafeIcon = Icon || AlertCircle;
+    const isRed = priority === 'high';
+    const brandColor = isRed ? '#ef4444' : '#0E50F6';
+    const brandBg = isRed ? 'bg-red-50' : 'bg-[#0E50F6]/10';
+
+    return (
+        <div className={cn(
+            "bg-white border rounded-[2rem] p-8 shadow-sm flex flex-col h-full ring-1 transition-all hover:shadow-md",
+            isRed ? "border-red-100 ring-red-500/10" : "border-border/50 ring-primary/5"
+        )}>
+            <div className="flex items-start justify-between mb-10">
+                <div className="flex gap-4">
+                    <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center", brandBg)}>
+                        <SafeIcon className="w-7 h-7" style={{ color: brandColor }} />
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-900 text-lg flex items-center gap-1">
+                        <h4 className="text-lg font-bold flex items-center gap-2">
                             {title}
-                            <div className="w-3 h-3 rounded-full border border-slate-300 flex items-center justify-center text-[8px] text-slate-400 font-bold">i</div>
+                            <div className="w-4 h-4 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 font-bold cursor-help">i</div>
                         </h4>
-                        <p className="text-xs text-slate-500 font-medium">{subtitle}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{subtitle}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
-                    <div className="bg-slate-50 border border-slate-100 px-3 py-1 rounded-full flex items-center gap-2">
-                        <TrendingUp className="w-3 h-3 text-red-400 rotate-180" />
-                        <span className="text-[10px] font-bold text-slate-300">0 Active</span>
+                    <div className={cn(
+                        "px-3 py-1 rounded-full flex items-center gap-2 border",
+                        isRed ? "bg-red-50 border-red-100" : "bg-emerald-50 border-emerald-100"
+                    )}>
+                        <TrendingUp className={cn("w-3 h-3", isRed ? "text-red-500" : "text-emerald-500")} />
+                        <span className={cn("text-[10px] font-bold uppercase", isRed ? "text-red-600" : "text-emerald-600")}>
+                            {isRed ? "Priority" : "Active"}
+                        </span>
                     </div>
-                    <RefreshCw className="w-4 h-4 text-slate-400 cursor-pointer hover:rotate-180 transition-transform duration-500" />
+                    <RefreshCw className="w-4 h-4 text-slate-300 cursor-pointer hover:rotate-180 transition-transform duration-700" />
                 </div>
             </div>
 
             <div className="mb-8">
                 <div className="flex items-baseline gap-2 mb-1">
-                    <h2 className="text-4xl font-black text-slate-900 tracking-tight">{status}</h2>
-                    <span className="text-sm font-medium text-slate-400">{statusDesc}</span>
+                    <h2 className={cn("text-5xl font-bold tracking-tighter", isRed ? "text-red-600" : "text-[#0E50F6]")}>{status}</h2>
+                    <span className="text-sm font-bold text-slate-400 uppercase">{statusDesc}</span>
                 </div>
             </div>
 
-            <div className="space-y-4 mb-8">
-                <div className="flex items-center justify-between text-xs font-semibold">
+            <div className="space-y-4 mb-8 bg-slate-50/50 p-5 rounded-2xl border border-slate-100/50">
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-tight">
                     <span className="text-slate-400">Experiment Velocity</span>
-                    <span className="text-emerald-500">{experiments}</span>
+                    <span className={isRed ? "text-red-600" : "text-emerald-600"}>{experiments}</span>
                 </div>
-                <div className="flex items-center justify-between text-xs font-semibold">
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-tight">
                     <span className="text-slate-400">Pipeline Flow</span>
-                    <span className="text-blue-500">{flow}</span>
+                    <span style={{ color: brandColor }}>{flow}</span>
                 </div>
             </div>
 
-            <div className="mt-auto py-4 border-t border-slate-100 flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-cyan-50 flex items-center justify-center">
-                    <Zap className="w-3.5 h-3.5 text-cyan-600" />
+            <div className="mt-auto py-5 border-t border-slate-100 flex items-center gap-3">
+                <div className={cn("w-7 h-7 rounded-full flex items-center justify-center", brandBg)}>
+                    <Zap className="w-4 h-4" style={{ color: brandColor }} />
                 </div>
-                <p className="text-xs text-slate-500 font-medium tracking-tight">
-                    Pipeline is clear. Ready to ingest new datasets.
+                <p className="text-xs text-slate-500 font-bold tracking-tight">
+                    {isRed ? "Critical limiter detected. Ingestion pathing throttled." : "Pipeline is clear. Ready to ingest new datasets."}
                 </p>
             </div>
         </div>
     );
 }
 
-function OptimizationCard({ title, subtitle, message, advice, icon: Icon }: any) {
+function OptimizationCard({ title, subtitle, message, advice, icon: Icon, priority }: any) {
     const SafeIcon = Icon || AlertCircle;
+    const isRed = priority === 'high';
+
     return (
-        <div className="bg-white border border-border/50 rounded-3xl p-6 shadow-sm flex flex-col h-full ring-1 ring-primary/5">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center">
-                        <SafeIcon className="w-6 h-6 text-emerald-600" />
+        <div className={cn(
+            "bg-white border rounded-[2rem] p-8 shadow-sm flex flex-col h-full ring-1 transition-all hover:shadow-md",
+            isRed ? "border-red-100 ring-red-500/10" : "border-border/50 ring-primary/5"
+        )}>
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                    <div className={cn(
+                        "w-14 h-14 rounded-2xl flex items-center justify-center",
+                        isRed ? "bg-red-50" : "bg-emerald-50"
+                    )}>
+                        <SafeIcon className={cn("w-7 h-7", isRed ? "text-red-500" : "text-emerald-600")} />
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-900 text-lg flex items-center gap-1">
+                        <h4 className="text-lg font-bold flex items-center gap-2">
                             {title}
-                            <div className="w-3 h-3 rounded-full border border-slate-300 flex items-center justify-center text-[8px] text-slate-400 font-bold">i</div>
+                            <div className="w-4 h-4 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 font-bold cursor-help">i</div>
                         </h4>
-                        <p className="text-xs text-slate-500 font-medium">{subtitle}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{subtitle}</p>
                     </div>
                 </div>
-                <RefreshCw className="w-4 h-4 text-slate-400 cursor-pointer hover:rotate-180 transition-transform duration-500" />
+                <Badge variant="outline" className={cn(
+                    "font-black text-[10px] uppercase px-3 py-1",
+                    isRed ? "bg-red-50 text-red-600 border-red-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"
+                )}>
+                    {isRed ? "Priority Alert" : "Detected"}
+                </Badge>
             </div>
 
-            <div className="bg-emerald-50/30 border border-emerald-100/50 rounded-2xl p-5 mb-6">
-                <p className="text-sm text-slate-600 font-medium leading-relaxed">
-                    {message}
-                </p>
-            </div>
+            <p className="text-base font-bold text-slate-900 leading-tight mb-6">{message}</p>
 
-            <div className="flex gap-3">
-                <CheckCircle2 className="w-4 h-4 text-cyan-500 shrink-0 mt-0.5" />
-                <p className="text-[13px] text-slate-500 font-medium leading-relaxed">
-                    {advice}
-                </p>
+            <div className={cn(
+                "mt-auto p-5 rounded-2xl border",
+                isRed ? "bg-red-50/30 border-red-100/50" : "bg-emerald-50/30 border-emerald-100/50"
+            )}>
+                <div className="flex gap-4">
+                    {isRed ? <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" /> : <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />}
+                    <p className="text-[13px] text-slate-700 font-bold leading-relaxed italic">
+                        {advice}
+                    </p>
+                </div>
             </div>
         </div>
     );
 }
 
-function FeatureCard({ title, subtitle, badge, icon: Icon, color }: any) {
+function FeatureCard({ title, subtitle, badge, metrics, icon: Icon }: any) {
     const SafeIcon = Icon || AlertCircle;
     return (
-        <div className={`bg-white border ${color === 'cyan' ? 'border-cyan-100' : 'border-purple-100'} rounded-3xl p-6 shadow-sm group hover:shadow-md transition-all`}>
-            <div className="flex items-center justify-between mb-6">
-                <div className={`w-14 h-14 rounded-2xl ${color === 'cyan' ? 'bg-cyan-50' : 'bg-purple-50'} flex items-center justify-center`}>
-                    <SafeIcon className={`w-7 h-7 ${color === 'cyan' ? 'text-cyan-600' : 'text-purple-600'}`} />
+        <div className="bg-white border border-[#0E50F6]/20 rounded-[2rem] p-8 shadow-sm group hover:shadow-md transition-all ring-1 ring-[#0E50F6]/5 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-8">
+                <div className="w-16 h-16 rounded-[1.25rem] bg-[#0E50F6]/10 flex items-center justify-center">
+                    <SafeIcon className="w-8 h-8 text-[#0E50F6]" />
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center gap-3">
+                    <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0E50F6]/10 text-[#0E50F6]">
+                        {badge}
+                    </span>
+                    <ArrowRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-transform group-hover:text-[#0E50F6]" />
+                </div>
             </div>
 
-            <h3 className="text-xl font-bold text-slate-900 mb-1">{title}</h3>
-            <p className="text-sm text-slate-500 font-medium mb-4">{subtitle}</p>
+            <div className="mb-8">
+                <h3 className="text-2xl font-bold text-slate-900 mb-1 tracking-tight">{title}</h3>
+                <p className="text-sm text-slate-400 font-bold uppercase tracking-tight">{subtitle}</p>
+            </div>
 
-            <span className={`inline-flex px-4 py-1.5 rounded-full text-xs font-bold text-white ${color === 'cyan' ? 'bg-purple-500/80' : 'bg-purple-500/80'}`}>
-                {badge}
-            </span>
+            {metrics && (
+                <div className="mt-auto pt-6 border-t border-slate-50 grid grid-cols-2 gap-6">
+                    {metrics.map((m: any, i: number) => (
+                        <div key={i}>
+                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{m.label}</p>
+                            <p className={`text-xl font-black tracking-tighter ${m.color === 'red' ? 'text-red-500' : m.color === 'green' ? 'text-emerald-500' : 'text-[#0E50F6]'}`}>{m.value}</p>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
@@ -229,104 +314,78 @@ export function OverviewPage() {
             <div className="flex flex-row items-start justify-between gap-6 mb-12">
                 <div className="text-left py-1">
                     <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2">
-                        Welcome John
+                        Welcome <span className="text-[#0E50F6]">John</span>
                     </h1>
-                    <p className="text-slate-500 text-base font-medium">
-                        Manage your patients and their account permissions here.
+                    <p className="text-slate-500 text-lg font-bold">
+                        Manage your <span className="text-[#0E50F6]">data intelligence and account permissions</span> here.
                     </p>
                 </div>
                 <div className="flex items-center pt-1">
                     <div className="flex items-stretch shadow-md rounded-lg overflow-hidden group hover:opacity-90 transition-opacity">
-                        <Button className="rounded-none bg-[#1d70b8] text-white font-semibold px-5 h-12 border-r border-white/10 text-sm">
+                        <Button className="rounded-none !bg-[#0E50F6] hover:!bg-[#0D44D1] text-white font-semibold px-5 h-12 border-r border-white/10 text-sm">
                             <Plus className="w-4 h-4 mr-2" />
-                            New Record
+                            New Dataset
                         </Button>
-                        <Button className="rounded-none bg-[#1d70b8] text-white px-3 h-12">
+                        <Button className="rounded-none !bg-[#0E50F6] hover:!bg-[#0D44D1] text-white px-3 h-12">
                             <ChevronDown className="w-5 h-5" />
                         </Button>
                     </div>
                 </div>
             </div>
 
-            {/* Stats Cards Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-14">
-                <StatCard
-                    title="Avg. Consultation Time"
-                    value="64"
-                    unit="mins"
-                    trend="24%"
-                    trendType="up"
-                    icon={Clock}
-                    subtext="vs last month"
+            {/* Usage & Plan Summary Tier */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <UsageCard
+                    title="Storage"
+                    value="3.6"
+                    max="10240"
+                    unit="MB"
+                    percent={35}
+                    plan="Pro"
+                    className="bg-[#F0F4FF]"
                 />
-                <StatCard
-                    title="Patient Avg. Stay"
-                    value="4.3"
-                    unit="days"
-                    trend="54%"
-                    trendType="down"
-                    icon={Users}
-                    subtext="vs last month"
+                <UsageCard
+                    title="AI Ops"
+                    value="0.0"
+                    max="10000"
+                    unit="req"
+                    percent={0}
+                    plan="Pro"
+                    className="bg-[#EEF2FF]"
                 />
-                <StatCard
-                    title="Pending Reports"
-                    value="54"
-                    trend="79%"
-                    trendType="up"
-                    icon={ClipboardPen}
-                    subtext="vs last month"
+                <UsageCard
+                    title="Datasets"
+                    value="11.0"
+                    max="100"
+                    unit="files"
+                    percent={11}
+                    plan="Pro"
+                    className="bg-[#F0F9FF]"
                 />
-                <StatCard
-                    title="Overdue Tasks"
-                    value="7"
-                    trend="32%"
-                    trendType="up"
-                    icon={AlertCircle}
-                    subtext="vs last month"
-                />
-                <StatCard
-                    title="Automations"
-                    value="12"
-                    trend="-1"
-                    trendType="neutral"
-                    icon={Bot}
-                    subtext="Limit"
+                <UsageCard
+                    title="Models"
+                    value="0"
+                    max="50"
+                    unit="models"
+                    percent={0}
+                    plan="Pro"
+                    className="bg-[#F5F3FF]"
                 />
             </div>
 
-            {/* Dashboard Grid Row 1: IQ Insights */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-                <IntelligenceCard
-                    title="Predictive Intelligence"
-                    subtitle="Operational Forecast"
-                    status="Standby"
-                    statusDesc="System Ready"
-                    experiments="0%"
-                    flow="100%"
-                    icon={Telescope}
-                    color="cyan"
-                />
-                <OptimizationCard
-                    title="Optimization Opportunity"
-                    subtitle="Detected Limiter"
-                    message="High query count may indicate inefficient queries or a large dataset."
-                    advice="Optimize queries by reindexing, redefining queries, and indexing columns used in WHERE and JOIN clauses."
-                    icon={CheckCircle2}
-                />
-            </div>
 
-            {/* Dashboard Grid Row 2: Recent Data & Features */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Table Section */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white border border-border/50 rounded-[2rem] p-8 shadow-sm ring-1 ring-primary/5">
+            {/* Main Content Grid: Table + Sidebar Stats */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+                {/* Table Section (Left) */}
+                <div className="lg:col-span-8">
+                    <div className="bg-white border border-border/50 rounded-[2rem] p-8 shadow-sm ring-1 ring-primary/5 h-full">
                         <div className="flex items-center justify-between mb-8">
                             <div className="flex items-center gap-3">
-                                <div className="p-2.5 bg-primary/10 rounded-xl">
-                                    <TableIcon className="w-5 h-5 text-primary" />
+                                <div className="p-2.5 bg-[#0E50F6]/10 rounded-xl">
+                                    <TableIcon className="w-5 h-5 text-[#0E50F6]" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold tracking-tight">Recent Datasets</h2>
+                                    <h2 className="text-xl font-bold tracking-tight text-[#0E50F6]">Recent Datasets</h2>
                                     <p className="text-xs font-medium text-muted-foreground">Successfully ingested source files</p>
                                 </div>
                             </div>
@@ -338,10 +397,10 @@ export function OverviewPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="border-none hover:bg-transparent">
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 p-4">Dataset Name</TableHead>
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 p-4 text-center">Source</TableHead>
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 p-4 text-center">Row Count</TableHead>
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 p-4 text-center">Status</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4">Dataset Name</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4 text-center">Source</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4 text-center">Row Count</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4 text-center">Status</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -362,7 +421,7 @@ export function OverviewPage() {
                                         <TableCell className="p-4 text-center">
                                             <div className="flex items-center justify-center gap-2">
                                                 <Circle className={`w-2 h-2 fill-current ${dataset.status === 'Ready' ? 'text-green-500' :
-                                                    dataset.status === 'Processing' ? 'text-blue-500 animate-pulse' : 'text-amber-500'
+                                                    dataset.status === 'Processing' ? 'text-[#0E50F6] animate-pulse' : 'text-amber-500'
                                                     }`} />
                                                 <span className="text-xs font-bold">{dataset.status}</span>
                                             </div>
@@ -372,30 +431,65 @@ export function OverviewPage() {
                             </TableBody>
                         </Table>
 
-                        <Button variant="ghost" className="w-full mt-6 text-xs font-bold text-primary hover:bg-primary/5 rounded-xl border border-dashed border-primary/20">
+                        <Button variant="ghost" className="w-full mt-6 text-xs font-bold text-[#0E50F6] hover:bg-[#0E50F6]/5 rounded-xl border border-dashed border-[#0E50F6]/20">
                             View All Datasets
                         </Button>
                     </div>
                 </div>
 
-                {/* Spotlight Sidebar */}
-                <div className="space-y-8">
-                    <FeatureCard
-                        title="Medical Device Streams"
-                        subtitle="Real-time IoT monitoring"
-                        badge="Pro Feature"
-                        icon={Radio}
-                        color="cyan"
+                {/* Sidebar Stats (Right) */}
+                <div className="lg:col-span-4 flex flex-col gap-4">
+                    <StatCard
+                        title="Total Rows Processed"
+                        value="1.2"
+                        unit="M"
+                        trend="+12%"
+                        trendType="up"
+                        icon={Database}
+                        subtext="vs last month"
+                        className="bg-[#F0F4FF]"
                     />
-                    <FeatureCard
-                        title="Data Anonymization"
-                        subtitle="PII/PHI detection pipeline"
-                        badge="Enterprise"
-                        icon={ShieldCheck}
-                        color="purple"
+                    <StatCard
+                        title="AI Insights Generated"
+                        value="842"
+                        trend="+24%"
+                        trendType="up"
+                        icon={Zap}
+                        subtext="vs last month"
+                        className="bg-[#F5F3FF]"
+                    />
+                    <StatCard
+                        title="Active Connectors"
+                        value="24"
+                        trend="Stable"
+                        trendType="neutral"
+                        icon={Activity}
+                        subtext="Live now"
+                        className="bg-[#F0FDF4]"
+                    />
+                    <StatCard
+                        title="Automations"
+                        value="12"
+                        trend="+1"
+                        trendType="up"
+                        icon={Bot}
+                        subtext="New this week"
+                        className="bg-[#FFF7ED]"
+                    />
+                    <StatCard
+                        title="Average Latency"
+                        value="48"
+                        unit="ms"
+                        trend="-12ms"
+                        trendType="up"
+                        icon={Clock}
+                        subtext="Optimization active"
+                        className="bg-[#FFF1F2]"
                     />
                 </div>
             </div>
+
+
         </div>
     );
 }

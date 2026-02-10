@@ -32,7 +32,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "../../components/ui/tooltip";
-import logoImage from 'figma:asset/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
+import logoImage from '../../assets/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
 
 interface SidebarItem {
     title: string;
@@ -184,13 +184,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                             {isSidebarOpen ? <PanelLeft className="w-5 h-5" /> : <PanelRight className="w-5 h-5" />}
                         </Button>
 
-                        <div className="relative w-full group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                            <input
-                                type="text"
-                                placeholder="Search datasets, insights, reports... (⌘ + F)"
-                                className="w-full bg-secondary/30 border border-border/40 rounded-full py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all shadow-sm"
-                            />
+                        <div className="flex-1 max-w-2xl group">
+                            <div className="relative flex items-center bg-primary/[0.02] border border-primary/30 rounded-2xl px-4 py-2.5 group-focus-within:bg-white group-focus-within:ring-[4px] group-focus-within:ring-primary/10 group-focus-within:border-primary transition-all shadow-sm hover:bg-primary/[0.04] hover:border-primary/50">
+                                <Search className="w-5 h-5 text-primary/60 group-focus-within:text-primary transition-colors flex-shrink-0" />
+                                <input
+                                    type="text"
+                                    placeholder="Search datasets, insights, reports... (⌘ + F)"
+                                    className="flex-1 bg-transparent border-none outline-none pl-3 text-[15px] font-bold placeholder:text-primary/30 text-foreground focus:ring-0"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -203,7 +205,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                                 <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Enterprise Plan</p>
                             </div>
                             <Avatar className="h-10 w-10 ring-2 ring-primary/10 transition-transform hover:scale-105 cursor-pointer">
-                                <AvatarImage src="https://ui-avatars.com/api/?name=John+Carter&background=1d4ed8&color=fff" />
+                                <AvatarImage src="https://ui-avatars.com/api/?name=John+Carter&background=0E50F6&color=fff" />
                                 <AvatarFallback>JC</AvatarFallback>
                             </Avatar>
                         </div>

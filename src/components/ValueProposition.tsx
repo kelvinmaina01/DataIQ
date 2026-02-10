@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import image1 from 'figma:asset/afcc58faa7429bb996605d70395eadcd46203350.png';
-import image2 from 'figma:asset/68ef41b2b29c59479aaab859caaed19800c882bf.png';
-import image3 from 'figma:asset/f1d5ae56d89c2d484b839a11d99436fb096e3b0b.png';
+import image1 from '../assets/afcc58faa7429bb996605d70395eadcd46203350.png';
+import image2 from '../assets/68ef41b2b29c59479aaab859caaed19800c882bf.png';
+import image3 from '../assets/f1d5ae56d89c2d484b839a11d99436fb096e3b0b.png';
 
 export function ValueProposition() {
   const [isVisible, setIsVisible] = useState<boolean[]>([false, false, false]);

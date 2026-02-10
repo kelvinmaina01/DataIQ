@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import logoImage from 'figma:asset/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
+import logoImage from '../../assets/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
 import authVisual from '../../assets/auth-visual-final.jpg';
 
 export function AuthLayout() {

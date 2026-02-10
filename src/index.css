@@ -3,9 +3,9 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
-  --color-primary: #1d4ed8;
+  --color-primary: #0E50F6;
   /* oklch(.546 .245 262.881) from static file */
-  --color-brand-blue: #1d4ed8;
+  --color-brand-blue: #0E50F6;
 
   --container-7xl: 80rem;
 

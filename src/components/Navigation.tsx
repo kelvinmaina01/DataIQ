@@ -1,4 +1,4 @@
-import logoImage from 'figma:asset/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
+import logoImage from '../assets/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
 import { Button } from './ui/button';
 import { User } from 'lucide-react';
 import { Link } from 'react-router-dom';
