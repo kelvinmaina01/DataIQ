@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { toast } from 'sonner';
 import {
     LayoutGrid,
     Import,
@@ -22,7 +25,8 @@ import {
     Menu,
     X,
     ChevronRight,
-    MessageSquare
+    MessageSquare,
+    UserCircle
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
@@ -57,8 +61,62 @@ const sidebarItems: SidebarItem[] = [
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
     const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            if (currentUser) {
+                if (currentUser.emailVerified) {
+                    setUser(currentUser);
+                    setLoading(false);
+                } else {
+                    // Block access if email not verified
+                    await signOut(auth);
+                    toast.error("Please verify your email to access the dashboard.");
+                    navigate(`/verify-email?email=${encodeURIComponent(currentUser.email || '')}`);
+                }
+            } else {
+                // If not logged in, redirect to login
+                navigate('/login');
+            }
+        });
+        return () => unsubscribe();
+    }, [navigate]);
+
+    const handleLogout = async () => {
+        setLoading(true);
+        try {
+            await signOut(auth);
+            toast.success("Successfully logged out");
+            navigate('/login');
+        } catch (error: any) {
+            console.error("Logout error:", error);
+            toast.error("Failed to log out");
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+                    <p className="text-sm font-medium text-primary animate-pulse tracking-wide">Securing Session...</p>
+                </div>
+            </div>
+        );
+    }
+
     console.log("DataIQ: DashboardLayout rendering. Path:", location.pathname);
+
+    // Default values if user info is missing
+    const displayName = user?.displayName || user?.email?.split('@')[0] || "User";
+    const userEmail = user?.email || "";
+    const userPhoto = user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0E50F6&color=fff`;
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden flex">
@@ -75,7 +133,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                             <div className="flex items-center justify-between w-full">
                                 <Link to="/" className="flex items-center gap-3 group transition-transform hover:scale-[1.02]">
                                     <img src={logoImage} alt="DataIQ" className="h-10 w-auto object-contain" />
-                                    <span className="font-bold text-xl text-primary tracking-tight">DataIQ</span>
+                                    <span className="font-semibold text-xl text-primary tracking-tight">DataIQ</span>
                                 </Link>
                                 <Button variant="ghost" size="icon" className="rounded-full relative hover:bg-primary/10 -mr-2">
                                     <div className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white animate-pulse"></div>
@@ -136,6 +194,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                                         variant="ghost"
                                         size={isSidebarOpen ? 'default' : 'icon'}
                                         className={`${isSidebarOpen ? 'flex-1' : 'w-10 h-10'} flex items-center justify-center gap-2 px-3 py-3 h-auto rounded-xl text-muted-foreground hover:bg-primary/5 hover:text-primary group transition-all`}
+                                        onClick={() => navigate('/dashboard/settings')}
                                     >
                                         <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
                                         {isSidebarOpen && <span className="text-sm font-medium">Settings</span>}
@@ -154,16 +213,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                                         variant="ghost"
                                         size={isSidebarOpen ? 'default' : 'icon'}
                                         className={`${isSidebarOpen ? 'flex-1' : 'w-10 h-10'} flex items-center justify-center gap-2 px-3 py-3 h-auto rounded-xl text-muted-foreground hover:bg-destructive/5 hover:text-destructive group transition-all`}
+                                        onClick={handleLogout}
                                     >
                                         <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                                         {isSidebarOpen && <span className="text-sm font-medium">Logout</span>}
                                     </Button>
                                 </TooltipTrigger>
-                                {!isSidebarOpen && (
-                                    <TooltipContent side="right" sideOffset={10} className="font-semibold">
-                                        Logout
-                                    </TooltipContent>
-                                )}
+                                <TooltipContent side="right" sideOffset={10} className="font-semibold" hidden={isSidebarOpen}>
+                                    Logout
+                                </TooltipContent>
                             </Tooltip>
                         </div>
                     </div>
@@ -173,7 +231,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
                 {/* Top Navbar */}
-                <header className="h-20 bg-white/60 backdrop-blur-md border-b border-border/50 flex items-center justify-between px-8">
+                <header className="h-20 bg-white/60 backdrop-blur-md border-b border-border/50 flex items-center justify-between px-8 relative z-50">
                     <div className="flex items-center gap-6 flex-1 max-w-2xl">
                         <Button
                             variant="ghost"
@@ -190,7 +248,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                                 <input
                                     type="text"
                                     placeholder="Search datasets, insights, reports... (⌘ + F)"
-                                    className="flex-1 bg-transparent border-none outline-none pl-3 text-[15px] font-bold placeholder:text-primary/30 text-foreground focus:ring-0"
+                                    className="flex-1 bg-transparent border-none outline-none pl-3 text-[15px] font-semibold placeholder:text-primary/30 text-foreground focus:ring-0"
                                 />
                             </div>
                         </div>
@@ -199,15 +257,83 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-4">
                         <div className="h-8 w-px bg-border/50 mx-2"></div>
 
-                        <div className="flex items-center gap-3 pl-2">
+                        <div className="flex items-center gap-3 pl-2 relative">
                             <div className="text-right hidden sm:block">
-                                <p className="text-sm font-bold text-foreground leading-tight">John Carter</p>
-                                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Enterprise Plan</p>
+                                <p className="text-sm font-semibold text-foreground leading-tight">{displayName}</p>
+                                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{userEmail}</p>
                             </div>
-                            <Avatar className="h-10 w-10 ring-2 ring-primary/10 transition-transform hover:scale-105 cursor-pointer">
-                                <AvatarImage src="https://ui-avatars.com/api/?name=John+Carter&background=0E50F6&color=fff" />
-                                <AvatarFallback>JC</AvatarFallback>
-                            </Avatar>
+                            <div className="relative">
+                                <Avatar
+                                    className="h-10 w-10 ring-2 ring-primary/10 transition-transform hover:scale-105 cursor-pointer"
+                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                >
+                                    <AvatarImage src={userPhoto} />
+                                    <AvatarFallback>{displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+
+                                {/* Profile Popover */}
+                                {isProfileOpen && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-[9998]"
+                                            onClick={() => setIsProfileOpen(false)}
+                                        />
+                                        <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-border/50 overflow-hidden z-[9999] animate-in fade-in zoom-in duration-200 origin-top-right">
+                                            <div className="p-4 border-b border-border/40">
+                                                <h3 className="text-sm font-semibold text-slate-800">My Account</h3>
+                                            </div>
+
+                                            <div className="p-2">
+                                                <button
+                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
+                                                    onClick={() => {
+                                                        setIsProfileOpen(false);
+                                                        navigate('/dashboard/profile');
+                                                    }}
+                                                >
+                                                    <UserCircle className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                                                    <span>Profile</span>
+                                                </button>
+
+                                                <button
+                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
+                                                    onClick={() => {
+                                                        setIsProfileOpen(false);
+                                                        navigate('/dashboard/notifications');
+                                                    }}
+                                                >
+                                                    <Bell className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                                                    <span>Notifications</span>
+                                                </button>
+
+                                                <button
+                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
+                                                    onClick={() => {
+                                                        setIsProfileOpen(false);
+                                                        navigate('/dashboard/settings');
+                                                    }}
+                                                >
+                                                    <Settings className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                                                    <span>Settings</span>
+                                                </button>
+                                            </div>
+
+                                            <div className="p-2 border-t border-border/40">
+                                                <button
+                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-500 hover:bg-rose-50 transition-colors group"
+                                                    onClick={() => {
+                                                        setIsProfileOpen(false);
+                                                        handleLogout();
+                                                    }}
+                                                >
+                                                    <LogOut className="w-4 h-4 text-rose-400 group-hover:text-rose-500 transition-colors" />
+                                                    <span>Sign Out</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </header>

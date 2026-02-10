@@ -3,7 +3,7 @@
 ![DataIQ Platform Preview](src/assets/dataiq-landing-preview.png)
 
 ## 🌟 The Vision
-DataIQ is more than just a data tool—it's a comprehensive **AI-Powered Data Intelligence Startup** designed to transform how organizations interact with their data. From seamless ingestion to predictive analysis and automated workflows, DataIQ is built to be the central nervous system for your data-driven decision-making.
+DataIQ is more than just a data tool—it's a comprehensive **AI-Powered Data Intelligence platform** designed to transform how organizations interact with their data. From seamless ingestion to predictive analysis and automated workflows, DataIQ is built to be the central nervous system for your data-driven decision-making.
 
 ---
 

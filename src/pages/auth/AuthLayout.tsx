@@ -5,6 +5,15 @@ import authVisual from '../../assets/auth-visual-final.jpg';
 export function AuthLayout() {
     const location = useLocation();
     const isLogin = location.pathname === '/login';
+    const isSignup = location.pathname === '/signup';
+    const isVerify = location.pathname === '/verify-email';
+
+    const getTitle = () => {
+        if (isLogin) return 'Welcome back';
+        if (isSignup) return 'Create an account';
+        if (isVerify) return 'Verify your email';
+        return 'Welcome to DataIQ';
+    };
 
     return (
         // Main Container: Transparent background to show global grid
@@ -39,13 +48,16 @@ export function AuthLayout() {
                     {/* Headings - Centered */}
                     <div className="flex flex-col items-center space-y-2 mb-6 text-center w-full">
                         <h1 className="text-3xl md:text-4xl font-bold text-[#0F172A] tracking-tight">
-                            {isLogin ? 'Welcome back' : 'Create an account'}
+                            {getTitle()}
                         </h1>
                         <p className="text-muted-foreground text-base">
-                            {isLogin
-                                ? <>New to DataIQ? <Link to="/signup" className="text-primary hover:underline font-medium ml-1">Create an account</Link></>
-                                : <>Already have an account? <Link to="/login" className="text-primary hover:underline font-medium ml-1">Log in</Link></>
-                            }
+                            {isVerify ? (
+                                <>Almost there! Please check your inbox.</>
+                            ) : isLogin ? (
+                                <>New to DataIQ? <Link to="/signup" className="text-primary hover:underline font-medium ml-1">Create an account</Link></>
+                            ) : (
+                                <>Already have an account? <Link to="/login" className="text-primary hover:underline font-medium ml-1">Log in</Link></>
+                            )}
                         </p>
                     </div>
 

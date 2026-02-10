@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthLayout } from './pages/auth/AuthLayout';
 import { LoginPage } from './pages/auth/LoginPage';
 import { SignUpPage } from './pages/auth/SignUpPage';
+import { VerificationPage } from './pages/auth/VerificationPage';
 import { LandingPage } from './pages/LandingPage';
 import { FAQPage } from './pages/FAQPage';
 import PricingPage from './pages/PricingPage';
@@ -9,6 +10,10 @@ import { ThemeProvider } from './components/theme-provider';
 import { DashboardLayout } from './pages/dashboard/DashboardLayout';
 import { OverviewPage } from './pages/dashboard/OverviewPage';
 import { BlankPage } from './pages/dashboard/BlankPage';
+import { SettingsPage } from './pages/dashboard/SettingsPage';
+import { ProfilePage } from './pages/dashboard/ProfilePage';
+import { NotificationsPage } from './pages/dashboard/NotificationsPage';
+import { Toaster } from 'sonner';
 import {
   LayoutGrid,
   Import,
@@ -21,13 +26,24 @@ import {
   FileSearch,
   FolderOpen,
   Cpu,
-  ShieldCheck
+  ShieldCheck,
+  PanelRight,
+  Search,
+  Bell,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+  MessageSquare,
+  UserCircle
 } from 'lucide-react';
 
 export default function App() {
   console.log("DataIQ: App Rendering...");
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <Toaster position="top-center" richColors />
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -36,21 +52,27 @@ export default function App() {
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/verify-email" element={<VerificationPage />} />
           </Route>
 
           {/* Dashboard Routes */}
-          <Route path="/dashboard" element={<DashboardLayout><OverviewPage /></DashboardLayout>} />
-          <Route path="/dashboard/ingestion" element={<DashboardLayout><BlankPage title="Data Ingestion" icon={Import} /></DashboardLayout>} />
-          <Route path="/dashboard/datasets" element={<DashboardLayout><BlankPage title="Datasets" icon={Database} /></DashboardLayout>} />
-          <Route path="/dashboard/notebook" element={<DashboardLayout><BlankPage title="AI Notebook" icon={BookOpen} /></DashboardLayout>} />
-          <Route path="/dashboard/auto-analysis" element={<DashboardLayout><BlankPage title="Auto Analysis" icon={Zap} /></DashboardLayout>} />
-          <Route path="/dashboard/chat" element={<DashboardLayout><BlankPage title="AI Chat" icon={MessagesSquare} /></DashboardLayout>} />
-          <Route path="/dashboard/pinned" element={<DashboardLayout><BlankPage title="Pinned Dashboards" icon={Files} /></DashboardLayout>} />
-          <Route path="/dashboard/reports" element={<DashboardLayout><BlankPage title="Reports" icon={FileText} /></DashboardLayout>} />
-          <Route path="/dashboard/file-processor" element={<DashboardLayout><BlankPage title="File Processor" icon={FileSearch} /></DashboardLayout>} />
-          <Route path="/dashboard/my-files" element={<DashboardLayout><BlankPage title="My Files" icon={FolderOpen} /></DashboardLayout>} />
-          <Route path="/dashboard/models" element={<DashboardLayout><BlankPage title="AI Model Hub" icon={Cpu} /></DashboardLayout>} />
-          <Route path="/dashboard/security" element={<DashboardLayout><BlankPage title="Security & Audit" icon={ShieldCheck} /></DashboardLayout>} />
+          <Route path="/dashboard" element={<DashboardLayout children={<Outlet />} />}>
+            <Route index element={<OverviewPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="ingestion" element={<BlankPage title="Data Ingestion" icon={Import} />} />
+            <Route path="datasets" element={<BlankPage title="Datasets" icon={Database} />} />
+            <Route path="notebook" element={<BlankPage title="AI Notebook" icon={BookOpen} />} />
+            <Route path="auto-analysis" element={<BlankPage title="Auto Analysis" icon={Zap} />} />
+            <Route path="chat" element={<BlankPage title="AI Chat" icon={MessagesSquare} />} />
+            <Route path="pinned" element={<BlankPage title="Pinned Dashboards" icon={Files} />} />
+            <Route path="reports" element={<BlankPage title="Reports" icon={FileText} />} />
+            <Route path="file-processor" element={<BlankPage title="File Processor" icon={FileSearch} />} />
+            <Route path="my-files" element={<BlankPage title="My Files" icon={FolderOpen} />} />
+            <Route path="models" element={<BlankPage title="AI Model Hub" icon={Cpu} />} />
+            <Route path="security" element={<BlankPage title="Security & Audit" icon={ShieldCheck} />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+          </Route>
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Router>

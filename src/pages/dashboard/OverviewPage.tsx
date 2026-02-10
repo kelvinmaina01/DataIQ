@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import {
     TrendingUp,
     Database,
@@ -57,7 +59,7 @@ function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext, c
 
     return (
         <div className={cn(
-            "border border-slate-100/50 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col h-full group",
+            "border border-[#0E50F6]/30 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col h-full group",
             className || "bg-white"
         )}>
             <div className="flex items-center justify-between mb-8">
@@ -94,7 +96,7 @@ function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext, c
 function UsageCard({ title, value, max, unit, percent, plan, className }: any) {
     return (
         <div className={cn(
-            "border border-slate-100/50 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-all flex flex-col h-full group ring-1 ring-[#0E50F6]/5",
+            "border border-[#0E50F6]/30 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-all flex flex-col h-full group ring-1 ring-[#0E50F6]/5",
             className || "bg-white"
         )}>
             <div className="flex items-center justify-between mb-6">
@@ -132,7 +134,7 @@ function IntelligenceCard({ title, subtitle, status, statusDesc, experiments, fl
     return (
         <div className={cn(
             "bg-white border rounded-[2rem] p-8 shadow-sm flex flex-col h-full ring-1 transition-all hover:shadow-md",
-            isRed ? "border-red-100 ring-red-500/10" : "border-border/50 ring-primary/5"
+            isRed ? "border-red-400/30 ring-red-500/10" : "border-[#0E50F6]/30 ring-primary/5"
         )}>
             <div className="flex items-start justify-between mb-10">
                 <div className="flex gap-4">
@@ -198,7 +200,7 @@ function OptimizationCard({ title, subtitle, message, advice, icon: Icon, priori
     return (
         <div className={cn(
             "bg-white border rounded-[2rem] p-8 shadow-sm flex flex-col h-full ring-1 transition-all hover:shadow-md",
-            isRed ? "border-red-100 ring-red-500/10" : "border-border/50 ring-primary/5"
+            isRed ? "border-red-400/30 ring-red-500/10" : "border-[#0E50F6]/30 ring-primary/5"
         )}>
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
@@ -285,12 +287,21 @@ const recentDatasets = [
 ];
 
 export function OverviewPage() {
+    const [user, setUser] = useState<User | null>(null);
     const [hasError, setHasError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                setUser(currentUser);
+            }
+        });
         console.log("DataIQ: OverviewPage mounted successfully.");
+        return () => unsubscribe();
     }, []);
+
+    const displayName = user?.displayName || user?.email?.split('@')[0] || "User";
 
     console.log("DataIQ: OverviewPage rendering...");
     console.log("Verified Icons:", {
@@ -314,7 +325,7 @@ export function OverviewPage() {
             <div className="flex flex-row items-start justify-between gap-6 mb-12">
                 <div className="text-left py-1">
                     <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2">
-                        Welcome <span className="text-[#0E50F6]">John</span>
+                        Welcome <span className="text-[#0E50F6]">{displayName}</span>
                     </h1>
                     <p className="text-slate-500 text-lg font-bold">
                         Manage your <span className="text-[#0E50F6]">data intelligence and account permissions</span> here.
@@ -378,7 +389,7 @@ export function OverviewPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
                 {/* Table Section (Left) */}
                 <div className="lg:col-span-8">
-                    <div className="bg-white border border-border/50 rounded-[2rem] p-8 shadow-sm ring-1 ring-primary/5 h-full">
+                    <div className="bg-white border border-[#0E50F6]/30 rounded-[2rem] p-8 shadow-sm ring-1 ring-primary/5 h-full">
                         <div className="flex items-center justify-between mb-8">
                             <div className="flex items-center gap-3">
                                 <div className="p-2.5 bg-[#0E50F6]/10 rounded-xl">
