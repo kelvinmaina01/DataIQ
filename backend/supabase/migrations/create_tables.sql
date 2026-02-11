@@ -57,7 +57,16 @@ VALUES ('datasets', 'datasets', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- Storage Policies (Simplified for Firebase compatibility via app layer isolation)
--- We allow all authenticated-like uploads to the 'datasets' bucket
--- but we enforce the directory structure in the application code.
+-- We allow all roles (including anon) to interact with the 'datasets' bucket
+-- Path-based isolation is enforced in the application code.
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
 CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'datasets');
+
+DROP POLICY IF EXISTS "Public Upload" ON storage.objects;
 CREATE POLICY "Public Upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'datasets');
+
+DROP POLICY IF EXISTS "Public Update" ON storage.objects;
+CREATE POLICY "Public Update" ON storage.objects FOR UPDATE USING (bucket_id = 'datasets');
+
+DROP POLICY IF EXISTS "Public Delete" ON storage.objects;
+CREATE POLICY "Public Delete" ON storage.objects FOR DELETE USING (bucket_id = 'datasets');

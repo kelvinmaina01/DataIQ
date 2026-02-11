@@ -251,10 +251,10 @@ export function DatasetsPage() {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 {[
-                    { label: 'Total Datasets', value: datasets.length, icon: Database, color: 'text-[#0E50F6]', bg: 'bg-blue-50' },
-                    { label: 'Total Rows', value: totalRows.toLocaleString(), icon: BarChart4, color: 'text-orange-500', bg: 'bg-orange-50' },
-                    { label: 'Total Storage', value: formatFileSize(totalStorage), icon: FileText, color: 'text-rose-500', bg: 'bg-rose-50' },
-                    { label: 'Health Verified', value: healthVerified, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+                    { label: 'total datasets', value: datasets.length, icon: Database, color: 'text-[#0E50F6]', bg: 'bg-blue-50' },
+                    { label: 'total rows', value: totalRows.toLocaleString(), icon: BarChart4, color: 'text-orange-500', bg: 'bg-orange-50' },
+                    { label: 'total storage', value: formatFileSize(totalStorage), icon: FileText, color: 'text-rose-500', bg: 'bg-rose-50' },
+                    { label: 'health verified', value: healthVerified, icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50' },
                 ].map((stat, i) => (
                     <motion.div
                         key={i}
@@ -264,7 +264,7 @@ export function DatasetsPage() {
                         className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all flex flex-row items-center justify-between h-full group top-aligned-stats"
                     >
                         <div className="flex flex-col gap-2">
-                            <h4 className="text-[13px] font-bold text-slate-500 tracking-wider whitespace-nowrap opacity-60 lowercase">{stat.label}</h4>
+                            <h4 className="text-[13px] font-bold text-slate-500 tracking-wider whitespace-nowrap opacity-60 !lowercase">{stat.label}</h4>
                             <p className="text-3xl font-bold text-slate-900 tracking-tighter">{stat.value}</p>
                         </div>
                         <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} transition-all duration-300 group-hover:scale-110 shadow-inner`}>
@@ -383,15 +383,15 @@ export function DatasetsPage() {
                                     <div className="absolute left-1/2 top-0 bottom-0 w-px bg-slate-100"></div>
 
                                     <div className="text-center md:text-left pl-2">
-                                        <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 lowercase">Rows</p>
+                                        <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 !lowercase">rows</p>
                                         <p className="text-lg font-bold text-slate-900 tracking-tight">{dataset.row_count?.toLocaleString() || '0'}</p>
                                     </div>
                                     <div className="text-center md:text-right pr-2">
-                                        <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 lowercase">Cols</p>
+                                        <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 !lowercase">cols</p>
                                         <p className="text-lg font-bold text-slate-900 tracking-tight">{dataset.column_count || '0'}</p>
                                     </div>
                                     <div className="col-span-2 text-center pt-4 border-t border-slate-50 mt-2">
-                                        <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 lowercase">Quality Score</p>
+                                        <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 !lowercase">quality score</p>
                                         <p className={`text-lg font-bold tracking-tight ${(dataset.quality_score || 0) > 80 ? 'text-emerald-500' :
                                             (dataset.quality_score || 0) > 50 ? 'text-amber-500' : 'text-slate-300'
                                             }`}>
