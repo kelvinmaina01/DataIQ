@@ -255,7 +255,7 @@ export function DataProcessingPage() {
                             <div className="p-8 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button
                                     onClick={() => navigate('/dashboard/datasets')}
-                                    className="h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-blue-600/20 px-8 transition-all flex items-center gap-2"
+                                    className="h-14 !bg-primary hover:!bg-primary/90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 px-8 transition-all flex items-center gap-2 border-none"
                                 >
                                     Go to Library
                                     <ArrowRight className="size-5" />

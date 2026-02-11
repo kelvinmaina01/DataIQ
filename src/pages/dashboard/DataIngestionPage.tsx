@@ -334,7 +334,7 @@ export function DataIngestionPage() {
             </div>
 
             {/* Controls: Tabs & Search */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-start gap-6 mb-8">
                 <div className="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-xl w-fit">
                     {categories.map(cat => (
                         <button
@@ -352,7 +352,7 @@ export function DataIngestionPage() {
                     ))}
                 </div>
 
-                <div className="relative w-full md:w-80">
+                <div className="relative w-full md:w-80 md:ml-0">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                     <Input
                         placeholder="Search connectors..."
