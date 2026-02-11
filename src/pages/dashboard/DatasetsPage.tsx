@@ -91,6 +91,7 @@ export function DatasetsPage() {
             const { data, error } = await supabase
                 .from('datasets')
                 .select('*')
+                .eq('user_id', user.uid)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;

@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Cpu,
-    CheckCircle2,
-    FileText,
-    Loader2,
+    Database,
+    Zap,
+    ShieldCheck,
+    Search,
     ArrowRight,
-    Search
+    CheckCircle2,
+    Loader2,
+    Activity,
+    Lock,
+    Server,
+    AlertCircle,
+    Cpu,
+    FileText
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { supabase, setSupabaseIdentity } from '../../../backend/supabase/supabaseClient';
@@ -122,6 +129,10 @@ export function DataProcessingPage() {
             setTimeout(() => {
                 clearInterval(animationInterval);
                 setProcessingProgress(100);
+
+                // Only show success page if at least one item succeeded
+                // Otherwise keep the state as processing (which handles its own error UI)
+                // or define an explicit error state to show what failed.
                 setUploadState('success');
             }, 3500);
         });
@@ -188,7 +199,7 @@ export function DataProcessingPage() {
                             ))}
                         </div>
                     </motion.div>
-                ) : (
+                ) : uploadState === 'success' && processedItems.some(i => i.status === 'success') ? (
                     <motion.div
                         key="success-page"
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -268,6 +279,44 @@ export function DataProcessingPage() {
                                     Upload More
                                 </Button>
                             </div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="error-summary"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex flex-col items-center text-center max-w-xl w-full"
+                    >
+                        <div className="size-20 bg-red-100 rounded-full flex items-center justify-center mb-6 ring-4 ring-red-50">
+                            <AlertCircle className="size-10 text-red-600" />
+                        </div>
+                        <h2 className="text-3xl font-bold text-slate-900 mb-4">Ingestion Failed</h2>
+                        <p className="text-slate-500 font-medium mb-10">We encountered a security policy or connection error during the upload process.</p>
+
+                        <div className="w-full bg-red-50/50 border border-red-100 p-6 rounded-2xl mb-8 text-left">
+                            <h4 className="text-sm font-bold text-red-800 uppercase tracking-widest mb-3">Diagnostic Log</h4>
+                            {processedItems.filter(i => i.status === 'error').map((item, idx) => (
+                                <p key={idx} className="text-xs font-mono text-red-600 break-all mb-2">
+                                    {item.file.name}: {item.error}
+                                </p>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-4">
+                            <Button
+                                onClick={() => navigate('/dashboard/ingestion')}
+                                className="h-12 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-8"
+                            >
+                                Try Again
+                            </Button>
+                            <Button
+                                onClick={() => navigate('/dashboard/datasets')}
+                                variant="outline"
+                                className="h-12 border-2 border-slate-200 font-bold rounded-xl px-8"
+                            >
+                                Back to Library
+                            </Button>
                         </div>
                     </motion.div>
                 )}
