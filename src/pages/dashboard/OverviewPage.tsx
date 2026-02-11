@@ -100,10 +100,10 @@ function UsageCard({ title, value, max, unit, percent, plan, className }: any) {
             className || "bg-white"
         )}>
             <div className="flex items-center justify-between mb-6">
-                <h4 className="text-2xl font-black text-slate-900 tracking-tighter">{title}</h4>
+                <h4 className="text-2xl font-bold text-slate-900 tracking-tight">{title}</h4>
                 <div className="bg-[#0E50F6] text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
                     <Crown className="w-3.5 h-3.5 fill-current" />
-                    <span className="text-[10px] font-black uppercase tracking-wider">{plan}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider">{plan}</span>
                 </div>
             </div>
 
@@ -219,7 +219,7 @@ function OptimizationCard({ title, subtitle, message, advice, icon: Icon, priori
                     </div>
                 </div>
                 <Badge variant="outline" className={cn(
-                    "font-black text-[10px] uppercase px-3 py-1",
+                    "font-bold text-[10px] uppercase px-3 py-1",
                     isRed ? "bg-red-50 text-red-600 border-red-100" : "bg-emerald-50 text-emerald-600 border-emerald-100"
                 )}>
                     {isRed ? "Priority Alert" : "Detected"}
@@ -234,7 +234,7 @@ function OptimizationCard({ title, subtitle, message, advice, icon: Icon, priori
             )}>
                 <div className="flex gap-4">
                     {isRed ? <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" /> : <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />}
-                    <p className="text-[13px] text-slate-700 font-bold leading-relaxed italic">
+                    <p className="text-[13px] text-slate-700 font-bold leading-relaxed">
                         {advice}
                     </p>
                 </div>
@@ -252,7 +252,7 @@ function FeatureCard({ title, subtitle, badge, metrics, icon: Icon }: any) {
                     <SafeIcon className="w-8 h-8 text-[#0E50F6]" />
                 </div>
                 <div className="flex items-center gap-3">
-                    <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0E50F6]/10 text-[#0E50F6]">
+                    <span className="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#0E50F6]/10 text-[#0E50F6]">
                         {badge}
                     </span>
                     <ArrowRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-transform group-hover:text-[#0E50F6]" />
@@ -268,8 +268,8 @@ function FeatureCard({ title, subtitle, badge, metrics, icon: Icon }: any) {
                 <div className="mt-auto pt-6 border-t border-slate-50 grid grid-cols-2 gap-6">
                     {metrics.map((m: any, i: number) => (
                         <div key={i}>
-                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{m.label}</p>
-                            <p className={`text-xl font-black tracking-tighter ${m.color === 'red' ? 'text-red-500' : m.color === 'green' ? 'text-emerald-500' : 'text-[#0E50F6]'}`}>{m.value}</p>
+                            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-1">{m.label}</p>
+                            <p className={`text-xl font-bold tracking-tight ${m.color === 'red' ? 'text-red-500' : m.color === 'green' ? 'text-emerald-500' : 'text-[#0E50F6]'}`}>{m.value}</p>
                         </div>
                     ))}
                 </div>

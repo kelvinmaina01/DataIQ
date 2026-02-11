@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
     Upload,
@@ -25,14 +27,23 @@ import {
     Clock,
     ShieldCheck,
     Lock,
-    Fingerprint
+    Fingerprint,
+    Cpu,
+    Zap
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { cn } from '../../components/ui/utils';
+import { DropzoneArea } from '../../components/upload/DropzoneArea';
+import { FilePreviewCard } from '../../components/upload/FilePreviewCard';
+import { parseFile, ParseResult } from '../../services/fileParser';
+import { auth } from '../../lib/firebase';
+import { supabase, setSupabaseIdentity } from '../../../backend/supabase/supabaseClient';
+import { toast } from 'sonner';
 
 // Connector types
 type Category = 'All' | 'Manual' | 'Databases' | 'Warehouses' | 'Cloud' | 'Health' | 'Webhooks';
+type UploadState = 'idle' | 'parsing' | 'review' | 'uploading' | 'processing' | 'success' | 'error';
 
 interface Connector {
     id: string;
@@ -88,9 +99,22 @@ const CONNECTORS: Connector[] = [
 ];
 
 export function DataIngestionPage() {
+    const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<Category>('All');
     const [showConnectors, setShowConnectors] = useState(false);
+
+    // Batch Upload State
+    const [uploadState, setUploadState] = useState<UploadState>('idle');
+    const [processingQueue, setProcessingQueue] = useState<{
+        id: string;
+        file: File;
+        result?: ParseResult;
+        status: 'parsing' | 'review' | 'uploading' | 'processing' | 'success' | 'error';
+        error?: string;
+        progress: number;
+    }[]>([]);
+    const [uploadError, setUploadError] = useState<string | null>(null);
 
     const filteredConnectors = useMemo(() => {
         return CONNECTORS.filter(c => {
@@ -102,6 +126,81 @@ export function DataIngestionPage() {
     }, [searchQuery, activeTab]);
 
     const categories: Category[] = ['All', 'Manual', 'Databases', 'Warehouses', 'Cloud', 'Health', 'Webhooks'];
+
+    const handleFilesSelected = async (files: File[]) => {
+        setUploadState('parsing');
+        setUploadError(null);
+
+        const newEntries = files.map(file => ({
+            id: Math.random().toString(36).substr(2, 9),
+            file,
+            status: 'parsing' as const,
+            progress: 0
+        }));
+
+        setProcessingQueue(prev => [...prev, ...newEntries]);
+
+        // Process each file
+        for (const entry of newEntries) {
+            try {
+                let fileToParse = entry.file;
+                const fileType = fileToParse.name.split('.').pop()?.toLowerCase();
+
+                if (fileType === 'zip') {
+                    const { parseZip } = await import('../../services/fileParser');
+                    const extracted = await parseZip(fileToParse);
+                    if (extracted.length > 0) {
+                        fileToParse = extracted[0];
+                        toast.info(`Extracted ${fileToParse.name} from ZIP`, { duration: 2000 });
+                    }
+                }
+
+                const result = await parseFile(fileToParse);
+                setProcessingQueue(prev => prev.map(item =>
+                    item.id === entry.id ? { ...item, file: fileToParse, result, status: 'review' } : item
+                ));
+            } catch (error) {
+                console.error('Parsing error for', entry.file.name, ':', error);
+                setProcessingQueue(prev => prev.map(item =>
+                    item.id === entry.id ? { ...item, status: 'error', error: error instanceof Error ? error.message : 'Failed to parse' } : item
+                ));
+            }
+        }
+
+        setUploadState('review');
+    };
+
+    const resetUpload = () => {
+        setUploadState('idle');
+        setProcessingQueue([]);
+        setUploadError(null);
+    };
+
+    const resetUploadSingle = (id: string) => {
+        setProcessingQueue(prev => prev.filter(item => item.id !== id));
+        if (processingQueue.length <= 1) setUploadState('idle');
+    };
+
+    const handleUploadToFirebase = async () => {
+        if (processingQueue.length === 0) return;
+
+        // Filter only valid entries for processing
+        const validEntries = processingQueue.filter(entry =>
+            (entry.status === 'review' || entry.status === 'success') && entry.result
+        );
+
+        if (validEntries.length === 0) {
+            toast.error('No valid files to process');
+            return;
+        }
+
+        // Navigate to dedicated processing page with the batch payload
+        navigate('/dashboard/ingestion/processing', {
+            state: {
+                batch: validEntries
+            }
+        });
+    };
 
     if (!showConnectors) {
         return (
@@ -212,7 +311,7 @@ export function DataIngestionPage() {
 
                         <button
                             onClick={() => setShowConnectors(true)}
-                            className="bg-white text-primary px-10 h-16 rounded-full font-extrabold text-lg hover:bg-slate-50 transition-colors flex items-center gap-4 w-fit group shadow-xl"
+                            className="bg-white text-primary px-10 h-16 rounded-full font-bold text-lg hover:bg-slate-50 transition-colors flex items-center gap-4 w-fit group shadow-xl"
                         >
                             Investigate
                             <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
@@ -272,7 +371,7 @@ export function DataIngestionPage() {
                             <Upload className="size-6 text-primary" />
                             <h2 className="text-xl font-bold text-slate-900">Upload Dataset</h2>
                         </div>
-                        <p className="text-slate-500 font-medium mb-4 -mt-4">
+                        <p className="text-brand-blue font-bold mb-4 -mt-4">
                             Upload CSV, Excel, JSON or PDF files with automatic profiling and quality assessment.
                         </p>
                         <div className="flex items-center gap-3 mb-8">
@@ -283,114 +382,169 @@ export function DataIngestionPage() {
                                 { src: '/logos/pdf.svg', alt: 'PDF' },
                                 { src: '/logos/word.svg', alt: 'Word' },
                             ].map(f => (
-                                <div key={f.alt} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl hover:border-primary/20 hover:bg-primary/5 transition-all group cursor-default">
+                                <div key={f.alt} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-xl hover:border-brand-blue/20 hover:bg-brand-blue/5 transition-all group cursor-default">
                                     <img src={f.src} alt={f.alt} className="size-6 object-contain" />
-                                    <span className="text-xs font-bold text-slate-500 group-hover:text-primary transition-colors">{f.alt}</span>
+                                    <span className="text-xs font-bold text-slate-500 group-hover:text-brand-blue transition-colors">{f.alt}</span>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="border-2 border-dashed border-slate-200 rounded-2xl p-16 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 transition-all cursor-pointer group">
-                            <div className="size-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                                <Upload className="size-8 text-slate-400 group-hover:text-primary transition-colors" />
+                        {/* Import Guidelines */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex items-start gap-4 p-6 bg-amber-50/50 border border-amber-200/50 rounded-2xl mb-8 relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 right-0 p-3 opacity-5">
+                                <FileText className="size-16 text-amber-900" />
                             </div>
-                            <h3 className="text-xl font-bold text-slate-800 mb-2">Drop your file here or click to browse</h3>
-                            <p className="text-slate-400 font-medium mb-8">Supports CSV, Excel, JSON, PDF and Docs up to 50MB</p>
-
-                            <Button className="bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 px-8 h-12 rounded-xl font-bold shadow-sm">
-                                Select File
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Recent Uploads Section */}
-                    <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm">
-                        <div className="flex items-center gap-3 mb-8">
-                            <Clock className="size-6 text-primary" />
-                            <h2 className="text-xl font-bold text-slate-900">Recent Uploads</h2>
-                        </div>
-
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b border-slate-100">
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">File</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">Method</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">Status</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm text-center">Progress</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">Size</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">Rows</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">Quality</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">Duration</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm">Created</th>
-                                        <th className="pb-4 pt-2 font-semibold text-slate-400 text-sm text-right"></th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-50">
+                            <div className="size-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 border border-amber-200/50">
+                                <Info className="size-5 text-amber-700" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-amber-900 text-lg mb-4">Import Guidelines</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
                                     {[
-                                        {
-                                            name: 'impact-of-covid-19-on-sme...',
-                                            method: 'File Upload',
-                                            status: 'Processing',
-                                            progress: 0,
-                                            size: '234 B',
-                                            rows: '9',
-                                            quality: '-',
-                                            duration: '1358h 32m',
-                                            created: 'about 2 months ago'
-                                        },
-                                        {
-                                            name: 'maven_fuzzy_factory_data_...',
-                                            method: 'File Upload',
-                                            status: 'Processing',
-                                            progress: 0,
-                                            size: '2.48 KB',
-                                            rows: '36',
-                                            quality: '-',
-                                            duration: '1461h 25m',
-                                            created: '2 months ago'
-                                        }
-                                    ].map((upload, idx) => (
-                                        <tr key={idx} className="group/row hover:bg-slate-50/50 transition-colors">
-                                            <td className="py-5 font-bold text-slate-700 text-sm">{upload.name}</td>
-                                            <td className="py-5">
-                                                <span className="px-3 py-1 bg-slate-50 text-slate-500 rounded-full text-xs font-bold ring-1 ring-slate-100">
-                                                    {upload.method}
-                                                </span>
-                                            </td>
-                                            <td className="py-5">
-                                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 text-primary rounded-full text-[11px] font-bold w-fit ring-1 ring-primary/20">
-                                                    <span className="size-1.5 bg-primary rounded-full animate-pulse" />
-                                                    {upload.status}
-                                                </div>
-                                            </td>
-                                            <td className="py-5">
-                                                <div className="flex items-center gap-3 justify-center min-w-[120px]">
-                                                    <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
-                                                        <div
-                                                            className="h-full bg-primary rounded-full"
-                                                            style={{ width: `${upload.progress}%` }}
-                                                        />
-                                                    </div>
-                                                    <span className="text-[10px] font-bold text-slate-400">{upload.progress}%</span>
-                                                </div>
-                                            </td>
-                                            <td className="py-5 text-sm font-medium text-slate-500">{upload.size}</td>
-                                            <td className="py-5 text-sm font-bold text-slate-700">{upload.rows}</td>
-                                            <td className="py-5 text-sm font-medium text-slate-400 text-center">{upload.quality}</td>
-                                            <td className="py-5 text-sm font-medium text-slate-500">{upload.duration}</td>
-                                            <td className="py-5 text-sm font-medium text-slate-400">{upload.created}</td>
-                                            <td className="py-5 text-right">
-                                                <button className="p-2 text-slate-400 hover:text-primary transition-colors">
-                                                    <ExternalLink className="size-4" />
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        "First row should contain column headers",
+                                        "Use consistent units across measurements",
+                                        "Remove any sensitive information if possible",
+                                        "Max file size: 50MB"
+                                    ].map((text, i) => (
+                                        <div key={i} className="flex items-start gap-3 group">
+                                            <div className="mt-1.5 size-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 group-hover:scale-125 transition-transform" />
+                                            <span className="text-[15px] font-bold text-amber-900/80 leading-tight">{text}</span>
+                                        </div>
                                     ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {uploadState === 'idle' && (
+                            <DropzoneArea onFilesSelected={handleFilesSelected} />
+                        )}
+
+                        {uploadState === 'parsing' && (
+                            <div className="flex flex-col items-center justify-center p-12">
+                                <div className="size-12 border-4 border-slate-200 border-t-primary rounded-full animate-spin mb-4" />
+                                <p className="text-slate-500 font-medium">Parsing and analyzing file...</p>
+                            </div>
+                        )}
+
+                        {uploadState === 'processing' && (
+                            <div className="flex flex-col items-center justify-center p-12 py-20 animate-in fade-in zoom-in duration-500">
+                                <div className="relative size-32 mb-10">
+                                    <div className="absolute inset-0 border-4 border-slate-100 rounded-full" />
+                                    <div
+                                        className="absolute inset-0 border-4 border-primary rounded-full transition-all duration-300"
+                                        style={{
+                                            clipPath: `inset(0 0 0 0)`, // Just a placeholder, we use stroke-dasharray in real CSS usually
+                                            transform: `rotate(${processingProgress * 3.6}deg)`
+                                        }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="size-20 bg-primary/10 rounded-full flex items-center justify-center animate-pulse">
+                                            <Cpu className="size-10 text-primary" />
+                                        </div>
+                                    </div>
+                                    <svg className="absolute inset-0 size-32 -rotate-90">
+                                        <circle
+                                            cx="64"
+                                            cy="64"
+                                            r="60"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                            className="text-primary"
+                                            strokeDasharray={`${2 * Math.PI * 60}`}
+                                            strokeDashoffset={`${2 * Math.PI * 60 * (1 - processingProgress / 100)}`}
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
+                                </div>
+                                <h2 className="text-[28px] font-bold text-slate-900 mb-2 tracking-tight">Auto-Processing Engine</h2>
+                                <p className="text-primary font-bold uppercase tracking-[0.2em] animate-pulse mb-8">{processStage}</p>
+
+                                <div className="w-full max-w-md space-y-4">
+                                    {[
+                                        { label: 'PII Classification', done: processingProgress > 25 },
+                                        { label: 'Schema Registry', done: processingProgress > 50 },
+                                        { label: 'Data Quality Score', done: processingProgress > 75 },
+                                        { label: 'Missingness Analysis', done: processingProgress > 95 }
+                                    ].map((step, i) => (
+                                        <div key={i} className={`flex items-center gap-3 transition-all duration-500 ${step.done ? 'opacity-100 translate-x-0' : 'opacity-30 -translate-x-2'}`}>
+                                            <div className={`size-5 rounded-full flex items-center justify-center ${step.done ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                                {step.done ? <CheckCircle2 className="size-3" /> : <div className="size-1.5 bg-slate-400 rounded-full" />}
+                                            </div>
+                                            <span className="text-sm font-bold text-slate-700">{step.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {(uploadState === 'review' || uploadState === 'error') && processingQueue.length > 0 && (
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 gap-6">
+                                    {processingQueue.map((entry) => (
+                                        <div key={entry.id} className="relative group">
+                                            <FilePreviewCard
+                                                file={entry.file}
+                                                status={entry.status === 'error' ? 'error' : 'success'}
+                                                stats={entry.result ? {
+                                                    rowCount: entry.result.rowCount,
+                                                    columnCount: entry.result.columnCount,
+                                                    quality: entry.result.qualityScore,
+                                                    outliersFound: entry.result.columns.reduce((acc, col) => acc + (col.outlierCount || 0), 0),
+                                                    validRows: Math.round(entry.result.healthReport.validity * entry.result.rowCount),
+                                                    completeness: entry.result.healthReport.completeness,
+                                                    domain: entry.result.domain,
+                                                    traits: Array.from(new Set(entry.result.columns.map(c => c.trait).filter(t => t !== 'UNKNOWN')))
+                                                } : undefined}
+                                                error={entry.error}
+                                            />
+                                            {uploadState === 'review' && (
+                                                <button
+                                                    onClick={() => resetUploadSingle(entry.id)}
+                                                    className="absolute -top-2 -right-2 size-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 shadow-sm transition-all"
+                                                >
+                                                    <Plus className="size-4 rotate-45" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {uploadState === 'review' && (
+                                    <div className="flex flex-col gap-6 pt-8 border-t border-slate-100">
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-sm text-slate-400 font-medium flex items-center gap-2">
+                                                <Info className="size-4" />
+                                                Review batch quality before final research ingestion
+                                            </p>
+                                            <Button
+                                                variant="ghost"
+                                                onClick={resetUpload}
+                                                className="h-10 px-6 font-bold text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                            >
+                                                Discard All
+                                            </Button>
+                                        </div>
+                                        <Button
+                                            onClick={handleUploadToFirebase}
+                                            className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg rounded-2xl shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-3"
+                                        >
+                                            <Upload className="size-5" />
+                                            Finalize & Upload Batch ({processingQueue.length} Files)
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                     </div>
+
+                    {/* Redirection to DataProcessingPage handles success states */}
                 </div>
             )}
 
@@ -532,3 +686,4 @@ export function DataIngestionPage() {
         </div>
     );
 }
+

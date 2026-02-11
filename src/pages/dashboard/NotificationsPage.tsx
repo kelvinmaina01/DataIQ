@@ -57,7 +57,7 @@ export function NotificationsPage() {
                 </div>
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Notifications</h1>
-                    <p className="text-sm text-slate-400 font-semibold italic">Manage your alerts and preferences</p>
+                    <p className="text-sm text-slate-400 font-semibold">Manage your alerts and preferences</p>
                 </div>
             </div>
 
@@ -148,7 +148,7 @@ export function NotificationsPage() {
                             </div>
                             <h3 className="text-xl font-bold text-slate-800 tracking-tight">Email Notifications</h3>
                         </div>
-                        <p className="text-sm text-slate-400 font-semibold mb-10 pl-14 italic">Control which emails you receive</p>
+                        <p className="text-sm text-slate-400 font-semibold mb-10 pl-14">Control which emails you receive</p>
 
                         <div className="space-y-10 pl-14">
                             <div className="flex items-center justify-between">
@@ -189,7 +189,7 @@ export function NotificationsPage() {
                             </div>
                             <h3 className="text-xl font-bold text-slate-800 tracking-tight">Threshold Configuration</h3>
                         </div>
-                        <p className="text-sm text-slate-400 font-semibold mb-10 pl-14 italic">Adjust sensitivity for automated alerts</p>
+                        <p className="text-sm text-slate-400 font-semibold mb-10 pl-14">Adjust sensitivity for automated alerts</p>
 
                         <div className="space-y-12 pl-14">
                             <div className="space-y-4">
@@ -209,7 +209,7 @@ export function NotificationsPage() {
                                             background: `linear-gradient(to right, #0E50F6 ${thresholds.bottleneck}%, #E2E8F0 ${thresholds.bottleneck}% 90%, #A855F7 90%)`
                                         }}
                                     />
-                                    <p className="mt-4 text-[11px] text-slate-400 font-semibold italic tracking-tight">
+                                    <p className="mt-4 text-[11px] text-slate-400 font-semibold tracking-tight">
                                         Alert only when impact score exceeds this value.
                                     </p>
                                 </div>
@@ -232,7 +232,7 @@ export function NotificationsPage() {
                                             background: `linear-gradient(to right, #0E50F6 ${thresholds.quality}%, #E2E8F0 ${thresholds.quality}% 90%, #A855F7 90%)`
                                         }}
                                     />
-                                    <p className="mt-4 text-[11px] text-slate-400 font-semibold italic tracking-tight">
+                                    <p className="mt-4 text-[11px] text-slate-400 font-semibold tracking-tight">
                                         Alert when data quality drops below this percentage.
                                     </p>
                                 </div>

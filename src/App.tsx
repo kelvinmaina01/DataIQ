@@ -14,6 +14,8 @@ import { SettingsPage } from './pages/dashboard/SettingsPage';
 import { ProfilePage } from './pages/dashboard/ProfilePage';
 import { NotificationsPage } from './pages/dashboard/NotificationsPage';
 import { DataIngestionPage } from './pages/dashboard/DataIngestionPage';
+import { DataProcessingPage } from './pages/dashboard/DataProcessingPage';
+import { DatasetsPage } from './pages/dashboard/DatasetsPage';
 import { Toaster } from 'sonner';
 import {
   LayoutGrid,
@@ -62,7 +64,8 @@ export default function App() {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="ingestion" element={<DataIngestionPage />} />
-            <Route path="datasets" element={<BlankPage title="Datasets" icon={Database} />} />
+            <Route path="ingestion/processing" element={<DataProcessingPage />} />
+            <Route path="datasets" element={<DatasetsPage />} />
             <Route path="notebook" element={<BlankPage title="AI Notebook" icon={BookOpen} />} />
             <Route path="auto-analysis" element={<BlankPage title="Auto Analysis" icon={Zap} />} />
             <Route path="chat" element={<BlankPage title="AI Chat" icon={MessagesSquare} />} />

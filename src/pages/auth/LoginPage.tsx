@@ -110,6 +110,8 @@ export function LoginPage() {
     };
 
     const handleGoogleLogin = async () => {
+        if (isLoading) return;
+        setIsLoading(true);
         try {
             await signInWithPopup(auth, googleProvider);
             toast.success("Successfully logged in with Google!");
@@ -117,14 +119,23 @@ export function LoginPage() {
         } catch (error: any) {
             console.error("Google login error:", error);
             if (error.code === 'auth/account-exists-with-different-credential') {
-                toast.error("An account already exists with this email using a different login method. Please use your original method (e.g. Email/Password or GitHub).");
+                toast.error("An account already exists with this email using a different login method. Please use your original method.");
+            } else if (error.code === 'auth/cancelled-popup-request') {
+                // Ignore, as this usually means another request was started or it timed out
+                console.log("Concurrent popup request swallowed");
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                toast.error("Login cancelled. Popup was closed before completion.");
             } else {
                 toast.error(error.message || "Failed to log in with Google.");
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleGithubLogin = async () => {
+        if (isLoading) return;
+        setIsLoading(true);
         try {
             await signInWithPopup(auth, githubProvider);
             toast.success("Successfully logged in with GitHub!");
@@ -132,10 +143,16 @@ export function LoginPage() {
         } catch (error: any) {
             console.error("GitHub login error:", error);
             if (error.code === 'auth/account-exists-with-different-credential') {
-                toast.error("An account already exists with this email using a different login method. Please use your original method (e.g. Email/Password or Google).");
+                toast.error("An account already exists with this email using a different login method. Please use your original method.");
+            } else if (error.code === 'auth/cancelled-popup-request') {
+                console.log("Concurrent popup request swallowed");
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                toast.error("Login cancelled. Popup was closed before completion.");
             } else {
                 toast.error(error.message || "Failed to log in with GitHub.");
             }
+        } finally {
+            setIsLoading(false);
         }
     };
 

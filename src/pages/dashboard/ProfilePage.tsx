@@ -212,7 +212,7 @@ export function ProfilePage() {
                     {/* Intelligence Profile Card */}
                     <div className="bg-white border border-[#0E50F6]/20 shadow-sm rounded-[2rem] p-8">
                         <h3 className="text-lg font-bold text-slate-800 mb-2">Intelligence Profile</h3>
-                        <p className="text-sm text-[#0E50F6] font-semibold mb-6 italic">Select your data intelligence focus</p>
+                        <p className="text-sm text-[#0E50F6] font-semibold mb-6">Select your data intelligence focus</p>
 
                         <div className="relative">
                             <select
@@ -293,7 +293,7 @@ export function ProfilePage() {
                     <div className="bg-white border border-border/50 rounded-[2rem] shadow-sm flex flex-col h-full overflow-hidden">
                         <div className="p-8 flex-1">
                             <h3 className="text-2xl font-bold text-slate-800 tracking-tight mb-2">Personal Information</h3>
-                            <p className="text-sm text-[#0E50F6] font-semibold mb-8 italic">Update your personal details and bio.</p>
+                            <p className="text-sm text-[#0E50F6] font-semibold mb-8">Update your personal details and bio.</p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div className="space-y-2">
