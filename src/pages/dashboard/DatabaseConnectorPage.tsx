@@ -1,0 +1,337 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    ChevronLeft,
+    Database,
+    ShieldCheck,
+    Lock,
+    ExternalLink,
+    PlayCircle,
+    Mail,
+    CheckCircle2,
+    ArrowRight,
+    Info,
+    HelpCircle,
+    ChevronRight,
+} from 'lucide-react';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { cn } from '../../components/ui/utils';
+import { toast } from 'sonner';
+import { connectAndExtract } from '../../services/databaseService';
+import { CONNECTORS_INFO, ConnectorInfo } from '../../lib/connectors';
+
+// Connector Info now imported from ../../lib/connectors
+
+export function DatabaseConnectorPage() {
+    const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
+    const [view, setView] = useState<'intro' | 'config'>('intro');
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Form state
+    const [formData, setFormData] = useState<Record<string, string>>({});
+
+    const connector = id ? CONNECTORS_INFO[id] : null;
+
+    if (!connector) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20">
+                <div className="size-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                    <Database className="size-8 text-slate-300" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-800">Connector not found</h2>
+                <Button variant="ghost" className="mt-4" onClick={() => navigate('/dashboard/ingestion')}>
+                    Back to Connectors
+                </Button>
+            </div>
+        );
+    }
+
+    const highlightTerms = (text: string) => {
+        const terms = ['host', 'port', 'database name', 'credentials', 'IP whitelisting'];
+        let parts: (string | React.ReactNode)[] = [text];
+
+        terms.forEach(term => {
+            const nextParts: (string | React.ReactNode)[] = [];
+            parts.forEach(part => {
+                if (typeof part === 'string') {
+                    const regex = new RegExp(`(${term})`, 'gi');
+                    const split = part.split(regex);
+                    split.forEach((s, i) => {
+                        if (s.toLowerCase() === term.toLowerCase()) {
+                            nextParts.push(<span key={i} className="text-primary font-bold">{s}</span>);
+                        } else if (s !== "") {
+                            nextParts.push(s);
+                        }
+                    });
+                } else {
+                    nextParts.push(part);
+                }
+            });
+            parts = nextParts;
+        });
+
+        return parts;
+    };
+
+    const handleConnect = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!connector) return;
+
+        setIsLoading(true);
+        const loadingToast = toast.loading(`Connecting to ${connector.name}...`);
+
+        try {
+            // Simulate enterprise-grade extraction flow
+            const extractionResult = await connectAndExtract(connector.id, {
+                // In a real app, we'd pass the actual form data here
+                database: connector.name.toLowerCase(),
+                timestamp: new Date().toISOString()
+            });
+
+            toast.dismiss(loadingToast);
+            toast.success(`Successfully extracted data from ${connector.name}!`);
+
+            // Navigate to the processing page with the "virtual batch"
+            // We include method: 'Database: ID' so processing page knows to save it with specific mapping
+            navigate('/dashboard/ingestion/processing', {
+                state: {
+                    batch: [{
+                        ...extractionResult,
+                        method: `Database: ${connector.id}`
+                    }]
+                }
+            });
+        } catch (error) {
+            toast.dismiss(loadingToast);
+            toast.error('Failed to connect to database. Please check your credentials.');
+            console.error('Extraction error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="max-w-5xl mx-auto px-6 py-8 animate-fade-in">
+            {/* Header / Breadcrumb */}
+            <div className="flex items-center gap-4 mb-10">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full hover:bg-slate-100"
+                    onClick={() => view === 'config' ? setView('intro') : navigate('/dashboard/ingestion')}
+                >
+                    <ChevronLeft className="size-5 text-slate-600" />
+                </Button>
+
+                <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center p-1.5">
+                        <img src={connector.logo} alt={connector.name} className="size-full object-contain" />
+                    </div>
+                    <h1 className="text-xl font-bold text-primary">
+                        {view === 'intro' ? connector.name : `Create ${connector.name} Connector`}
+                    </h1>
+                </div>
+            </div>
+
+            <AnimatePresence mode="wait">
+                {view === 'intro' ? (
+                    <motion.div
+                        key="intro"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="max-w-3xl ml-14"
+                    >
+                        <div className="space-y-6">
+                            <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
+                                {highlightTerms(connector.setupTitle)}
+                            </p>
+
+                            <p className="text-lg text-slate-600 leading-relaxed max-w-2xl">
+                                {highlightTerms(connector.setupDescription)}
+                            </p>
+
+                            <div className="flex flex-col gap-4 py-4">
+                                <div className="flex items-center gap-3 text-slate-600 group cursor-pointer hover:text-primary transition-colors">
+                                    <PlayCircle className="size-5" />
+                                    <span className="font-semibold text-[15px]">watch our <span className="text-primary underline decoration-primary/30">video walkthrough</span></span>
+                                </div>
+                                <div className="flex items-center gap-3 text-slate-600 group cursor-pointer hover:text-primary transition-colors">
+                                    <Mail className="size-5" />
+                                    <span className="font-semibold text-[15px]">send setup information directly to your IT department below.</span>
+                                </div>
+                            </div>
+
+                            <div className="pt-6">
+                                <Button
+                                    className="h-12 px-8 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
+                                    onClick={() => setView('config')}
+                                >
+                                    Set up {connector.name}
+                                </Button>
+                            </div>
+                        </div>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="config"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="grid grid-cols-1 lg:grid-cols-2 gap-12"
+                    >
+                        {/* Form Column */}
+                        <div className="space-y-10">
+                            {connector.id === 'postgres' && (
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-bold text-slate-900 uppercase tracking-wider">Authentication Method</label>
+                                    </div>
+                                    <select className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                                        <option>Direct Connection</option>
+                                        <option>SSH Tunnel</option>
+                                    </select>
+                                    <p className="text-sm font-medium text-slate-400">Choose how you want to authenticate with {connector.name}</p>
+                                </div>
+                            )}
+
+                            <div className="space-y-8">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Connection Name *</h3>
+                                        <HelpCircle className="size-4 text-slate-300" />
+                                    </div>
+                                    <Input
+                                        placeholder="e.g. Postgres, Main DB"
+                                        className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
+                                    />
+                                </div>
+
+                                <div className="space-y-6 pt-2">
+                                    <div className="space-y-1">
+                                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Credentials</h3>
+                                        <p className="text-sm font-medium text-slate-400">Your credentials are encrypted and never stored in plain text.</p>
+                                    </div>
+
+                                    {['Username', 'Password', 'Host', 'Port', 'Database'].map((field) => (
+                                        <div key={field}>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{field} *</label>
+                                                <HelpCircle className="size-3.5 text-slate-300" />
+                                            </div>
+                                            <Input
+                                                type={field === 'Password' ? 'password' : 'text'}
+                                                placeholder={field === 'Port' ? 'Port number' : `${field} name`}
+                                                className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="space-y-6 pt-4">
+                                <p className="text-sm font-medium text-slate-500 leading-relaxed">
+                                    If your database requires IP whitelisting, you need to add IP addresses to your system.
+                                    <button className="ml-1 text-primary hover:underline font-bold">Show IPs to whitelist</button>
+                                </p>
+
+                                <div className="flex items-center gap-4 pt-4 border-t border-slate-100">
+                                    <Button
+                                        variant="outline"
+                                        className="h-12 px-8 border-slate-200 rounded-xl font-bold text-slate-600 hover:bg-slate-50"
+                                        onClick={() => setView('intro')}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        className="h-12 px-10 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
+                                        onClick={handleConnect}
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? 'Connecting...' : 'Connect'}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Visual / Info Column (Optional, to balance the grid) */}
+                        <div className="hidden lg:block">
+                            <div className="bg-slate-50/50 rounded-3xl p-10 border border-slate-100 relative overflow-hidden h-full">
+                                <div className="absolute top-0 right-0 p-8 opacity-10">
+                                    <ShieldCheck className="size-40 text-primary" />
+                                </div>
+                                <div className="relative z-10 space-y-8">
+                                    <div className="size-14 rounded-2xl bg-white shadow-sm flex items-center justify-center border border-slate-100">
+                                        <ShieldCheck className="size-8 text-primary" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-900 leading-tight">Secure, Enterprise-Grade Data Connection</h3>
+                                    <div className="space-y-6">
+                                        {[
+                                            { title: 'Read-Only Access', desc: 'DataIQ only requires read access to your data tables.' },
+                                            { title: 'End-to-End Encryption', desc: 'Your credentials and data are encrypted in transit and at rest.' },
+                                            { title: 'No Data Storage', desc: 'We do not store your raw database data unless explicitly cached.' }
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex gap-4">
+                                                <div className="mt-1 size-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                                    <CheckCircle2 className="size-3 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-slate-800 text-sm mb-1">{item.title}</h4>
+                                                    <p className="text-xs text-slate-500 font-medium leading-relaxed">{item.desc}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Compliance Badges */}
+                                    <div className="pt-8 border-t border-slate-200/60 mt-8 space-y-4">
+                                        {[
+                                            {
+                                                name: 'SOC 2 Type 2',
+                                                logo: 'https://www.vectorlogo.zone/logos/aicpa_soc2/aicpa_soc2-icon.svg',
+                                                color: 'bg-[#0E50F6]'
+                                            },
+                                            {
+                                                name: 'GDPR',
+                                                logo: 'https://www.vectorlogo.zone/logos/gdpr/gdpr-icon.svg',
+                                                color: 'bg-[#003399]'
+                                            }
+                                        ].map((badge, i) => (
+                                            <div key={i} className="bg-white border border-slate-100/80 rounded-[1.5rem] p-5 flex items-center justify-between group cursor-pointer hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                                                <div className="flex items-center gap-5">
+                                                    <div className={cn("size-14 rounded-full flex items-center justify-center p-3 shadow-sm", badge.color)}>
+                                                        <img
+                                                            src={badge.logo}
+                                                            alt={badge.name}
+                                                            className="size-full object-contain brightness-0 invert"
+                                                            onError={(e) => {
+                                                                (e.target as HTMLImageElement).style.visibility = 'hidden';
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <h4 className="font-extrabold text-slate-900 text-[17px] tracking-tight">{badge.name}</h4>
+                                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/10 text-[11px] font-bold text-emerald-700 bg-emerald-50/50">
+                                                            <div className="size-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                                                                <CheckCircle2 className="size-2.5 text-white" strokeWidth={4} />
+                                                            </div>
+                                                            Compliant
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <ChevronRight className="size-6 text-slate-200 group-hover:text-primary/40 group-hover:translate-x-1 transition-all" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}

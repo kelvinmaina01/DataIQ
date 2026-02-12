@@ -105,7 +105,7 @@ export function DataProcessingPage() {
                             quality_score: item.result.qualityScore,
                             grade: item.result.grade,
                             domain: item.result.domain,
-                            method: 'Manual Upload',
+                            method: (item as any).method || 'Manual Upload',
                             file_size: item.file.size,
                             status: 'Ready',
                             storage_path: filePath
@@ -113,189 +113,204 @@ export function DataProcessingPage() {
 
                     if (dbError) throw dbError;
 
-                    results.push({ ...item, status: 'success' });
+                    results.push({
+                        id: item.id,
+                        file: item.file,
+                        result: item.result,
+                        status: 'success'
+                    });
+
                 } catch (error: any) {
-                    console.error('Migration failed for', item.file.name, ':', error);
-                    toast.error(`Upload failed for ${item.file.name}: ${error.message}`);
-                    results.push({ ...item, status: 'error', error: error.message || 'Upload failed' });
+                    if (error.message?.includes('AbortError') || error.name === 'AbortError') return;
+                    console.error('Upload error:', error);
+                    results.push({
+                        id: item.id,
+                        file: item.file,
+                        status: 'error',
+                        error: error.message
+                    });
                 }
             }
-            setProcessedItems(results);
+            return results;
         };
 
         const animationInterval = runProcessingAnimation();
-        uploadToSupabase().then(() => {
-            // Wait for animation to finish or at least 3 seconds
-            setTimeout(() => {
-                clearInterval(animationInterval);
-                setProcessingProgress(100);
-
-                // Only show success page if at least one item succeeded
-                // Otherwise keep the state as processing (which handles its own error UI)
-                // or define an explicit error state to show what failed.
-                setUploadState('success');
-            }, 3500);
+        uploadToSupabase().then(results => {
+            if (results) {
+                setProcessedItems(results);
+                const allSuccess = results.every(r => r.status === 'success');
+                setTimeout(() => {
+                    setUploadState(allSuccess ? 'success' : 'error');
+                }, 1000);
+            }
         });
 
         return () => clearInterval(animationInterval);
     }, [batchData, navigate]);
 
     return (
-        <div className="min-h-[calc(100vh-10rem)] flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-6xl mx-auto px-6 py-8">
             <AnimatePresence mode="wait">
                 {uploadState === 'processing' ? (
                     <motion.div
                         key="processing"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        className="flex flex-col items-center text-center max-w-xl w-full"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-8"
                     >
-                        <div className="relative size-40 mb-10">
-                            <div className="absolute inset-0 border-4 border-slate-100 rounded-full" />
-                            <svg className="absolute inset-0 size-40 -rotate-90">
-                                <circle
-                                    cx="80"
-                                    cy="80"
-                                    r="76"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                    className="text-[#0E50F6]"
-                                    strokeDasharray={`${2 * Math.PI * 76}`}
-                                    strokeDashoffset={`${2 * Math.PI * 76 * (1 - processingProgress / 100)}`}
-                                    strokeLinecap="round"
-                                />
-                            </svg>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="size-24 bg-[#0E50F6]/5 rounded-full flex items-center justify-center">
-                                    <Cpu className="size-12 text-[#0E50F6]" />
-                                </div>
-                            </div>
+                        <div className="text-center mb-12">
+                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Processing Your Data</h1>
+                            <p className="text-slate-500 font-medium">Analyzing and optimizing your dataset...</p>
                         </div>
 
-                        <h2 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Auto-Processing Engine</h2>
-                        <p className="text-[#0E50F6] font-bold uppercase tracking-[0.2em] animate-pulse mb-10 text-sm">
-                            {processStage}
-                        </p>
-
-                        <div className="w-full space-y-4 bg-slate-50/50 p-8 rounded-3xl border border-slate-100">
-                            {[
-                                { label: 'PII Classification', done: processingProgress > 25 },
-                                { label: 'Schema Registry', done: processingProgress > 50 },
-                                { label: 'Data Quality Score', done: processingProgress > 75 },
-                                { label: 'Missingness Analysis', done: processingProgress > 95 }
-                            ].map((step, i) => (
-                                <div
-                                    key={i}
-                                    className={`flex items-center gap-4 transition-all duration-500 ${step.done ? 'opacity-100' : 'opacity-30'}`}
-                                >
-                                    <div className={`size-6 rounded-full flex items-center justify-center ${step.done ? 'bg-green-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
-                                        {step.done ? <CheckCircle2 className="size-4" /> : <div className="size-2 bg-slate-400 rounded-full" />}
+                        <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="size-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                        <Cpu className="size-5 text-primary" />
                                     </div>
-                                    <span className="text-base font-bold text-slate-700">{step.label}</span>
-                                    {step.done && <span className="ml-auto text-[10px] font-bold text-green-600 uppercase tracking-widest bg-green-50 px-2 py-0.5 rounded">Verified</span>}
+                                    <div>
+                                        <h3 className="font-bold text-slate-900">Auto-Processing Engine</h3>
+                                        <p className="text-sm text-slate-500">{processStage}</p>
+                                    </div>
                                 </div>
-                            ))}
+                                <span className="text-2xl font-bold text-primary">{Math.round(processingProgress)}%</span>
+                            </div>
+
+                            <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden mb-8">
+                                <motion.div
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${processingProgress}%` }}
+                                    transition={{ duration: 0.5, ease: "easeOut" }}
+                                    className="h-full bg-primary rounded-full"
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                {[
+                                    { label: 'PII Classification', done: processingProgress > 25 },
+                                    { label: 'Schema Registry', done: processingProgress > 50 },
+                                    { label: 'Data Quality Score', done: processingProgress > 75 },
+                                    { label: 'Missingness Analysis', done: processingProgress > 95 }
+                                ].map((step, i) => (
+                                    <div
+                                        key={i}
+                                        className={`flex items-center gap-4 transition-opacity duration-300 ${step.done ? 'opacity-100' : 'opacity-40'}`}
+                                    >
+                                        <div className={`size-6 rounded-full flex items-center justify-center transition-colors ${step.done ? 'bg-green-500' : 'bg-slate-200'}`}>
+                                            {step.done && <CheckCircle2 className="size-4 text-white" />}
+                                        </div>
+                                        <span className="text-sm font-bold text-slate-700">{step.label}</span>
+                                        {step.done && (
+                                            <span className="ml-auto text-xs font-bold text-green-600 uppercase tracking-wider bg-green-50 px-2 py-0.5 rounded">
+                                                Verified
+                                            </span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </motion.div>
                 ) : uploadState === 'success' && processedItems.some(i => i.status === 'success') ? (
                     <motion.div
-                        key="success-page"
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-                        className="w-full max-w-5xl"
+                        key="success"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-8"
                     >
-                        <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden flex flex-col border border-slate-200/60">
-                            <div className="p-10 flex flex-col items-center text-center border-b border-slate-100 bg-slate-50/30">
-                                <div className="size-20 bg-green-100/50 rounded-full flex items-center justify-center mb-6 ring-4 ring-green-50">
-                                    <CheckCircle2 className="size-10 text-green-600" />
-                                </div>
-                                <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Ingestion Successful</h2>
-                                <p className="text-slate-500 font-medium max-w-lg text-lg">Your data has been processed, normalized, and is now ready for analysis.</p>
+                        <div className="text-center py-8 bg-gradient-to-b from-green-50/50 to-transparent rounded-2xl">
+                            <div className="size-16 bg-green-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                                <CheckCircle2 className="size-8 text-green-600" />
                             </div>
+                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Ingestion Successful</h1>
+                            <p className="text-slate-500 font-medium">Your data has been processed, normalized, and is now ready for analysis.</p>
+                        </div>
 
-                            <div className="p-10 bg-white">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {processedItems.map(item => (
-                                        item.status === 'success' && item.result && (
-                                            <div key={item.id} className="bg-slate-50/50 border border-slate-100 rounded-[2rem] p-6 hover:shadow-md hover:border-blue-100 transition-all group">
-                                                <div className="flex items-start justify-between mb-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="size-12 bg-white rounded-2xl border border-slate-100 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                                                            <FileText className="size-6 text-blue-600" />
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="font-bold text-slate-900 text-base truncate max-w-[150px]">{item.file.name}</h4>
-                                                            <div className="flex items-center gap-2 mt-1">
-                                                                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
-                                                                    <CheckCircle2 className="size-2.5" />
-                                                                    Valid
-                                                                </span>
-                                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.result.rowCount.toLocaleString()} Rows</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <div className="text-2xl font-bold text-slate-900">{item.result.grade}</div>
-                                                        <div className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Grade</div>
-                                                    </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                            {processedItems.map(item => (
+                                item.status === 'success' && item.result && (
+                                    <div key={item.id} className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
+                                        <div className="flex items-start justify-between mb-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="size-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                                                    <FileText className="size-6 text-blue-600" />
                                                 </div>
-
-                                                <div className="grid grid-cols-3 gap-3">
-                                                    <div className="bg-white rounded-xl p-3 border border-slate-100">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Health</p>
-                                                        <p className="text-lg font-bold text-slate-700">{Math.round(item.result.healthReport.validity * 100)}%</p>
-                                                    </div>
-                                                    <div className="bg-white rounded-xl p-3 border border-slate-100">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Completeness</p>
-                                                        <p className="text-lg font-bold text-slate-700">{Math.round(item.result.healthReport.completeness * 100)}%</p>
-                                                    </div>
-                                                    <div className="bg-white rounded-xl p-3 border border-slate-100">
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Outliers</p>
-                                                        <p className="text-lg font-bold text-slate-700">{item.result.columns.reduce((acc: number, col: any) => acc + (col.outlierCount || 0), 0)}</p>
+                                                <div>
+                                                    <h4 className="font-bold text-slate-900 text-sm truncate max-w-[150px]">{item.file.name}</h4>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className="inline-flex items-center gap-1 text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+                                                            <CheckCircle2 className="size-3" />
+                                                            Valid
+                                                        </span>
+                                                        <span className="text-xs font-bold text-slate-400">{item.result.rowCount.toLocaleString()} Rows</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        )
-                                    ))}
-                                </div>
-                            </div>
+                                            <div className="text-right">
+                                                <div className="text-2xl font-bold text-slate-900">{item.result.grade}</div>
+                                                <div className="text-xs font-bold text-slate-400 uppercase">Grade</div>
+                                            </div>
+                                        </div>
 
-                            <div className="p-8 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row gap-4 justify-center">
-                                <Button
-                                    onClick={() => navigate('/dashboard/datasets')}
-                                    className="h-14 !bg-primary hover:!bg-primary/90 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/20 px-8 transition-all flex items-center gap-2 border-none"
-                                >
-                                    Go to Library
-                                    <ArrowRight className="size-5" />
-                                </Button>
-                                <Button
-                                    onClick={() => navigate('/dashboard/ingestion')}
-                                    variant="outline"
-                                    className="h-14 border-2 border-slate-200 hover:bg-white text-slate-600 font-bold text-lg rounded-xl px-8 transition-all"
-                                >
-                                    Upload More
-                                </Button>
-                            </div>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                                <p className="text-xs font-bold text-slate-400 uppercase mb-1">Health</p>
+                                                <p className="text-lg font-bold text-slate-700">{Math.round(item.result.healthReport.validity * 100)}%</p>
+                                            </div>
+                                            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                                <p className="text-xs font-bold text-slate-400 uppercase mb-1">Complete</p>
+                                                <p className="text-lg font-bold text-slate-700">{Math.round(item.result.healthReport.completeness * 100)}%</p>
+                                            </div>
+                                            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                                <p className="text-xs font-bold text-slate-400 uppercase mb-1">Outliers</p>
+                                                <p className="text-lg font-bold text-slate-700">{item.result.columns.reduce((acc: number, col: any) => acc + (col.outlierCount || 0), 0)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            ))}
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200 max-w-2xl mx-auto w-full">
+                            <Button
+                                onClick={() => navigate('/dashboard/datasets')}
+                                className="flex-1 h-12 !bg-primary hover:!bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20"
+                            >
+                                Go to Library
+                                <ArrowRight className="size-4 ml-2" />
+                            </Button>
+                            <Button
+                                onClick={() => navigate('/dashboard/ingestion')}
+                                variant="outline"
+                                className="flex-1 h-12 border-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl"
+                            >
+                                Upload More
+                            </Button>
                         </div>
                     </motion.div>
                 ) : (
                     <motion.div
-                        key="error-summary"
+                        key="error"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="flex flex-col items-center text-center max-w-xl w-full"
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-8"
                     >
-                        <div className="size-20 bg-red-100 rounded-full flex items-center justify-center mb-6 ring-4 ring-red-50">
-                            <AlertCircle className="size-10 text-red-600" />
+                        <div className="text-center py-8">
+                            <div className="size-16 bg-red-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                                <AlertCircle className="size-8 text-red-600" />
+                            </div>
+                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Ingestion Failed</h1>
+                            <p className="text-slate-500 font-medium">We encountered a security policy or connection error during the upload process.</p>
                         </div>
-                        <h2 className="text-3xl font-bold text-slate-900 mb-4">Ingestion Failed</h2>
-                        <p className="text-slate-500 font-medium mb-10">We encountered a security policy or connection error during the upload process.</p>
 
-                        <div className="w-full bg-red-50/50 border border-red-100 p-6 rounded-2xl mb-8 text-left">
-                            <h4 className="text-sm font-bold text-red-800 uppercase tracking-widest mb-3">Diagnostic Log</h4>
+                        <div className="bg-red-50 border border-red-100 p-6 rounded-2xl">
+                            <h4 className="text-sm font-bold text-red-800 uppercase tracking-wider mb-3">Diagnostic Log</h4>
                             {processedItems.filter(i => i.status === 'error').map((item, idx) => (
                                 <p key={idx} className="text-xs font-mono text-red-600 break-all mb-2">
                                     {item.file.name}: {item.error}
@@ -303,7 +318,7 @@ export function DataProcessingPage() {
                             ))}
                         </div>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-4 justify-center">
                             <Button
                                 onClick={() => navigate('/dashboard/ingestion')}
                                 className="h-12 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-8"

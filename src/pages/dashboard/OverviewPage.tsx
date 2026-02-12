@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, type User } from 'firebase/auth';
+import { supabase } from '../../../backend/supabase/supabaseClient';
 import {
     TrendingUp,
     Database,
@@ -27,6 +28,7 @@ import {
     AlertCircle,
     Crown
 } from 'lucide-react';
+import { getConnectorLogo } from '../../lib/connectors';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { cn } from '../../components/ui/utils';
@@ -93,31 +95,37 @@ function StatCard({ title, value, unit, trend, trendType, icon: Icon, subtext, c
     );
 }
 
-function UsageCard({ title, value, max, unit, percent, plan, className }: any) {
+function UsageCard({ title, value, max, unit, percent, plan, className, color = '#0E50F6' }: any) {
+    const lightBg = `${color}10`; // 10% opacity
+
     return (
         <div className={cn(
-            "border border-[#0E50F6]/30 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-all flex flex-col h-full group ring-1 ring-[#0E50F6]/5",
+            "border border-[#0E50F6]/20 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-all flex flex-col h-full group ring-1 ring-primary/5",
             className || "bg-white"
-        )}>
+        )} style={{ borderColor: `${color}30` }}>
             <div className="flex items-center justify-between mb-6">
                 <h4 className="text-2xl font-bold text-slate-900 tracking-tight">{title}</h4>
-                <div className="bg-[#0E50F6] text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+                <div className="text-white px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm" style={{ backgroundColor: color }}>
                     <Crown className="w-3.5 h-3.5 fill-current" />
                     <span className="text-[10px] font-bold uppercase tracking-wider">{plan}</span>
                 </div>
             </div>
 
             <div className="mb-6">
-                <p className="text-[15px] font-bold text-slate-400">
+                <div className="text-[15px] font-bold text-slate-400">
                     <span className="text-slate-900">{value}</span> / {max} {unit}
-                </p>
+                </div>
             </div>
 
             <div className="mt-auto">
-                <div className="w-full bg-white/50 h-4 rounded-full overflow-hidden p-0.5 border border-slate-200/50">
+                <div className="w-full h-4 rounded-full overflow-hidden p-0.5 border border-slate-200/50" style={{ backgroundColor: `${color}05` }}>
                     <div
-                        className="bg-[#0E50F6] h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(14,80,246,0.5)]"
-                        style={{ width: `${percent}%` }}
+                        className="h-full rounded-full transition-all duration-1000"
+                        style={{
+                            width: `${percent}%`,
+                            backgroundColor: color,
+                            boxShadow: `0 0 10px ${color}50`
+                        }}
                     />
                 </div>
             </div>
@@ -278,28 +286,75 @@ function FeatureCard({ title, subtitle, badge, metrics, icon: Icon }: any) {
     );
 }
 
-const recentDatasets = [
-    { name: 'Customer_Churn_Q1.csv', type: 'CSV', rows: '45,203', size: '12.4 MB', date: 'Dec 15, 2026', status: 'Ready' },
-    { name: 'Marketing_Campaign_Alpha', type: 'SQL', rows: '1.2M', size: 'N/A', date: 'Dec 14, 2026', status: 'Processing' },
-    { name: 'Inventory_Logs_Sync_01', type: 'JSON', rows: '678,921', size: '45.1 MB', date: 'Dec 14, 2026', status: 'Ready' },
-    { name: 'User_Behavior_Tracking', type: 'BigQuery', rows: '15.4M', size: 'N/A', date: 'Dec 13, 2026', status: 'Ready' },
-    { name: 'Sales_Performance_Global', type: 'CSV', rows: '89,450', size: '22.8 MB', date: 'Dec 12, 2026', status: 'Warning' },
-];
+
 
 export function OverviewPage() {
     const [user, setUser] = useState<User | null>(null);
     const [hasError, setHasError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
+    const [recentDatasets, setRecentDatasets] = useState<any[]>([]);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             if (currentUser) {
                 setUser(currentUser);
+                fetchRecentDatasets(currentUser.uid);
             }
         });
         console.log("DataIQ: OverviewPage mounted successfully.");
         return () => unsubscribe();
     }, []);
+
+    const fetchRecentDatasets = async (userId: string) => {
+        try {
+            const { data, error } = await supabase
+                .from('datasets')
+                .select('name, method, row_count, status, created_at')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (error) {
+                if (error.message?.includes('AbortError')) return;
+                console.error('Error fetching datasets:', error);
+                return;
+            }
+
+            // Transform data to match table schema
+            const formatted = data?.map(dataset => ({
+                name: dataset.name,
+                type: dataset.method || 'Manual',
+                rows: dataset.row_count?.toLocaleString() || '0',
+                date: new Date(dataset.created_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                }),
+                status: dataset.status || 'Ready'
+            })) || [];
+
+            setRecentDatasets(formatted);
+        } catch (err) {
+            console.error('Failed to fetch datasets:', err);
+        }
+    };
+
+    const getInitials = (name: string) => {
+        if (!name) return "DS";
+        const parts = name.split('.');
+        const ext = parts.length > 1 ? parts.pop() : "";
+        const baseName = parts.join('.');
+
+        const initials = baseName
+            .split(/[\s_-]+/)
+            .filter(word => word.length > 0)
+            .map(word => word[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 3);
+
+        return initials + (ext ? `.${ext.toLowerCase()}` : "");
+    };
 
     const displayName = user?.displayName || user?.email?.split('@')[0] || "User";
 
@@ -353,7 +408,8 @@ export function OverviewPage() {
                     unit="MB"
                     percent={35}
                     plan="Pro"
-                    className="bg-[#F0F4FF]"
+                    className="bg-[#F0F7FF]"
+                    color="#0E50F6"
                 />
                 <UsageCard
                     title="AI Ops"
@@ -362,7 +418,8 @@ export function OverviewPage() {
                     unit="req"
                     percent={0}
                     plan="Pro"
-                    className="bg-[#EEF2FF]"
+                    className="bg-[#F5F3FF]"
+                    color="#8B5CF6"
                 />
                 <UsageCard
                     title="Datasets"
@@ -371,7 +428,8 @@ export function OverviewPage() {
                     unit="files"
                     percent={11}
                     plan="Pro"
-                    className="bg-[#F0F9FF]"
+                    className="bg-[#ECFDF5]"
+                    color="#10B981"
                 />
                 <UsageCard
                     title="Models"
@@ -380,7 +438,8 @@ export function OverviewPage() {
                     unit="models"
                     percent={0}
                     plan="Pro"
-                    className="bg-[#F5F3FF]"
+                    className="bg-[#FFF1F2]"
+                    color="#F43F5E"
                 />
             </div>
 
@@ -408,33 +467,47 @@ export function OverviewPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="border-none hover:bg-transparent">
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4">Dataset Name</TableHead>
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4 text-center">Source</TableHead>
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4 text-center">Row Count</TableHead>
-                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] p-4 text-center">Status</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] px-2 py-4">Dataset Name</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] px-2 py-4 text-center">Source</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] px-2 py-4 text-center text-nowrap">Rows</TableHead>
+                                    <TableHead className="text-[11px] font-bold uppercase tracking-widest text-[#0E50F6] px-2 py-4 text-center">Status</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {recentDatasets.map((dataset, idx) => (
                                     <TableRow key={idx} className="group border-b border-border/20 last:border-0 hover:bg-primary/[0.02] transition-colors rounded-2xl">
-                                        <TableCell className="p-4">
-                                            <div>
-                                                <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{dataset.name}</p>
+                                        <TableCell className="px-2 py-4">
+                                            <div title={dataset.name}>
+                                                <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{getInitials(dataset.name)}</p>
                                                 <p className="text-[10px] font-bold text-muted-foreground/70">{dataset.date}</p>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="p-4 text-center">
-                                            <Badge variant="outline" className="rounded-lg bg-secondary/50 font-bold text-[10px] px-2 py-0.5">{dataset.type}</Badge>
+                                        <TableCell className="px-2 py-4 text-center">
+                                            <div className="flex flex-col items-center gap-1">
+                                                {(() => {
+                                                    const logo = getConnectorLogo(dataset.type);
+                                                    if (logo) {
+                                                        return (
+                                                            <img
+                                                                src={logo}
+                                                                alt={dataset.type}
+                                                                className="w-5 h-5 object-contain"
+                                                            />
+                                                        );
+                                                    }
+                                                    return <Badge variant="outline" className="rounded-lg bg-secondary/50 font-bold text-[10px] px-2 py-0.5 truncate max-w-[80px]">{dataset.type}</Badge>;
+                                                })()}
+                                            </div>
                                         </TableCell>
-                                        <TableCell className="p-4 text-center">
+                                        <TableCell className="px-2 py-4 text-center">
                                             <p className="text-sm font-bold text-foreground/80 tracking-tight">{dataset.rows}</p>
                                         </TableCell>
-                                        <TableCell className="p-4 text-center">
-                                            <div className="flex items-center justify-center gap-2">
+                                        <TableCell className="px-2 py-4 text-center">
+                                            <div className="flex items-center justify-center gap-1.5">
                                                 <Circle className={`w-2 h-2 fill-current ${dataset.status === 'Ready' ? 'text-green-500' :
                                                     dataset.status === 'Processing' ? 'text-[#0E50F6] animate-pulse' : 'text-amber-500'
                                                     }`} />
-                                                <span className="text-xs font-bold">{dataset.status}</span>
+                                                <span className="text-[10px] font-bold">{dataset.status}</span>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -442,8 +515,13 @@ export function OverviewPage() {
                             </TableBody>
                         </Table>
 
-                        <Button variant="ghost" className="w-full mt-6 text-xs font-bold text-[#0E50F6] hover:bg-[#0E50F6]/5 rounded-xl border border-dashed border-[#0E50F6]/20">
-                            View All Datasets
+                        <Button
+                            variant="ghost"
+                            className="w-full mt-6 text-xs font-bold text-[#0E50F6] hover:bg-[#0E50F6]/5 rounded-xl border border-dashed border-[#0E50F6]/20"
+                            onClick={() => window.location.href = '/dashboard/ingestion'}
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Upload Dataset
                         </Button>
                     </div>
                 </div>

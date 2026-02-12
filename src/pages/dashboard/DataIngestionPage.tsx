@@ -334,7 +334,7 @@ export function DataIngestionPage() {
             </div>
 
             {/* Controls: Tabs & Search */}
-            <div className="flex flex-col md:flex-row md:items-center justify-start gap-6 mb-8">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-start gap-6 mb-8">
                 <div className="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-xl w-fit">
                     {categories.map(cat => (
                         <button
@@ -551,43 +551,43 @@ export function DataIngestionPage() {
             {/* Health Data Compliance Card */}
             {(activeTab === 'Health') && (
                 <div className="mb-8 animate-slide-up">
-                    <div className="relative overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-white p-6">
-                        {/* Decorative background elements */}
-                        <div className="absolute -right-8 -top-8 size-40 rounded-full bg-blue-100/30 blur-2xl" />
-                        <div className="absolute -right-4 -bottom-4 size-24 rounded-full bg-indigo-100/20 blur-xl" />
+                    <div className="relative overflow-hidden rounded-2xl border-none p-6" style={{ backgroundColor: '#E97450' }}>
+                        {/* Decorative background elements - adjusted for contrast */}
+                        <div className="absolute -right-8 -top-8 size-40 rounded-full bg-white/10 blur-2xl" />
+                        <div className="absolute -right-4 -bottom-4 size-24 rounded-full bg-black/10 blur-xl" />
 
                         <div className="relative flex items-start gap-5">
-                            {/* Shield Icon */}
-                            <div className="flex-shrink-0 size-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25 flex items-center justify-center">
-                                <ShieldCheck className="size-7 text-white" strokeWidth={2} />
+                            {/* Shield Icon - Fix visibility */}
+                            <div className="flex-shrink-0 size-14 rounded-2xl bg-white/20 backdrop-blur-md shadow-lg flex items-center justify-center">
+                                <ShieldCheck className="size-7 text-white" strokeWidth={2.5} />
                             </div>
 
                             {/* Content */}
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <h3 className="text-lg font-bold text-slate-900">Optimized for Health Data</h3>
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-50 text-green-700 ring-1 ring-green-600/10">
+                                    <h3 className="text-lg font-bold text-white">Optimized for Health Data</h3>
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white ring-1 ring-white/30">
                                         <Lock className="size-2.5" />
                                         HIPAA Ready
                                     </span>
                                 </div>
-                                <p className="text-sm text-slate-600 leading-relaxed">
+                                <p className="text-sm text-white/90 leading-relaxed font-medium">
                                     This pipeline is specifically engineered for sensitive medical and research data. It automatically applies{' '}
-                                    <span className="font-bold text-slate-800">advanced PII detection</span> and{' '}
-                                    <span className="font-bold text-slate-800">anonymization algorithms</span> before processing, ensuring your data remains compliant and secure by design.
+                                    <span className="font-bold text-white underline decoration-white/30">advanced PII detection</span> and{' '}
+                                    <span className="font-bold text-white underline decoration-white/30">anonymization algorithms</span> before processing, ensuring your data remains compliant and secure by design.
                                 </p>
-                                <div className="flex items-center gap-4 mt-3">
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                                        <Fingerprint className="size-3.5 text-blue-500" />
-                                        <span className="font-semibold">End-to-end encryption</span>
+                                <div className="flex items-center gap-4 mt-4">
+                                    <div className="flex items-center gap-1.5 text-xs text-white/80">
+                                        <Fingerprint className="size-3.5" />
+                                        <span className="font-bold">End-to-end encryption</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                                        <ShieldCheck className="size-3.5 text-green-500" />
-                                        <span className="font-semibold">SOC 2 Type II</span>
+                                    <div className="flex items-center gap-1.5 text-xs text-white/80">
+                                        <ShieldCheck className="size-3.5" />
+                                        <span className="font-bold">SOC 2 Type II</span>
                                     </div>
-                                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                                        <Lock className="size-3.5 text-indigo-500" />
-                                        <span className="font-semibold">GDPR Compliant</span>
+                                    <div className="flex items-center gap-1.5 text-xs text-white/80">
+                                        <Lock className="size-3.5" />
+                                        <span className="font-bold">GDPR Compliant</span>
                                     </div>
                                 </div>
                             </div>
@@ -603,7 +603,8 @@ export function DataIngestionPage() {
                     .map((connector) => (
                         <div
                             key={connector.id}
-                            className="group bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:border-primary/30 transition-all duration-300 relative flex flex-col h-full"
+                            onClick={() => !connector.status?.includes('Connected') && navigate(`/dashboard/ingestion/connect/${connector.id}`)}
+                            className="group bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:border-primary/30 transition-all duration-300 relative flex flex-col h-full cursor-pointer"
                         >
                             <div className="flex items-start gap-4 mb-4">
                                 <div className="size-16 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-white group-hover:border-primary/10 transition-all duration-300 overflow-hidden p-2 shadow-sm group-hover:shadow-md">
@@ -646,7 +647,11 @@ export function DataIngestionPage() {
                                         Connected
                                     </div>
                                 ) : (
-                                    <Button variant="ghost" className="h-9 px-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary rounded-lg transition-all group-hover:bg-primary group-hover:text-white">
+                                    <Button
+                                        variant="ghost"
+                                        className="h-9 px-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary rounded-lg transition-all group-hover:bg-primary group-hover:text-white"
+                                        onClick={() => navigate(`/dashboard/ingestion/connect/${connector.id}`)}
+                                    >
                                         Connect
                                     </Button>
                                 )}
@@ -679,7 +684,10 @@ export function DataIngestionPage() {
                     </div>
                 </div>
 
-                <Button className="bg-primary hover:bg-primary/90 text-white px-10 rounded-2xl h-14 font-bold shadow-[0_10px_40px_rgba(14,80,246,0.3)] hover:shadow-[0_15px_50px_rgba(14,80,246,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all relative z-10 whitespace-nowrap">
+                <Button
+                    onClick={() => navigate('/dashboard/ingestion/request')}
+                    className="bg-primary hover:bg-primary/90 text-white px-10 rounded-2xl h-14 font-bold shadow-[0_10px_40px_rgba(14,80,246,0.3)] hover:shadow-[0_15px_50px_rgba(14,80,246,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all relative z-10 whitespace-nowrap"
+                >
                     Request connector
                 </Button>
             </div>

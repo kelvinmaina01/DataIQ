@@ -23,7 +23,7 @@ export function FilePreviewCard({ file, status, stats, error }: FilePreviewCardP
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full bg-[#f8faff] border border-brand-blue/10 rounded-2xl p-6 shadow-sm mb-6"
+            className="w-full bg-[#f8faff] border-2 border-primary rounded-2xl p-6 shadow-sm mb-6"
         >
             <div className="flex items-center gap-2 mb-6 text-brand-blue">
                 <FilePlus2 className="size-5" />
@@ -57,12 +57,12 @@ export function FilePreviewCard({ file, status, stats, error }: FilePreviewCardP
                     {
                         label: 'Rows Found:',
                         value: stats?.rowCount.toLocaleString() || '0',
-                        color: (stats?.rowCount || 0) > 0 ? 'text-slate-700' : 'text-red-500'
+                        color: 'text-red-600 font-black'
                     },
                     {
                         label: 'Columns Found:',
                         value: stats?.columnCount || '0',
-                        color: (stats?.columnCount || 0) > 0 ? 'text-slate-700' : 'text-red-500'
+                        color: 'text-red-600 font-black'
                     },
                 ].map((item, idx) => (
                     <div key={idx} className="flex items-center justify-between text-[13px] py-1">

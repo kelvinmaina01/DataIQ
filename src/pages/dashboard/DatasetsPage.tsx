@@ -26,7 +26,8 @@ import {
     CheckCircle2,
     BarChart4,
     Upload,
-    Cloud
+    Cloud,
+    ArrowRight
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -46,6 +47,7 @@ import {
 } from "../../components/ui/select";
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getConnectorLogo } from '../../lib/connectors';
 
 interface Dataset {
     id: string;
@@ -220,18 +222,18 @@ export function DatasetsPage() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700 pb-20">
+        <div className="animate-in fade-in duration-700">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12 w-full border-b border-slate-50 pb-8">
-                <div className="text-left">
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Datasets</h1>
-                    <p className="text-slate-500 font-medium mt-1 text-base italic-none">
+            <div className="flex flex-row items-center justify-between w-full p-0 m-0 border-none mb-8">
+                <div className="text-left flex flex-col p-0 m-0">
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight p-0 m-0 leading-none">Datasets</h1>
+                    <p className="text-slate-500 font-medium text-xs md:text-sm p-0 m-0 mt-0.5">
                         Manage and explore all your <span className="text-[#0E50F6] font-bold">uploaded datasets</span>
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3 md:ml-auto shrink-0">
+                <div className="flex items-center gap-2 shrink-0 p-0 m-0">
                     <Button
                         variant="outline"
                         onClick={fetchDatasets}
@@ -262,10 +264,10 @@ export function DatasetsPage() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.1 }}
-                        className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all flex flex-row items-center justify-between h-full group top-aligned-stats"
+                        className="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:border-[#0E50F6]/40 transition-all flex flex-row items-center justify-between h-full group top-aligned-stats"
                     >
                         <div className="flex flex-col gap-2">
-                            <h4 className="text-[13px] font-bold text-slate-500 tracking-wider whitespace-nowrap opacity-60 !lowercase">{stat.label}</h4>
+                            <h4 className="text-[13px] font-bold text-primary tracking-wider whitespace-nowrap opacity-100 !lowercase">{stat.label}</h4>
                             <p className="text-3xl font-bold text-slate-900 tracking-tighter">{stat.value}</p>
                         </div>
                         <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} transition-all duration-300 group-hover:scale-110 shadow-inner`}>
@@ -275,42 +277,6 @@ export function DatasetsPage() {
                 ))}
             </div>
 
-            {/* Toolbar */}
-            <div className="bg-white p-3 rounded-[1.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 flex flex-row gap-3 items-center justify-between mb-12">
-                <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0E50F6]" />
-                    <Input
-                        placeholder="Search datasets..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 h-10 bg-slate-50/30 border-[#0E50F6]/30 focus:border-[#0E50F6] rounded-xl focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all text-slate-600 font-semibold placeholder:text-slate-400 w-full"
-                    />
-                </div>
-                <div className="flex items-center gap-2 ml-auto">
-                    <Select value={domainFilter} onValueChange={setDomainFilter}>
-                        <SelectTrigger className="w-[130px] h-9 rounded-xl border-slate-200 bg-white font-bold text-xs text-slate-600 hover:border-primary/50 transition-colors">
-                            <SelectValue placeholder="All Domains" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-slate-100 shadow-2xl">
-                            <SelectItem value="All Domains">All Domains</SelectItem>
-                            <SelectItem value="Health">Health</SelectItem>
-                            <SelectItem value="Finance">Finance</SelectItem>
-                            <SelectItem value="General">General</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Select value={sortOrder} onValueChange={setSortOrder}>
-                        <SelectTrigger className="w-[130px] h-9 rounded-xl border-slate-200 bg-white font-bold text-xs text-slate-600 hover:border-primary/50 transition-colors">
-                            <SelectValue placeholder="Newest First" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-slate-100 shadow-2xl">
-                            <SelectItem value="Newest First">Newest First</SelectItem>
-                            <SelectItem value="Oldest First">Oldest First</SelectItem>
-                            <SelectItem value="Highest Quality">Highest Quality</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </div>
             {/* Datasets Grid */}
             {loading ? (
                 <div className="min-h-[400px] flex flex-col items-center justify-center gap-4">
@@ -338,15 +304,32 @@ export function DatasetsPage() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.2 }}
-                                className="bg-white rounded-[24px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col p-6 group relative overflow-hidden"
+                                className="bg-white rounded-[24px] border border-blue-100 hover:border-[#0E50F6]/40 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col p-6 group relative overflow-hidden"
                             >
                                 {/* Selection Border Effect */}
                                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#0E50F6] transition-colors duration-300 rounded-l-2xl"></div>
 
                                 {/* Top Row: Icon + Status */}
                                 <div className="flex items-center justify-between mb-4">
-                                    <div className="p-3 bg-cyan-50 rounded-xl">
-                                        <Database className="w-6 h-6 text-cyan-500" />
+                                    <div className="p-3 bg-blue-50 rounded-xl flex items-center justify-center overflow-hidden">
+                                        {(() => {
+                                            const logo = getConnectorLogo(dataset.method);
+                                            if (logo) {
+                                                return (
+                                                    <img
+                                                        src={logo}
+                                                        alt={dataset.method}
+                                                        className="w-6 h-6 object-contain"
+                                                        onError={(e) => {
+                                                            (e.target as any).style.display = 'none';
+                                                            (e.target as any).nextSibling.style.display = 'block';
+                                                        }}
+                                                    />
+                                                );
+                                            }
+                                            return <Database className="w-6 h-6 text-[#0E50F6]" />;
+                                        })()}
+                                        <Database className="w-6 h-6 text-[#0E50F6] hidden" />
                                     </div>
                                     <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border ${dataset.status === 'Ready' ? 'border-emerald-100 bg-emerald-50 text-emerald-600' :
                                         dataset.status === 'Processing' ? 'border-blue-100 bg-blue-50 text-blue-600' : 'border-amber-100 bg-amber-50 text-amber-600'
@@ -371,9 +354,9 @@ export function DatasetsPage() {
 
                                 {/* Title & Info */}
                                 <div className="mb-6">
-                                    <h3 className="text-xl font-bold text-slate-900 mb-1 truncate" title={dataset.name}>{dataset.name}</h3>
+                                    <h3 className="text-xl font-bold text-[#0E50F6] mb-1 truncate" title={dataset.name}>{dataset.name}</h3>
                                     <div className="flex items-center gap-2 text-slate-400 text-xs font-medium">
-                                        <FileText className="w-3.5 h-3.5" />
+                                        <FileText className="w-3.5 h-3.5 text-[#0E50F6]/70" />
                                         <span className="truncate max-w-[200px]">{dataset.name}.csv</span>
                                     </div>
                                 </div>
@@ -385,11 +368,11 @@ export function DatasetsPage() {
 
                                     <div className="text-center md:text-left pl-2">
                                         <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 !lowercase">rows</p>
-                                        <p className="text-lg font-bold text-slate-900 tracking-tight">{dataset.row_count?.toLocaleString() || '0'}</p>
+                                        <p className="text-lg font-bold text-red-600 tracking-tight">{dataset.row_count?.toLocaleString() || '0'}</p>
                                     </div>
                                     <div className="text-center md:text-right pr-2">
                                         <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 !lowercase">cols</p>
-                                        <p className="text-lg font-bold text-slate-900 tracking-tight">{dataset.column_count || '0'}</p>
+                                        <p className="text-lg font-bold text-red-600 tracking-tight">{dataset.column_count || '0'}</p>
                                     </div>
                                     <div className="col-span-2 text-center pt-4 border-t border-slate-50 mt-2">
                                         <p className="text-[10px] font-bold text-slate-400 tracking-widest mb-1 !lowercase">quality score</p>
@@ -400,6 +383,15 @@ export function DatasetsPage() {
                                         </p>
                                     </div>
                                 </div>
+
+                                {/* Explore Button */}
+                                <Button
+                                    variant="ghost"
+                                    className="w-full mb-6 text-[#0E50F6] font-bold hover:bg-blue-50 group/explore border border-blue-100 rounded-xl"
+                                    onClick={() => navigate(`/dashboard/datasets/${dataset.id}`)}
+                                >
+                                    Explore <ArrowRight className="ml-2 w-4 h-4 group-hover/explore:translate-x-1 transition-transform" />
+                                </Button>
 
                                 {/* Footer */}
                                 <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
@@ -412,25 +404,22 @@ export function DatasetsPage() {
                                     </Badge>
                                 </div>
 
-                                {/* Actions Dropdown */}
-                                <div className="absolute top-4 right-14 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-slate-100 text-slate-400">
-                                                <MoreVertical className="w-4 h-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="w-40 rounded-xl border-slate-100 shadow-xl p-1">
-                                            <DropdownMenuItem onClick={() => window.open(dataset.url)} className="text-xs font-bold text-slate-600 rounded-lg cursor-pointer">
-                                                <Download className="w-3.5 h-3.5 mr-2" />
-                                                Download
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleDelete(dataset.id)} className="text-xs font-bold text-rose-600 focus:text-rose-600 rounded-lg cursor-pointer">
-                                                <Trash2 className="w-3.5 h-3.5 mr-2" />
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                                {/* Quick Actions */}
+                                <div className="absolute top-4 right-6 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={() => window.open(dataset.url)}
+                                        className="h-8 w-8 rounded-lg bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-[#0E50F6] hover:border-blue-200 transition-all hover:scale-110"
+                                        title="Download"
+                                    >
+                                        <Download className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(dataset.id)}
+                                        className="h-8 w-8 rounded-lg bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-400 hover:text-rose-600 hover:border-rose-200 transition-all hover:scale-110"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
                                 </div>
                             </motion.div>
                         ))}
