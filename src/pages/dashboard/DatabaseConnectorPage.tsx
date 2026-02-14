@@ -8,18 +8,17 @@ import {
     Lock,
     ExternalLink,
     PlayCircle,
-    Mail,
     CheckCircle2,
     ArrowRight,
+    ChevronRight,
     Info,
     HelpCircle,
-    ChevronRight,
+    Mail
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { cn } from '../../components/ui/utils';
 import { toast } from 'sonner';
-import { connectAndExtract } from '../../services/databaseService';
 import { CONNECTORS_INFO, ConnectorInfo } from '../../lib/connectors';
 
 // Connector Info now imported from ../../lib/connectors
@@ -81,34 +80,45 @@ export function DatabaseConnectorPage() {
         if (!connector) return;
 
         setIsLoading(true);
-        const loadingToast = toast.loading(`Connecting to ${connector.name}...`);
+        const loadingToast = toast.loading(`Testing connection to ${connector.name}...`);
 
         try {
-            // Simulate enterprise-grade extraction flow
-            const extractionResult = await connectAndExtract(connector.id, {
-                // In a real app, we'd pass the actual form data here
-                database: connector.name.toLowerCase(),
-                timestamp: new Date().toISOString()
+            // Import connection service
+            const { testConnection, saveConnection } = await import('../../services/connectionService');
+
+            // Test the connection (no data import)
+            const testResult = await testConnection(connector.id, formData);
+
+            if (!testResult.success) {
+                throw new Error(testResult.message);
+            }
+
+            // Save connection credentials securely
+            await saveConnection({
+                connectorType: connector.id,
+                connectionName: formData.connectionName || `${connector.name} Connection`,
+                credentials: formData,
+                status: 'connected',
+                lastTested: new Date()
             });
 
             toast.dismiss(loadingToast);
-            toast.success(`Successfully extracted data from ${connector.name}!`);
+            toast.success(
+                <div>
+                    <p className="font-bold">Connection Successful!</p>
+                    <p className="text-sm">Your {connector.name} is now connected and ready to query.</p>
+                </div>
+            );
 
-            // Navigate to the processing page with the "virtual batch"
-            // We include method: 'Database: ID' so processing page knows to save it with specific mapping
-            navigate('/dashboard/ingestion/processing', {
-                state: {
-                    batch: [{
-                        ...extractionResult,
-                        method: `Database: ${connector.id}`
-                    }]
-                }
-            });
+            // Navigate to the connection detail page
+            setTimeout(() => {
+                navigate(`/dashboard/connection/${connector.id}`);
+            }, 1000);
+
         } catch (error) {
             toast.dismiss(loadingToast);
-            toast.error('Failed to connect to database. Please check your credentials.');
-            console.error('Extraction error:', error);
-        } finally {
+            toast.error('Failed to connect. Please check your credentials.');
+            console.error('Connection error:', error);
             setIsLoading(false);
         }
     };

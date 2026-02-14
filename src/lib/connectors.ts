@@ -80,6 +80,33 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         setupTitle: 'Configure a connector to analyze your Snowflake data with DataIQ.',
         setupDescription: "Account URL and credentials required. Optimized for high-performance enterprise analytics.",
         fields: ['Connection Name', 'Account Name', 'Username', 'Password', 'Warehouse', 'Database', 'Schema']
+    },
+    'gdrive': {
+        id: 'gdrive',
+        name: 'Google Drive',
+        description: 'Connect your Google Drive files for instant AI analysis',
+        logo: 'https://www.vectorlogo.zone/logos/google_drive/google_drive-icon.svg',
+        setupTitle: 'Connect your Google Drive to DataIQ.',
+        setupDescription: "Authorize DataIQ to access your Google Sheets and Drive files. We only access files you explicitly share with us.",
+        fields: []
+    },
+    'google-sheets': {
+        id: 'google-sheets',
+        name: 'Google Sheets',
+        description: 'Live connection to your Google Sheets',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Google_Sheets_logo_%282014-2020%29.svg',
+        setupTitle: 'Connect Google Workspace to DataIQ.',
+        setupDescription: "Authorize once to access Google Sheets, Drive, and Ads data. OAuth 2.0 secured.",
+        fields: []
+    },
+    'gads': {
+        id: 'gads',
+        name: 'Google Ads',
+        description: 'Analyze your Google Ads campaigns and performance data',
+        logo: 'https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg',
+        setupTitle: 'Connect Google Ads to DataIQ.',
+        setupDescription: "Authorize DataIQ to access your Google Ads account data. Analyze campaigns, keywords, and conversions.",
+        fields: []
     }
 };
 
