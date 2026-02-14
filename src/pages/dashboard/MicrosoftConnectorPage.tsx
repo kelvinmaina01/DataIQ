@@ -168,7 +168,7 @@ export function MicrosoftConnectorPage() {
                     <div className="text-center py-16 px-6 max-w-4xl mx-auto">
                         {/* Primary Connector Logo (large, centered) */}
                         <div className="flex items-center justify-center mb-6">
-                            <div className="size-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-3xl shadow-lg flex items-center justify-center">
+                            <div className="size-24 bg-gradient-to-br from-[#0078D4] to-[#50E6FF] rounded-3xl shadow-lg flex items-center justify-center">
                                 <svg className="size-14 text-white" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M0 0h11.377v11.372H0zm12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zm12.623 0H24V24H12.623" />
                                 </svg>
@@ -259,7 +259,7 @@ export function MicrosoftConnectorPage() {
                     <Button
                         onClick={handleConnect}
                         disabled={isLoading}
-                        className="bg-[#0078D4] hover:bg-[#006ABC] text-white font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all"
+                        className="bg-gradient-to-r from-[#0078D4] to-[#00BCF2] hover:from-[#006ABC] hover:to-[#00A8E0] text-white font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all"
                     >
                         {isLoading ? (
                             <div className="flex items-center gap-2">
