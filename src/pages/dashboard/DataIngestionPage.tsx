@@ -559,49 +559,49 @@ export function DataIngestionPage() {
                                                     } else {
                                                         navigate(`/dashboard/ingestion/connect/${connector.id}`);
                                                     }
-                                                }}}
+                                                }}
                                             >
-                                        Connect
+                                                Connect
                                             </Button>
-                            );
+                                        );
                                     }
                                 })()}
-                        </div>
+                            </div>
                         </div>
                     ))}
 
-            {filteredConnectors.length === 0 && (
-                <div className="col-span-full py-20 text-center">
-                    <div className="size-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Info className="size-8 text-slate-300" />
+                {filteredConnectors.length === 0 && (
+                    <div className="col-span-full py-20 text-center">
+                        <div className="size-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Info className="size-8 text-slate-300" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800 mb-2">No connectors found</h3>
+                        <p className="text-slate-500">Try adjusting your search or category filters.</p>
                     </div>
-                    <h3 className="text-xl font-bold text-slate-800 mb-2">No connectors found</h3>
-                    <p className="text-slate-500">Try adjusting your search or category filters.</p>
+                )}
+            </div>
+
+            {/* Support Banner */}
+            <div className="mt-16 p-8 rounded-[3rem] bg-primary/[0.03] border border-primary/10 flex flex-row items-center justify-between gap-8 relative overflow-hidden group shadow-sm">
+                <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
+
+                <div className="flex items-center gap-6 relative z-10">
+                    <div className="size-16 rounded-2xl bg-primary shadow-lg shadow-primary/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
+                        <Plus className="size-8" strokeWidth={3} />
+                    </div>
+                    <div>
+                        <h3 className="text-2xl font-bold text-slate-900 mb-1">Need another connection?</h3>
+                        <p className="text-slate-600 font-medium tracking-tight">Let us know what data you'd like to use in DataIQ.</p>
+                    </div>
                 </div>
-            )}
-        </div>
 
-            {/* Support Banner */ }
-    <div className="mt-16 p-8 rounded-[3rem] bg-primary/[0.03] border border-primary/10 flex flex-row items-center justify-between gap-8 relative overflow-hidden group shadow-sm">
-        <div className="absolute right-0 top-0 bottom-0 w-1/4 bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
-
-        <div className="flex items-center gap-6 relative z-10">
-            <div className="size-16 rounded-2xl bg-primary shadow-lg shadow-primary/20 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
-                <Plus className="size-8" strokeWidth={3} />
+                <Button
+                    onClick={() => navigate('/dashboard/ingestion/request')}
+                    className="bg-primary hover:bg-primary/90 text-white px-10 rounded-2xl h-14 font-bold shadow-[0_10px_40px_rgba(14,80,246,0.3)] hover:shadow-[0_15px_50px_rgba(14,80,246,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all relative z-10 whitespace-nowrap"
+                >
+                    Request connector
+                </Button>
             </div>
-            <div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-1">Need another connection?</h3>
-                <p className="text-slate-600 font-medium tracking-tight">Let us know what data you'd like to use in DataIQ.</p>
-            </div>
-        </div>
-
-        <Button
-            onClick={() => navigate('/dashboard/ingestion/request')}
-            className="bg-primary hover:bg-primary/90 text-white px-10 rounded-2xl h-14 font-bold shadow-[0_10px_40px_rgba(14,80,246,0.3)] hover:shadow-[0_15px_50px_rgba(14,80,246,0.4)] hover:-translate-y-0.5 active:scale-95 transition-all relative z-10 whitespace-nowrap"
-        >
-            Request connector
-        </Button>
-    </div>
         </div >
     );
 }
