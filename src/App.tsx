@@ -23,6 +23,7 @@ import { ConnectionDetailPage } from './pages/dashboard/ConnectionDetailPage';
 import { GoogleSheetsPage } from './pages/dashboard/GoogleSheetsPage';
 import { GoogleSheetsConnectorPage } from './pages/dashboard/GoogleSheetsConnectorPage';
 import { MetaAdsConnectorPage } from './pages/dashboard/MetaAdsConnectorPage';
+import { MicrosoftConnectorPage } from './pages/dashboard/MicrosoftConnectorPage';
 import { GoogleAuthCallback } from './pages/auth/GoogleAuthCallback';
 import { Toaster } from 'sonner';
 import {
@@ -80,6 +81,7 @@ export default function App() {
             <Route path="ingestion/connect/:id" element={<DatabaseConnectorPage />} />
             <Route path="ingestion/connect/google-sheets" element={<GoogleSheetsConnectorPage />} />
             <Route path="ingestion/connect/metaads" element={<MetaAdsConnectorPage />} />
+            <Route path="ingestion/connect/microsoft" element={<MicrosoftConnectorPage />} />
             <Route path="connection/:connectorId" element={<ConnectionDetailPage />} />
             <Route path="ingestion/request" element={<ConnectorRequestPage />} />
             <Route path="google-sheets" element={<GoogleSheetsPage />} />

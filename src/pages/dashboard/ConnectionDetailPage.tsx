@@ -10,7 +10,7 @@ import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { cn } from '../../components/ui/utils';
 import { CONNECTORS_INFO } from '../../lib/connectors';
-import { getConnectionsByType, deleteConnection, getGoogleSheetsConnection, disconnectGoogleSheets, getMetaAdsConnection, disconnectMetaAds } from '../../services/connectionService';
+import { getConnectionsByType, deleteConnection, getGoogleSheetsConnection, disconnectGoogleSheets, getMetaAdsConnection, disconnectMetaAds, getMicrosoftConnection, disconnectMicrosoft } from '../../services/connectionService';
 import { toast } from 'sonner';
 
 type TabType = 'browse' | 'customize' | 'learnings' | 'settings';
@@ -31,11 +31,15 @@ export function ConnectionDetailPage() {
     const isMetaAds = connectorId === 'metaads';
     const metaAdsConnection = isMetaAds ? getMetaAdsConnection() : null;
 
+    // Handle Microsoft connections (OneDrive + SharePoint)
+    const isMicrosoft = connectorId === 'onedrive' || connectorId === 'sharepoint';
+    const microsoftConnection = isMicrosoft ? getMicrosoftConnection() : null;
+
     // Handle database/warehouse connections
-    const connections = (!isGoogleWorkspace && !isMetaAds) ? getConnectionsByType(connectorId || '') : [];
+    const connections = (!isGoogleWorkspace && !isMetaAds && !isMicrosoft) ? getConnectionsByType(connectorId || '') : [];
     const activeConnection = connections[0];
 
-    if (!connector && !isGoogleWorkspace && !isMetaAds) {
+    if (!connector && !isGoogleWorkspace && !isMetaAds && !isMicrosoft) {
         return <div>Connector not found</div>;
     }
 
@@ -57,6 +61,12 @@ export function ConnectionDetailPage() {
             if (confirm(`Are you sure you want to disconnect Meta Ads? This will remove access to your Facebook and Instagram ad data.`)) {
                 disconnectMetaAds();
                 toast.success('Meta Ads disconnected successfully');
+                navigate('/dashboard/ingestion');
+            }
+        } else if (isMicrosoft) {
+            if (confirm(`Are you sure you want to disconnect Microsoft? This will remove access to OneDrive and SharePoint data.`)) {
+                disconnectMicrosoft();
+                toast.success('Microsoft disconnected successfully');
                 navigate('/dashboard/ingestion');
             }
         } else if (activeConnection && confirm(`Are you sure you want to delete this connector and all learnings associated with it?`)) {

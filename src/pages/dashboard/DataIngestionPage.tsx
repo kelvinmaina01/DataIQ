@@ -479,6 +479,9 @@ export function DataIngestionPage() {
                                 // Special handling for Google Workspace OAuth (Sheets, Drive, Ads)
                                 if (connector.id === 'gsheets' || connector.id === 'google-sheets' || connector.id === 'gdrive' || connector.id === 'gads') {
                                     navigate(`/dashboard/ingestion/connect/google-sheets?source=${connector.id}`);
+                                } else if (connector.id === 'onedrive' || connector.id === 'sharepoint') {
+                                    // Special handling for Microsoft OAuth (OneDrive + SharePoint)
+                                    navigate(`/dashboard/ingestion/connect/microsoft?source=${connector.id}`);
                                 } else {
                                     navigate(`/dashboard/ingestion/connect/${connector.id}`);
                                 }
@@ -556,6 +559,8 @@ export function DataIngestionPage() {
                                                     e.stopPropagation();
                                                     if (isGoogleSheets) {
                                                         navigate(`/dashboard/ingestion/connect/google-sheets?source=${connector.id}`);
+                                                    } else if (connector.id === 'onedrive' || connector.id === 'sharepoint') {
+                                                        navigate(`/dashboard/ingestion/connect/microsoft?source=${connector.id}`);
                                                     } else {
                                                         navigate(`/dashboard/ingestion/connect/${connector.id}`);
                                                     }

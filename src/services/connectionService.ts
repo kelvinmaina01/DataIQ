@@ -40,6 +40,19 @@ export interface MetaAdsConnection {
     createdAt: Date;
 }
 
+export interface MicrosoftConnection {
+    id: string;
+    connectorType: 'microsoft';
+    connectionName: string;
+    accessToken: string;
+    refreshToken?: string;
+    expiresAt: Date;
+    scope: string;
+    userEmail?: string;
+    status: 'connected' | 'disconnected' | 'error';
+    createdAt: Date;
+}
+
 /**
  * Test a database connection without importing data
  */
@@ -150,6 +163,12 @@ export function hasActiveConnection(connectorType: string): boolean {
     if (connectorType === 'metaads') {
         const metaConnection = getMetaAdsConnection();
         return metaConnection !== null && metaConnection.status === 'connected';
+    }
+
+    // Check Microsoft connection (OneDrive + SharePoint)
+    if (connectorType === 'onedrive' || connectorType === 'sharepoint') {
+        const microsoftConnection = getMicrosoftConnection();
+        return microsoftConnection !== null && microsoftConnection.status === 'connected';
     }
 
     return hasDB;
@@ -278,4 +297,47 @@ export function getMetaAdsConnection(): MetaAdsConnection | null {
 export function disconnectMetaAds(): void {
     localStorage.removeItem('meta_ads_connection');
     console.log('[ConnectionService] Meta Ads connection removed');
+}
+
+/**
+ * Save Microsoft OAuth connection (OneDrive + SharePoint)
+ */
+export function saveMicrosoftConnection(connection: Omit<MicrosoftConnection, 'id' | 'createdAt'>): MicrosoftConnection {
+    const newConnection: MicrosoftConnection = {
+        ...connection,
+        id: `ms_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        createdAt: new Date()
+    };
+
+    localStorage.setItem('microsoft_connection', JSON.stringify(newConnection));
+    console.log('[ConnectionService] Microsoft connection saved:', newConnection);
+    return newConnection;
+}
+
+/**
+ * Get Microsoft connection (only one allowed per user)
+ */
+export function getMicrosoftConnection(): MicrosoftConnection | null {
+    const stored = localStorage.getItem('microsoft_connection');
+    if (!stored) return null;
+
+    try {
+        const connection = JSON.parse(stored);
+        return {
+            ...connection,
+            createdAt: new Date(connection.createdAt),
+            expiresAt: new Date(connection.expiresAt)
+        };
+    } catch (error) {
+        console.error('[ConnectionService] Error parsing Microsoft connection:', error);
+        return null;
+    }
+}
+
+/**
+ * Disconnect (delete) Microsoft connection
+ */
+export function disconnectMicrosoft(): void {
+    localStorage.removeItem('microsoft_connection');
+    console.log('[ConnectionService] Microsoft connection removed');
 }
