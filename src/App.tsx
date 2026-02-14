@@ -44,6 +44,8 @@ import {
   UserCircle
 } from 'lucide-react';
 
+import { DocumentIntelligencePage } from './pages/dashboard/DocumentIntelligencePage';
+
 export default function App() {
   console.log("DataIQ: App Rendering...");
   return (
@@ -75,7 +77,7 @@ export default function App() {
             <Route path="chat" element={<BlankPage title="AI Chat" icon={MessagesSquare} />} />
             <Route path="pinned" element={<BlankPage title="Pinned Dashboards" icon={Files} />} />
             <Route path="reports" element={<BlankPage title="Reports" icon={FileText} />} />
-            <Route path="file-parser" element={<BlankPage title="File Parser" icon={FileSearch} />} />
+            <Route path="document-intelligence" element={<DocumentIntelligencePage />} />
             <Route path="my-files" element={<BlankPage title="My Files" icon={FolderOpen} />} />
             <Route path="models" element={<BlankPage title="AI Model Hub" icon={Cpu} />} />
             <Route path="security" element={<BlankPage title="Security & Audit" icon={ShieldCheck} />} />

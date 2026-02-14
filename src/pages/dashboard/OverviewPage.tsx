@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { supabase } from '../../../backend/supabase/supabaseClient';
@@ -26,7 +27,10 @@ import {
     Users,
     ClipboardPen,
     AlertCircle,
-    Crown
+    Crown,
+    FileText,
+    FileJson,
+    FileCode
 } from 'lucide-react';
 import { getConnectorLogo } from '../../lib/connectors';
 import { Button } from '../../components/ui/button';
@@ -40,6 +44,14 @@ import {
     TableHeader,
     TableRow
 } from '../../components/ui/table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
 
 interface StatCardProps {
     title: string;
@@ -289,6 +301,7 @@ function FeatureCard({ title, subtitle, badge, metrics, icon: Icon }: any) {
 
 
 export function OverviewPage() {
+    const navigate = useNavigate();
     const [user, setUser] = useState<User | null>(null);
     const [hasError, setHasError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -388,13 +401,91 @@ export function OverviewPage() {
                 </div>
                 <div className="flex items-center pt-1">
                     <div className="flex items-stretch shadow-md rounded-lg overflow-hidden group hover:opacity-90 transition-opacity">
-                        <Button className="rounded-none !bg-[#0E50F6] hover:!bg-[#0D44D1] text-white font-semibold px-5 h-12 border-r border-white/10 text-sm">
+                        <Button
+                            onClick={() => navigate('/dashboard/document-intelligence')}
+                            className="rounded-none !bg-[#0E50F6] hover:!bg-[#0D44D1] text-white font-semibold px-5 h-12 border-r border-white/10 text-sm"
+                        >
                             <Plus className="w-4 h-4 mr-2" />
                             New Dataset
                         </Button>
-                        <Button className="rounded-none !bg-[#0E50F6] hover:!bg-[#0D44D1] text-white px-3 h-12">
-                            <ChevronDown className="w-5 h-5" />
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button className="rounded-none !bg-[#0E50F6] hover:!bg-[#0D44D1] text-white px-3 h-12 outline-none focus:ring-0">
+                                    <ChevronDown className="w-5 h-5" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 p-2 rounded-xl border border-slate-100 shadow-xl bg-white">
+                                <DropdownMenuLabel className="text-xs font-bold text-slate-400 uppercase tracking-wider px-2 py-2">
+                                    Quick Upload
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-slate-100 my-1" />
+
+                                <DropdownMenuItem
+                                    onClick={() => navigate('/dashboard/document-intelligence', { state: { method: 'CSV' } })}
+                                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer focus:bg-slate-50 focus:text-slate-900 group/item transition-colors"
+                                >
+                                    <div className="size-8 rounded-lg bg-orange-50 flex items-center justify-center border border-orange-100 group-hover/item:border-orange-200 transition-colors">
+                                        <img src="https://cdn-icons-png.flaticon.com/512/28/28842.png" alt="CSV" className="size-5 object-contain" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-sm font-bold text-slate-700 group-hover/item:text-slate-900">CSV File</span>
+                                        <span className="text-[10px] font-medium text-slate-400">Structured Data</span>
+                                    </div>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() => navigate('/dashboard/document-intelligence', { state: { method: 'Excel' } })}
+                                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer focus:bg-slate-50 focus:text-slate-900 group/item transition-colors"
+                                >
+                                    <div className="size-8 rounded-lg bg-green-50 flex items-center justify-center border border-green-100 group-hover/item:border-green-200 transition-colors">
+                                        <img src="/logos/excel.svg" alt="Excel" className="size-5 object-contain" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-sm font-bold text-slate-700 group-hover/item:text-slate-900">Excel</span>
+                                        <span className="text-[10px] font-medium text-slate-400">Spreadsheets</span>
+                                    </div>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() => navigate('/dashboard/document-intelligence', { state: { method: 'JSON' } })}
+                                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer focus:bg-slate-50 focus:text-slate-900 group/item transition-colors"
+                                >
+                                    <div className="size-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100 group-hover/item:border-slate-200 transition-colors">
+                                        <img src="https://cdn.simpleicons.org/json/000000" alt="JSON" className="size-5 object-contain opacity-70" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-sm font-bold text-slate-700 group-hover/item:text-slate-900">JSON</span>
+                                        <span className="text-[10px] font-medium text-slate-400">Nested Data</span>
+                                    </div>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() => navigate('/dashboard/document-intelligence', { state: { method: 'PDF' } })}
+                                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer focus:bg-slate-50 focus:text-slate-900 group/item transition-colors"
+                                >
+                                    <div className="size-8 rounded-lg bg-red-50 flex items-center justify-center border border-red-100 group-hover/item:border-red-200 transition-colors">
+                                        <img src="/logos/pdf.svg" alt="PDF" className="size-5 object-contain" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-sm font-bold text-slate-700 group-hover/item:text-slate-900">PDF</span>
+                                        <span className="text-[10px] font-medium text-slate-400">Documents</span>
+                                    </div>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                    onClick={() => navigate('/dashboard/document-intelligence', { state: { method: 'Text' } })}
+                                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer focus:bg-slate-50 focus:text-slate-900 group/item transition-colors"
+                                >
+                                    <div className="size-8 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100 group-hover/item:border-blue-200 transition-colors">
+                                        <img src="/logos/word.svg" alt="Word" className="size-5 object-contain" />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-sm font-bold text-slate-700 group-hover/item:text-slate-900">Text / Doc</span>
+                                        <span className="text-[10px] font-medium text-slate-400">Unstructured</span>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </div>
@@ -518,7 +609,7 @@ export function OverviewPage() {
                         <Button
                             variant="ghost"
                             className="w-full mt-6 text-xs font-bold text-[#0E50F6] hover:bg-[#0E50F6]/5 rounded-xl border border-dashed border-[#0E50F6]/20"
-                            onClick={() => window.location.href = '/dashboard/ingestion'}
+                            onClick={() => navigate('/dashboard/document-intelligence')}
                         >
                             <Plus className="w-4 h-4 mr-2" />
                             Upload Dataset
