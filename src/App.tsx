@@ -45,6 +45,7 @@ import {
 } from 'lucide-react';
 
 import { DocumentIntelligencePage } from './pages/dashboard/DocumentIntelligencePage';
+import { MyFilesPage } from './pages/dashboard/MyFilesPage';
 
 export default function App() {
   console.log("DataIQ: App Rendering...");
@@ -78,7 +79,7 @@ export default function App() {
             <Route path="pinned" element={<BlankPage title="Pinned Dashboards" icon={Files} />} />
             <Route path="reports" element={<BlankPage title="Reports" icon={FileText} />} />
             <Route path="document-intelligence" element={<DocumentIntelligencePage />} />
-            <Route path="my-files" element={<BlankPage title="My Files" icon={FolderOpen} />} />
+            <Route path="my-files" element={<MyFilesPage />} />
             <Route path="models" element={<BlankPage title="AI Model Hub" icon={Cpu} />} />
             <Route path="security" element={<BlankPage title="Security & Audit" icon={ShieldCheck} />} />
             <Route path="notifications" element={<NotificationsPage />} />
