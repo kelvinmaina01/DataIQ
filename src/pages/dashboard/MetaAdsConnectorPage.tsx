@@ -128,8 +128,8 @@ export function MetaAdsConnectorPage() {
             {/* Content */}
             <div className="max-w-4xl mx-auto px-6 py-12">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ y: 20 }}
+                    animate={{ y: 0 }}
                 >
                     {/* Hero Content */}
                     <div className="text-center py-16 px-6 max-w-4xl mx-auto">
@@ -154,8 +154,8 @@ export function MetaAdsConnectorPage() {
 
                 {/* Features */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ y: 20 }}
+                    animate={{ y: 0 }}
                     transition={{ delay: 0.1 }}
                     className="grid md:grid-cols-3 gap-6 mb-12"
                 >
@@ -198,8 +198,8 @@ export function MetaAdsConnectorPage() {
 
                 {/* Connect Button */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ y: 20 }}
+                    animate={{ y: 0 }}
                     transition={{ delay: 0.2 }}
                     className="flex flex-col items-center gap-4"
                 >
