@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ChevronLeft,
@@ -24,15 +24,15 @@ const SCOPES = [
 
 export function GoogleSheetsConnectorPage() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
     const [existingConnection, setExistingConnection] = useState(getGoogleSheetsConnection());
 
     // Read source parameter to determine which connector was clicked
-    const searchParams = new URLSearchParams(window.location.search);
-    const source = searchParams.get('source') || 'gsheets'; // default to sheets
+    const source = searchParams.get('source') || 'gsheets';
 
-    // Dynamic content based on source
-    const getConnectorInfo = () => {
+    // Dynamic content based on source - memoized to prevent recalculation
+    const connectorInfo = useMemo(() => {
         switch (source) {
             case 'gdrive':
                 return {
@@ -56,9 +56,7 @@ export function GoogleSheetsConnectorPage() {
                     feature: 'Sheets'
                 };
         }
-    };
-
-    const connectorInfo = getConnectorInfo();
+    }, [source]);
 
     useEffect(() => {
         // Check if user is returning from OAuth
