@@ -27,6 +27,19 @@ export interface GoogleSheetsConnection {
     createdAt: Date;
 }
 
+export interface MetaAdsConnection {
+    id: string;
+    connectorType: 'metaads';
+    connectionName: string;
+    accessToken: string;
+    expiresAt: Date;
+    scope: string;
+    userEmail?: string;
+    adAccountId?: string;
+    status: 'connected' | 'disconnected' | 'error';
+    createdAt: Date;
+}
+
 /**
  * Test a database connection without importing data
  */
@@ -122,7 +135,10 @@ export function deleteConnection(connectionId: string): void {
  */
 export function hasActiveConnection(connectorType: string): boolean {
     // Check database/warehouse connections
-    const dbConnections = getConnectionsByType(connectorType).some(conn => conn.status === 'connected');
+    const connections = getStoredConnections();
+    const hasDB = connections.some(conn =>
+        conn.connectorType === connectorType && conn.status === 'connected'
+    );
 
     // Check Google Sheets/Drive/Ads connection
     if (connectorType === 'google-sheets' || connectorType === 'gsheets' || connectorType === 'gdrive' || connectorType === 'gads') {
@@ -130,7 +146,13 @@ export function hasActiveConnection(connectorType: string): boolean {
         return sheetsConnection !== null && sheetsConnection.status === 'connected';
     }
 
-    return dbConnections;
+    // Check Meta Ads connection
+    if (connectorType === 'metaads') {
+        const metaConnection = getMetaAdsConnection();
+        return metaConnection !== null && metaConnection.status === 'connected';
+    }
+
+    return hasDB;
 }
 
 /**
@@ -208,10 +230,52 @@ export async function refreshGoogleToken(): Promise<{ success: boolean; message:
 }
 
 /**
- * Disconnect Google Sheets
+ * Disconnect (delete) Google Sheets connection
  */
 export function disconnectGoogleSheets(): void {
     localStorage.removeItem('google_sheets_connection');
-    console.log('[ConnectionService] Google Sheets disconnected');
+    console.log('[ConnectionService] Google Sheets connection removed');
 }
 
+/**
+ * Save Meta Ads OAuth connection
+ */
+export function saveMetaAdsConnection(connection: Omit<MetaAdsConnection, 'id' | 'createdAt'>): MetaAdsConnection {
+    const newConnection: MetaAdsConnection = {
+        ...connection,
+        id: `meta_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        createdAt: new Date()
+    };
+
+    localStorage.setItem('meta_ads_connection', JSON.stringify(newConnection));
+    console.log('[ConnectionService] Meta Ads connection saved:', newConnection);
+    return newConnection;
+}
+
+/**
+ * Get Meta Ads connection (only one allowed per user)
+ */
+export function getMetaAdsConnection(): MetaAdsConnection | null {
+    const stored = localStorage.getItem('meta_ads_connection');
+    if (!stored) return null;
+
+    try {
+        const connection = JSON.parse(stored);
+        return {
+            ...connection,
+            createdAt: new Date(connection.createdAt),
+            expiresAt: new Date(connection.expiresAt)
+        };
+    } catch (error) {
+        console.error('[ConnectionService] Error parsing Meta Ads connection:', error);
+        return null;
+    }
+}
+
+/**
+ * Disconnect (delete) Meta Ads connection
+ */
+export function disconnectMetaAds(): void {
+    localStorage.removeItem('meta_ads_connection');
+    console.log('[ConnectionService] Meta Ads connection removed');
+}

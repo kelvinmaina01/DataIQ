@@ -10,7 +10,7 @@ import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { cn } from '../../components/ui/utils';
 import { CONNECTORS_INFO } from '../../lib/connectors';
-import { getConnectionsByType, deleteConnection, getGoogleSheetsConnection, disconnectGoogleSheets } from '../../services/connectionService';
+import { getConnectionsByType, deleteConnection, getGoogleSheetsConnection, disconnectGoogleSheets, getMetaAdsConnection, disconnectMetaAds } from '../../services/connectionService';
 import { toast } from 'sonner';
 
 type TabType = 'browse' | 'customize' | 'learnings' | 'settings';
@@ -27,11 +27,15 @@ export function ConnectionDetailPage() {
     const isGoogleWorkspace = connectorId === 'google-sheets' || connectorId === 'gsheets' || connectorId === 'gdrive' || connectorId === 'gads';
     const googleSheetsConnection = isGoogleWorkspace ? getGoogleSheetsConnection() : null;
 
+    // Handle Meta Ads connection
+    const isMetaAds = connectorId === 'metaads';
+    const metaAdsConnection = isMetaAds ? getMetaAdsConnection() : null;
+
     // Handle database/warehouse connections
-    const connections = !isGoogleWorkspace ? getConnectionsByType(connectorId || '') : [];
+    const connections = (!isGoogleWorkspace && !isMetaAds) ? getConnectionsByType(connectorId || '') : [];
     const activeConnection = connections[0];
 
-    if (!connector && !isGoogleWorkspace) {
+    if (!connector && !isGoogleWorkspace && !isMetaAds) {
         return <div>Connector not found</div>;
     }
 
@@ -47,6 +51,12 @@ export function ConnectionDetailPage() {
             if (confirm(`Are you sure you want to disconnect Google Workspace? This will remove access to Sheets, Drive, and Ads data.`)) {
                 disconnectGoogleSheets();
                 toast.success('Google Workspace disconnected successfully');
+                navigate('/dashboard/ingestion');
+            }
+        } else if (isMetaAds) {
+            if (confirm(`Are you sure you want to disconnect Meta Ads? This will remove access to your Facebook and Instagram ad data.`)) {
+                disconnectMetaAds();
+                toast.success('Meta Ads disconnected successfully');
                 navigate('/dashboard/ingestion');
             }
         } else if (activeConnection && confirm(`Are you sure you want to delete this connector and all learnings associated with it?`)) {
