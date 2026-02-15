@@ -54,12 +54,34 @@ class DatabaseConnectorService {
                 body: JSON.stringify({ dbType, credentials })
             });
 
+            // Check response status
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Backend error (${response.status}): ${errorText}`);
+            }
+
+            // Check content type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Backend returned non-JSON response');
+            }
+
             return await response.json();
         } catch (error: any) {
             console.error('[DatabaseConnectorService] Test error:', error);
+
+            // Provide helpful error messages
+            if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                return {
+                    success: false,
+                    message: '❌ Backend server is not responding. Please ensure: npm run backend:dev is running',
+                    error
+                };
+            }
+
             return {
                 success: false,
-                message: error.message,
+                message: error.message || 'Connection test failed',
                 error
             };
         }
@@ -83,12 +105,34 @@ class DatabaseConnectorService {
                 body: JSON.stringify({ dbType, connectionName, credentials })
             });
 
+            // Check response status
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Backend error (${response.status}): ${errorText}`);
+            }
+
+            // Check content type
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Backend returned non-JSON response');
+            }
+
             return await response.json();
         } catch (error: any) {
             console.error('[DatabaseConnectorService] Connect error:', error);
+
+            // Provide helpful error messages
+            if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+                return {
+                    success: false,
+                    message: '❌ Backend server is not responding. Please ensure: npm run backend:dev is running',
+                    error
+                };
+            }
+
             return {
                 success: false,
-                message: error.message,
+                message: error.message || 'Connection failed',
                 error
             };
         }

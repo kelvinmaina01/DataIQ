@@ -261,6 +261,7 @@ export function DatabaseConnectorPage() {
 
                                     {connector.fields.map((field, fieldIndex) => {
                                         const fieldKey = field.toLowerCase().replace(/\s+/g, '');
+                                        const placeholder = connector.placeholders?.[field] || field;
 
                                         return (
                                             <div key={`field-${fieldIndex}`}>
@@ -270,7 +271,7 @@ export function DatabaseConnectorPage() {
                                                 </div>
                                                 <Input
                                                     type={field.toLowerCase().includes('password') ? 'password' : 'text'}
-                                                    placeholder={field === 'Port' ? 'Port number' : `${field}`}
+                                                    placeholder={placeholder}
                                                     className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
                                                     value={formData[fieldKey] || ''}
                                                     onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}

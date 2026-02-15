@@ -6,6 +6,7 @@ export interface ConnectorInfo {
     setupTitle: string;
     setupDescription: string;
     fields: string[];
+    placeholders?: Record<string, string>;
 }
 
 export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
@@ -16,7 +17,15 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         logo: 'https://www.vectorlogo.zone/logos/postgresql/postgresql-icon.svg',
         setupTitle: 'Configure a connector to analyze your Postgres data with DataIQ.',
         setupDescription: "You'll need a host, port, database name, and credentials. IP whitelisting is optional. Your credentials are encrypted and never stored in plain text.",
-        fields: ['Connection Name', 'Username', 'Password', 'Host', 'Port', 'Database']
+        fields: ['Connection Name', 'Username', 'Password', 'Host', 'Port', 'Database'],
+        placeholders: {
+            'Connection Name': 'My PostgreSQL Database',
+            'Username': 'postgres',
+            'Password': 'Enter your password',
+            'Host': 'localhost or db.example.com',
+            'Port': '5432',
+            'Database': 'mydb'
+        }
     },
     'supabase': {
         id: 'supabase',
@@ -25,7 +34,15 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         logo: 'https://www.vectorlogo.zone/logos/supabase/supabase-icon.svg',
         setupTitle: 'Connect your Supabase project to DataIQ.',
         setupDescription: "Provide your database host, name, and credentials. Ensure your database is accessible (check IP settings if needed).",
-        fields: ['Connection Name', 'Username', 'Password', 'Host', 'Port', 'Database']
+        fields: ['Connection Name', 'Username', 'Password', 'Host', 'Port', 'Database'],
+        placeholders: {
+            'Connection Name': 'My Supabase Project',
+            'Username': 'postgres',
+            'Password': 'Your database password from Supabase',
+            'Host': 'db.xxxxx.supabase.co',
+            'Port': '5432',
+            'Database': 'postgres'
+        }
     },
     'vertica': {
         id: 'vertica',
@@ -43,7 +60,15 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         logo: 'https://cdn.simpleicons.org/mysql/4479A1',
         setupTitle: 'Configure a connector to analyze your MySQL data with DataIQ.',
         setupDescription: "Standard MySQL connection details required. Your data remains secure with enterprise-grade encryption.",
-        fields: ['Connection Name', 'Username', 'Password', 'Host', 'Port', 'Database']
+        fields: ['Connection Name', 'Username', 'Password', 'Host', 'Port', 'Database'],
+        placeholders: {
+            'Connection Name': 'My MySQL Database',
+            'Username': 'root',
+            'Password': 'Enter your password',
+            'Host': 'localhost or mysql.example.com',
+            'Port': '3306',
+            'Database': 'mydb'
+        }
     },
     'sqlserver': {
         id: 'sqlserver',
