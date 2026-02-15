@@ -83,42 +83,73 @@ export function DatabaseConnectorPage() {
         const loadingToast = toast.loading(`Testing connection to ${connector.name}...`);
 
         try {
-            // Import connection service
-            const { testConnection, saveConnection } = await import('../../services/connectionService');
+            // Import database connector service
+            const { databaseConnectorService } = await import('../../services/databaseConnectorService');
 
-            // Test the connection (no data import)
-            const testResult = await testConnection(connector.id, formData);
+            // Build credentials object based on connector type
+            const credentials: any = {
+                host: formData.host || '',
+                port: parseInt(formData.port) || 5432,
+                database: formData.database || '',
+                username: formData.username || '',
+                password: formData.password || '',
+                ssl: formData.ssl === 'true' || false
+            };
 
-            if (!testResult.success) {
-                throw new Error(testResult.message);
+            // MongoDB-specific: support connection string
+            if (connector.id === 'mongodb' && formData.connectionString) {
+                credentials.connectionString = formData.connectionString;
             }
 
-            // Save connection credentials securely
-            await saveConnection({
-                connectorType: connector.id,
-                connectionName: formData.connectionName || `${connector.name} Connection`,
-                credentials: formData,
-                status: 'connected',
-                lastTested: new Date()
-            });
+            // Supabase-specific: requires URL and key
+            if (connector.id === 'supabase' && formData.supabaseUrl && formData.supabaseKey) {
+                credentials.supabaseUrl = formData.supabaseUrl;
+                credentials.supabaseKey = formData.supabaseKey;
+            }
+
+            // Step 1: Test the connection
+            console.log('[DatabaseConnectorPage] Testing connection:', connector.id);
+            const testResult = await databaseConnectorService.testConnection(connector.id, credentials);
+
+            if (!testResult.success) {
+                throw new Error(testResult.message || 'Connection test failed');
+            }
+
+            // Step 2: Save the connection
+            console.log('[DatabaseConnectorPage] Saving connection...');
+            const connectionName = formData.connectionName || `${connector.name} Connection`;
+            const connectResult = await databaseConnectorService.connect(
+                connector.id,
+                connectionName,
+                credentials
+            );
+
+            if (!connectResult.success || !connectResult.connectionId) {
+                throw new Error(connectResult.message || 'Failed to save connection');
+            }
 
             toast.dismiss(loadingToast);
             toast.success(
                 <div>
                     <p className="font-bold">Connection Successful!</p>
-                    <p className="text-sm">Your {connector.name} is now connected and ready to query.</p>
+                    <p className="text-sm">Your {connector.name} database is now connected and ready to query.</p>
                 </div>
             );
 
             // Navigate to the connection detail page
             setTimeout(() => {
-                navigate(`/dashboard/connection/${connector.id}`);
+                navigate(`/dashboard/connection/${connectResult.connectionId}`);
             }, 1000);
 
-        } catch (error) {
+        } catch (error: any) {
             toast.dismiss(loadingToast);
-            toast.error('Failed to connect. Please check your credentials.');
-            console.error('Connection error:', error);
+            toast.error(
+                <div>
+                    <p className="font-bold">Connection Failed</p>
+                    <p className="text-sm">{error.message || 'Please check your credentials and try again.'}</p>
+                </div>
+            );
+            console.error('[DatabaseConnectorPage] Connection error:', error);
             setIsLoading(false);
         }
     };
@@ -215,8 +246,10 @@ export function DatabaseConnectorPage() {
                                         <HelpCircle className="size-4 text-slate-300" />
                                     </div>
                                     <Input
-                                        placeholder="e.g. Postgres, Main DB"
+                                        placeholder={`e.g. ${connector.name} Production DB`}
                                         className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
+                                        value={formData.connectionName || ''}
+                                        onChange={(e) => setFormData({ ...formData, connectionName: e.target.value })}
                                     />
                                 </div>
 
@@ -226,19 +259,25 @@ export function DatabaseConnectorPage() {
                                         <p className="text-sm font-medium text-slate-400">Your credentials are encrypted and never stored in plain text.</p>
                                     </div>
 
-                                    {['Username', 'Password', 'Host', 'Port', 'Database'].map((field) => (
-                                        <div key={field}>
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{field} *</label>
-                                                <HelpCircle className="size-3.5 text-slate-300" />
+                                    {connector.fields.map((field, fieldIndex) => {
+                                        const fieldKey = field.toLowerCase().replace(/\s+/g, '');
+
+                                        return (
+                                            <div key={`field-${fieldIndex}`}>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{field} *</label>
+                                                    <HelpCircle className="size-3.5 text-slate-300" />
+                                                </div>
+                                                <Input
+                                                    type={field.toLowerCase().includes('password') ? 'password' : 'text'}
+                                                    placeholder={field === 'Port' ? 'Port number' : `${field}`}
+                                                    className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
+                                                    value={formData[fieldKey] || ''}
+                                                    onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                                />
                                             </div>
-                                            <Input
-                                                type={field === 'Password' ? 'password' : 'text'}
-                                                placeholder={field === 'Port' ? 'Port number' : `${field} name`}
-                                                className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
-                                            />
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
 
