@@ -21,45 +21,13 @@ import { SupabaseConnector } from "../connectors/SupabaseConnector";
 import { VerticaConnector } from "../connectors/VerticaConnector";
 
 // Register singleton services
-container.registerSingleton("CredentialsManager", CredentialsManager);
-container.registerSingleton("DatabaseConnectionManager", DatabaseConnectionManager);
-container.registerSingleton("DatabaseConnectorFactory", DatabaseConnectorFactory);
-
-console.log('[DI Container] Core services registered');
+// Moved to initializeDIContainer
 
 // Register all database connectors
-container.register("PostgreSQLConnector", { useClass: PostgreSQLConnector });
-container.register("MySQLConnector", { useClass: MySQLConnector });
-container.register("SQLServerConnector", { useClass: SQLServerConnector });
-container.register("MongoDBConnector", { useClass: MongoDBConnector });
-container.register("SupabaseConnector", { useClass: SupabaseConnector });
-container.register("VerticaConnector", { useClass: VerticaConnector });
+// Moved to initializeDIContainer
 
 // Register connectors in factory
-const factory = container.resolve(DatabaseConnectorFactory);
-
-const postgresConnector = container.resolve<IDatabaseConnector>("PostgreSQLConnector" as any);
-factory.registerConnector("postgres", postgresConnector);
-factory.registerConnector("postgresql", postgresConnector);
-
-const mysqlConnector = container.resolve<IDatabaseConnector>("MySQLConnector" as any);
-factory.registerConnector("mysql", mysqlConnector);
-
-const sqlserverConnector = container.resolve<IDatabaseConnector>("SQLServerConnector" as any);
-factory.registerConnector("sqlserver", sqlserverConnector);
-factory.registerConnector("mssql", sqlserverConnector);
-
-const mongoConnector = container.resolve<IDatabaseConnector>("MongoDBConnector" as any);
-factory.registerConnector("mongodb", mongoConnector);
-factory.registerConnector("mongo", mongoConnector);
-
-const supabaseConnector = container.resolve<IDatabaseConnector>("SupabaseConnector" as any);
-factory.registerConnector("supabase", supabaseConnector);
-
-const verticaConnector = container.resolve<IDatabaseConnector>("VerticaConnector" as any);
-factory.registerConnector("vertica", verticaConnector);
-
-console.log('[DI Container] All 6 database connectors registered');
+// Moved to initializeDIContainer
 
 export { container };
 
@@ -74,10 +42,45 @@ export function getService<T>(identifier: string): T {
  * Initialize the DI container (call this on app startup)
  */
 export function initializeDIContainer(): void {
+    // 1. Register singleton services
+    container.registerSingleton(CredentialsManager);
+    container.registerSingleton(DatabaseConnectionManager);
+    container.registerSingleton(DatabaseConnectorFactory);
+
+    console.log('[DI Container] Core services registered');
+
+    // 2. Register all database connectors
+    container.register("PostgreSQLConnector", { useClass: PostgreSQLConnector });
+    container.register("MySQLConnector", { useClass: MySQLConnector });
+    container.register("SQLServerConnector", { useClass: SQLServerConnector });
+    container.register("MongoDBConnector", { useClass: MongoDBConnector });
+    container.register("SupabaseConnector", { useClass: SupabaseConnector });
+    container.register("VerticaConnector", { useClass: VerticaConnector });
+
+    // 3. Register connectors in factory
+    const factory = container.resolve(DatabaseConnectorFactory);
+
+    const postgresConnector = container.resolve<IDatabaseConnector>("PostgreSQLConnector" as any);
+    factory.registerConnector("postgres", postgresConnector);
+    factory.registerConnector("postgresql", postgresConnector);
+
+    const mysqlConnector = container.resolve<IDatabaseConnector>("MySQLConnector" as any);
+    factory.registerConnector("mysql", mysqlConnector);
+
+    const sqlserverConnector = container.resolve<IDatabaseConnector>("SQLServerConnector" as any);
+    factory.registerConnector("sqlserver", sqlserverConnector);
+    factory.registerConnector("mssql", sqlserverConnector);
+
+    const mongoConnector = container.resolve<IDatabaseConnector>("MongoDBConnector" as any);
+    factory.registerConnector("mongodb", mongoConnector);
+    factory.registerConnector("mongo", mongoConnector);
+
+    const supabaseConnector = container.resolve<IDatabaseConnector>("SupabaseConnector" as any);
+    factory.registerConnector("supabase", supabaseConnector);
+
+    const verticaConnector = container.resolve<IDatabaseConnector>("VerticaConnector" as any);
+    factory.registerConnector("vertica", verticaConnector);
+
+    console.log('[DI Container] All 6 database connectors registered');
     console.log('[DI Container] Initialization complete');
-    console.log('[DI Container] Registered services:', [
-        'CredentialsManager',
-        'DatabaseConnectionManager',
-        'DatabaseConnectorFactory'
-    ]);
 }

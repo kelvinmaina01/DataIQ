@@ -1,10 +1,12 @@
 /**
  * Supabase Database Connector
  * Wrapper around PostgreSQL connector for Supabase
+ * USES DIRECT DB CONNECTION (pg) to allow Schema Extraction
  */
 
 import { injectable, inject } from "tsyringe";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { Pool, PoolConfig } from "pg";
+import { randomUUID } from "crypto";
 import {
     IDatabaseConnector,
     DatabaseCredentials,
@@ -15,44 +17,39 @@ import {
 import { DatabaseConnectionManager } from "../services/DatabaseConnectionManager";
 import { CredentialsManager } from "../services/CredentialsManager";
 
-interface SupabaseCredentials extends DatabaseCredentials {
-    supabaseUrl?: string;
-    supabaseKey?: string;
-}
-
 @injectable()
 export class SupabaseConnector implements IDatabaseConnector {
-    private clients: Map<string, SupabaseClient> = new Map();
+    private pools: Map<string, Pool> = new Map();
 
     constructor(
         @inject(DatabaseConnectionManager) private connectionManager: DatabaseConnectionManager,
         @inject(CredentialsManager) private credentialsManager: CredentialsManager
     ) {
-        console.log('[SupabaseConnector] Initialized');
+        console.log('[SupabaseConnector] Initialized (Direct DB Mode)');
     }
 
     async testConnection(credentials: DatabaseCredentials): Promise<ConnectionResult> {
-        console.log('[SupabaseConnector] Testing connection');
+        console.log('[SupabaseConnector] Testing connection to:', credentials.host);
 
-        const supabaseCreds = credentials as SupabaseCredentials;
+        // Supabase requires SSL
+        const poolConfig: PoolConfig = {
+            host: credentials.host,
+            port: credentials.port,
+            database: credentials.database,
+            user: credentials.username,
+            password: credentials.password,
+            ssl: { rejectUnauthorized: false }, // Supabase enforces SSL
+            connectionTimeoutMillis: 30000,
+            max: 1
+        };
 
-        if (!supabaseCreds.supabaseUrl || !supabaseCreds.supabaseKey) {
-            return {
-                success: false,
-                message: "Supabase URL and Key are required",
-                error: new Error("Missing Supabase credentials")
-            };
-        }
+        const testPool = new Pool(poolConfig);
 
         try {
-            const client = createClient(supabaseCreds.supabaseUrl, supabaseCreds.supabaseKey);
-
-            // Test connection by listing a table
-            const { data, error } = await client.from('_supabase_migrations').select('*').limit(1);
-
-            if (error && !error.message.includes('does not exist')) {
-                throw error;
-            }
+            const client = await testPool.connect();
+            const result = await client.query("SELECT version()");
+            client.release();
+            await testPool.end();
 
             console.log('[SupabaseConnector] Test successful');
 
@@ -60,11 +57,11 @@ export class SupabaseConnector implements IDatabaseConnector {
                 success: true,
                 message: "Supabase connection successful",
                 metadata: {
-                    url: supabaseCreds.supabaseUrl,
-                    authenticated: true
+                    version: result.rows[0].version
                 }
             };
         } catch (error: any) {
+            await testPool.end();
             console.error('[SupabaseConnector] Test failed:', error.message);
             return {
                 success: false,
@@ -75,30 +72,30 @@ export class SupabaseConnector implements IDatabaseConnector {
     }
 
     async connect(credentials: DatabaseCredentials, connectionName: string): Promise<ConnectionResult> {
-        const connectionId = `supabase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const connectionId = randomUUID();
 
         console.log('[SupabaseConnector] Connecting:', connectionId);
 
-        const supabaseCreds = credentials as SupabaseCredentials;
+        const poolConfig: PoolConfig = {
+            host: credentials.host,
+            port: credentials.port,
+            database: credentials.database,
+            user: credentials.username,
+            password: credentials.password,
+            ssl: { rejectUnauthorized: false },
+            max: 10,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 30000
+        };
 
-        if (!supabaseCreds.supabaseUrl || !supabaseCreds.supabaseKey) {
-            return {
-                success: false,
-                message: "Supabase URL and Key are required",
-                error: new Error("Missing Supabase credentials")
-            };
-        }
+        const pool = new Pool(poolConfig);
 
         try {
-            const client = createClient(supabaseCreds.supabaseUrl, supabaseCreds.supabaseKey);
+            const client = await pool.connect();
+            const result = await client.query("SELECT version()");
+            client.release();
 
-            // Test connection
-            const { error } = await client.from('_supabase_migrations').select('*').limit(1);
-            if (error && !error.message.includes('does not exist')) {
-                throw error;
-            }
-
-            this.clients.set(connectionId, client);
+            this.pools.set(connectionId, pool);
 
             this.connectionManager.registerConnection({
                 connectionId,
@@ -107,7 +104,7 @@ export class SupabaseConnector implements IDatabaseConnector {
                 userId: 'temp-user-id',
                 connectedAt: new Date(),
                 metadata: {
-                    url: supabaseCreds.supabaseUrl
+                    version: result.rows[0].version
                 }
             });
 
@@ -118,12 +115,12 @@ export class SupabaseConnector implements IDatabaseConnector {
                 message: "Supabase connected successfully",
                 connectionId,
                 metadata: {
-                    url: supabaseCreds.supabaseUrl
+                    version: result.rows[0].version
                 }
             };
         } catch (error: any) {
+            await pool.end();
             console.error('[SupabaseConnector] Connection failed:', error.message);
-
             return {
                 success: false,
                 message: `Connection failed: ${error.message}`,
@@ -133,106 +130,94 @@ export class SupabaseConnector implements IDatabaseConnector {
     }
 
     async listTables(connectionId: string): Promise<string[]> {
-        const client = this.clients.get(connectionId);
-        if (!client) throw new Error("Connection not found");
+        const pool = this.pools.get(connectionId);
+        if (!pool) throw new Error("Connection not found");
 
-        console.log('[SupabaseConnector] Listing tables for:', connectionId);
+        console.log('[SupabaseConnector] Listing tables');
 
-        // Use RPC to get tables from information_schema
-        const { data, error } = await client.rpc('get_tables' as any);
+        // Standard Postgres Query
+        const query = `
+            SELECT table_schema || '.' || table_name as full_name
+            FROM information_schema.tables
+            WHERE table_schema NOT IN ('pg_catalog', 'information_schema', 'auth', 'storage', 'graphql_public')
+              AND table_type = 'BASE TABLE'
+            ORDER BY table_schema, table_name;
+        `;
 
-        if (error) {
-            // Fallback: just return empty if RPC doesn't exist
-            console.warn('[SupabaseConnector] Could not list tables:', error.message);
-            return [];
-        }
-
-        const tables = data?.map((t: any) => `${t.table_schema}.${t.table_name}`) || [];
-
-        console.log(`[SupabaseConnector] Found ${tables.length} tables`);
-        return tables;
+        const result = await pool.query(query);
+        return result.rows.map(row => row.full_name);
     }
 
     async getSchema(connectionId: string, tableName: string): Promise<FieldInfo[]> {
-        const client = this.clients.get(connectionId);
-        if (!client) throw new Error("Connection not found");
+        const pool = this.pools.get(connectionId);
+        if (!pool) throw new Error("Connection not found");
 
         console.log('[SupabaseConnector] Getting schema for:', tableName);
 
-        // Sample one row to infer schema
-        const { data, error } = await client.from(tableName).select('*').limit(1);
+        const [schema, table] = tableName.includes('.') ? tableName.split('.') : ['public', tableName];
 
-        if (error) {
-            throw error;
-        }
+        const query = `
+            SELECT 
+                column_name as name,
+                data_type as type,
+                is_nullable = 'YES' as nullable
+            FROM information_schema.columns 
+            WHERE table_schema = $1 AND table_name = $2
+            ORDER BY ordinal_position;
+        `;
 
-        if (!data || data.length === 0) {
-            return [];
-        }
+        const result = await pool.query(query, [schema, table]);
 
-        const fields: FieldInfo[] = Object.keys(data[0]).map(key => ({
-            name: key,
-            type: typeof data[0][key],
-            nullable: true,
-            isPrimaryKey: key === 'id'
+        return result.rows.map(row => ({
+            name: row.name,
+            type: row.type,
+            nullable: row.nullable
         }));
-
-        console.log(`[SupabaseConnector] Found ${fields.length} columns`);
-        return fields;
     }
 
     async query(connectionId: string, query: string, params?: any[]): Promise<QueryResult> {
-        throw new Error("Direct SQL queries not supported for Supabase connector. Use table name in sampleData instead.");
-    }
+        const pool = this.pools.get(connectionId);
+        if (!pool) throw new Error("Connection not found");
 
-    async sampleData(connectionId: string, tableName: string, limit: number = 10): Promise<QueryResult> {
-        const client = this.clients.get(connectionId);
-        if (!client) throw new Error("Connection not found");
-
-        console.log(`[SupabaseConnector] Sampling ${limit} rows from:`, tableName);
-
-        const startTime = Date.now();
-        const { data, error } = await client.from(tableName).select('*').limit(limit);
-        const executionTime = Date.now() - startTime;
-
-        if (error) {
-            throw error;
+        // Basic Security
+        if (!query.trim().toLowerCase().startsWith("select")) {
+            throw new Error("Only SELECT queries are allowed");
         }
 
-        const fields: FieldInfo[] = data && data.length > 0
-            ? Object.keys(data[0]).map(key => ({
-                name: key,
-                type: typeof data[0][key],
-                nullable: true
-            }))
-            : [];
+        const startTime = Date.now();
+        const result = await pool.query({ text: query, values: params, rowMode: 'array' });
+        const executionTime = Date.now() - startTime;
 
         return {
-            rows: data || [],
-            rowCount: data?.length || 0,
-            fields,
+            rows: result.rows as any[],
+            rowCount: result.rowCount || 0,
+            fields: result.fields.map(f => ({ name: f.name, type: f.dataTypeID.toString(), nullable: true })),
             executionTime
         };
     }
 
-    async disconnect(connectionId: string): Promise<void> {
-        console.log('[SupabaseConnector] Disconnecting:', connectionId);
+    async sampleData(connectionId: string, tableName: string, limit: number = 10): Promise<QueryResult> {
+        // Sanitize
+        if (!/^[a-zA-Z0-9_.]+$/.test(tableName)) throw new Error("Invalid table name");
+        return this.query(connectionId, `SELECT * FROM ${tableName} LIMIT ${limit}`);
+    }
 
-        const client = this.clients.get(connectionId);
-        if (client) {
-            // Supabase client doesn't need explicit disconnect
-            this.clients.delete(connectionId);
+    async disconnect(connectionId: string): Promise<void> {
+        const pool = this.pools.get(connectionId);
+        if (pool) {
+            await pool.end();
+            this.pools.delete(connectionId);
             this.connectionManager.removeConnection(connectionId);
-            console.log('[SupabaseConnector] Disconnected');
         }
     }
 
     async healthCheck(connectionId: string): Promise<boolean> {
-        const client = this.clients.get(connectionId);
-        if (!client) return false;
-
+        const pool = this.pools.get(connectionId);
+        if (!pool) return false;
         try {
-            await client.from('_supabase_migrations').select('*').limit(1);
+            const client = await pool.connect();
+            await client.query("SELECT 1");
+            client.release();
             this.connectionManager.updateHealthCheck(connectionId);
             return true;
         } catch {

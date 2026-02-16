@@ -9,7 +9,7 @@ import { DatabaseConnectorFactory } from "./factories/DatabaseConnectorFactory";
 import { IDatabaseConnector } from "./interfaces/IDatabaseConnector";
 
 // Initialize DI container
-initializeDIContainer();
+// initializeDIContainer(); // REMOVED: Called in server.ts after dotenv load
 
 // Export factory for getting connectors
 export function getDatabaseConnector(dbType: string): IDatabaseConnector {

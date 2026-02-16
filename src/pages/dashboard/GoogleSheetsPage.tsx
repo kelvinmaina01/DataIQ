@@ -8,12 +8,15 @@ import {
     Users,
     Clock,
     Loader2,
-    Check,
-    ChevronRight
+    MessageSquare,
+    ChevronRight,
+    Filter
 } from 'lucide-react';
-import { Button } from '../../components/ui/button';
+import { AnalysisActionModal } from '../../components/AnalysisActionModal';
 import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
 import { toast } from 'sonner';
+import { getGoogleSheetsConnection, isGoogleTokenExpired } from '../../services/connectionService';
 
 interface GoogleSheet {
     id: string;
@@ -24,386 +27,196 @@ interface GoogleSheet {
     webViewLink?: string;
 }
 
-interface SchemaColumn {
-    name: string;
-    type: 'string' | 'number' | 'date' | 'boolean';
-    index: number;
-    sampleValues: any[];
-}
-
-type ViewState = 'loading' | 'picker' | 'schema' | 'importing';
-
 export function GoogleSheetsPage() {
     const navigate = useNavigate();
-    const [viewState, setViewState] = useState<ViewState>('loading');
+    const [isLoading, setIsLoading] = useState(true);
     const [sheets, setSheets] = useState<GoogleSheet[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSheet, setSelectedSheet] = useState<GoogleSheet | null>(null);
-    const [schema, setSchema] = useState<SchemaColumn[]>([]);
-    const [preview, setPreview] = useState<any[]>([]);
-    const [importProgress, setImportProgress] = useState(0);
+    const [sortBy, setSortBy] = useState<'name' | 'date'>('date');
+    const [showFilterMenu, setShowFilterMenu] = useState(false);
 
     useEffect(() => {
         checkAuthAndLoadSheets();
     }, []);
 
     const checkAuthAndLoadSheets = async () => {
-        const accessToken = localStorage.getItem('google_access_token');
+        const connection = getGoogleSheetsConnection();
 
-        if (!accessToken) {
-            // Not authenticated, initiate OAuth
-            initiateOAuth();
+        if (!connection || isGoogleTokenExpired()) {
+            toast.error('Please connect your Google account first');
+            navigate('/dashboard/ingestion/connect/google-sheets');
             return;
         }
 
-        // Fetch sheets
         try {
             const response = await fetch(
-                `/api/integrations/google/sheets/list?access_token=${encodeURIComponent(accessToken)}`
+                `/api/integrations/google/sheets/list?access_token=${encodeURIComponent(connection.accessToken)}`
             );
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response from server:', errorText);
+                throw new Error(`Server returned ${response.status}: ${errorText}`);
+            }
+
             const data = await response.json();
 
             if (data.sheets) {
                 setSheets(data.sheets);
-                setViewState('picker');
+            } else if (data.error) {
+                throw new Error(data.error);
             } else {
-                throw new Error('Failed to fetch sheets');
+                throw new Error('Invalid response format from server');
             }
         } catch (error) {
             console.error('Error loading sheets:', error);
-            toast.error('Failed to load your Google Sheets');
-            // Token might be expired, try re-auth
-            initiateOAuth();
+            toast.error(error instanceof Error ? error.message : 'Failed to load your Google Sheets');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const initiateOAuth = async () => {
-        try {
-            const response = await fetch('/api/integrations/google/auth');
-            const data = await response.json();
-
-            if (data.authUrl) {
-                window.location.href = data.authUrl;
-            }
-        } catch (error) {
-            console.error('Error initiating OAuth:', error);
-            toast.error('Failed to start authentication');
-        }
-    };
-
-    const handleSelectSheet = async (sheet: GoogleSheet) => {
+    const handleSheetClick = (sheet: GoogleSheet) => {
         setSelectedSheet(sheet);
-        setViewState('loading');
-
-        const accessToken = localStorage.getItem('google_access_token');
-
-        try {
-            const response = await fetch(
-                `/api/integrations/google/sheets/${sheet.id}/schema?access_token=${encodeURIComponent(accessToken!)}`
-            );
-            const data = await response.json();
-
-            setSchema(data.schema);
-            setPreview(data.preview);
-            setViewState('schema');
-        } catch (error) {
-            console.error('Error fetching schema:', error);
-            toast.error('Failed to analyze sheet');
-            setViewState('picker');
-        }
     };
 
-    const handleImport = async () => {
-        if (!selectedSheet) return;
-
-        setViewState('importing');
-        setImportProgress(0);
-
-        const accessToken = localStorage.getItem('google_access_token');
-
-        // Simulate progress
-        const progressInterval = setInterval(() => {
-            setImportProgress(prev => Math.min(prev + 10, 90));
-        }, 200);
-
-        try {
-            const response = await fetch(
-                `/api/integrations/google/sheets/${selectedSheet.id}/import`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        access_token: accessToken,
-                        datasetName: selectedSheet.name
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            clearInterval(progressInterval);
-            setImportProgress(100);
-
-            if (data.success) {
-                toast.success('Sheet imported successfully!');
-                setTimeout(() => {
-                    navigate('/dashboard/data-processing', {
-                        state: { dataset: data.dataset }
-                    });
-                }, 1000);
+    const filteredSheets = sheets
+        .filter(sheet => sheet.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        .sort((a, b) => {
+            if (sortBy === 'name') {
+                return a.name.localeCompare(b.name);
             } else {
-                throw new Error('Import failed');
+                return new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime();
             }
-        } catch (error) {
-            clearInterval(progressInterval);
-            console.error('Error importing sheet:', error);
-            toast.error('Failed to import sheet');
-            setViewState('schema');
-        }
-    };
+        });
 
-    const filteredSheets = sheets.filter(sheet =>
-        sheet.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    if (viewState === 'loading') {
+    if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="text-center">
-                    <Loader2 className="h-12 w-12 text-primary mx-auto mb-4 animate-spin" />
-                    <p className="text-slate-600 font-medium">Loading your Google Sheets...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (viewState === 'importing') {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="bg-white rounded-2xl shadow-lg p-12 max-w-md w-full">
-                    <div className="text-center mb-6">
-                        <FileSpreadsheet className="h-16 w-16 text-primary mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                            Importing Sheet
-                        </h3>
-                        <p className="text-slate-600">{selectedSheet?.name}</p>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="relative h-3 bg-slate-100 rounded-full overflow-hidden mb-4">
-                        <motion.div
-                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-blue-500"
-                            initial={{ width: '0%' }}
-                            animate={{ width: `${importProgress}%` }}
-                            transition={{ duration: 0.3 }}
-                        />
-                    </div>
-                    <p className="text-center text-sm text-slate-600">{importProgress}% complete</p>
+                    <Loader2 className="h-10 w-10 text-primary mx-auto mb-4 animate-spin" />
+                    <p className="text-slate-600 font-medium">Loading your sheets...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="max-w-6xl mx-auto p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => viewState === 'schema' ? setViewState('picker') : navigate('/dashboard/data-ingestion')}
-                        className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                    >
-                        <ArrowLeft className="h-5 w-5 text-slate-600" />
-                    </button>
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Google Sheets</h1>
-                        <p className="text-slate-600 mt-1">
-                            {viewState === 'picker' ? 'Select a sheet to analyze' : 'Review and import data'}
-                        </p>
-                    </div>
+                <div>
+                    <h1 className="text-2xl font-bold text-primary">Start Analysis</h1>
+                    <p className="text-slate-500 mt-1">Choose a sheet or <button onClick={() => navigate('/dashboard/google-drive')} className="text-primary hover:underline font-medium">browse all Drive files</button></p>
                 </div>
-
-                {viewState === 'picker' && (
-                    <div className="text-sm text-slate-500">
-                        {localStorage.getItem('google_user_email')}
+                <div className="flex items-center gap-3 relative">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl gap-2 text-slate-600 border-slate-200 hidden md:flex"
+                        onClick={() => navigate('/dashboard/google-drive')}
+                    >
+                        Browse all Files
+                    </Button>
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 h-10 w-64 bg-white"
+                        />
                     </div>
-                )}
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className={`h-10 w-10 ${showFilterMenu ? 'bg-slate-100' : ''}`}
+                        onClick={() => setShowFilterMenu(!showFilterMenu)}
+                    >
+                        <Filter className="h-4 w-4 text-slate-600" />
+                    </Button>
+                    {showFilterMenu && (
+                        <div className="absolute top-12 right-0 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-10">
+                            <button
+                                onClick={() => { setSortBy('date'); setShowFilterMenu(false); }}
+                                className={`w-full px-4 py-2 text-sm text-left hover:bg-slate-50 ${sortBy === 'date' ? 'text-primary font-medium' : 'text-slate-700'}`}
+                            >
+                                Sort by Date
+                            </button>
+                            <button
+                                onClick={() => { setSortBy('name'); setShowFilterMenu(false); }}
+                                className={`w-full px-4 py-2 text-sm text-left hover:bg-slate-50 ${sortBy === 'name' ? 'text-primary font-medium' : 'text-slate-700'}`}
+                            >
+                                Sort by Name
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            <AnimatePresence mode="wait">
-                {viewState === 'picker' && (
-                    <motion.div
-                        key="picker"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                    >
-                        {/* Search Bar */}
-                        <div className="mb-6">
-                            <div className="relative">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                                <Input
-                                    type="text"
-                                    placeholder="Search sheets..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-12 h-12 text-base"
-                                />
-                            </div>
-                        </div>
+            {/* Sheets List (Clean Table Design) */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                {/* Table Header */}
+                <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-slate-50/50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    <div className="col-span-6">Name</div>
+                    <div className="col-span-4">Owner</div>
+                    <div className="col-span-2 text-right">Last Modified</div>
+                </div>
 
-                        {/* Sheets Grid */}
-                        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                            {/* Table Header */}
-                            <div className="grid grid-cols-12 gap-4 px-6 py-3 bg-slate-50 border-b border-slate-200 text-sm font-medium text-slate-600">
-                                <div className="col-span-6">Name</div>
-                                <div className="col-span-3">Owner</div>
-                                <div className="col-span-3">Last Modified</div>
-                            </div>
-
-                            {/* Sheets List */}
-                            <div className="divide-y divide-slate-100">
-                                {filteredSheets.map((sheet) => (
-                                    <button
-                                        key={sheet.id}
-                                        onClick={() => handleSelectSheet(sheet)}
-                                        className="w-full grid grid-cols-12 gap-4 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
-                                    >
-                                        <div className="col-span-6 flex items-center gap-3">
-                                            <FileSpreadsheet className="h-5 w-5 text-green-500 flex-shrink-0" />
-                                            <span className="font-medium text-slate-900 group-hover:text-primary transition-colors truncate">
-                                                {sheet.name}
-                                            </span>
-                                        </div>
-                                        <div className="col-span-3 flex items-center text-slate-600 text-sm truncate">
-                                            <Users className="h-4 w-4 mr-2 flex-shrink-0" />
-                                            {sheet.owner}
-                                        </div>
-                                        <div className="col-span-3 flex items-center justify-between text-slate-600 text-sm">
-                                            <div className="flex items-center">
-                                                <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
-                                                {new Date(sheet.modifiedTime).toLocaleDateString()}
-                                            </div>
-                                            <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-primary transition-colors" />
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-
-                            {filteredSheets.length === 0 && (
-                                <div className="py-12 text-center text-slate-500">
-                                    No sheets found
-                                </div>
-                            )}
-                        </div>
-                    </motion.div>
-                )}
-
-                {viewState === 'schema' && selectedSheet && (
-                    <motion.div
-                        key="schema"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="space-y-6"
-                    >
-                        {/* Sheet Info */}
-                        <div className="bg-white rounded-xl border border-slate-200 p-6">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <FileSpreadsheet className="h-8 w-8 text-green-500" />
-                                    <div>
-                                        <h3 className="text-lg font-bold text-slate-900">{selectedSheet.name}</h3>
-                                        <p className="text-sm text-slate-600">{schema.length} columns detected</p>
+                {/* Sheets Rows */}
+                <div className="divide-y divide-slate-100">
+                    {filteredSheets.length > 0 ? (
+                        filteredSheets.map((sheet) => (
+                            <motion.button
+                                key={sheet.id}
+                                onClick={() => handleSheetClick(sheet)}
+                                whileHover={{ backgroundColor: 'rgba(248, 250, 252, 0.8)' }}
+                                className="w-full grid grid-cols-12 gap-4 px-6 py-4 text-left group transition-colors"
+                            >
+                                <div className="col-span-6 flex items-center gap-3">
+                                    <div className="h-8 w-8 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0 text-green-600 group-hover:bg-green-100 transition-colors">
+                                        <FileSpreadsheet className="h-4 w-4" />
                                     </div>
+                                    <span className="font-medium text-slate-700 group-hover:text-primary transition-colors truncate">
+                                        {sheet.name}
+                                    </span>
                                 </div>
-                                <Button onClick={handleImport} size="lg">
-                                    <Check className="h-5 w-5 mr-2" />
-                                    Import Sheet
-                                </Button>
+                                <div className="col-span-4 flex items-center text-slate-500 text-sm truncate">
+                                    <Users className="h-3.5 w-3.5 mr-2 text-slate-400" />
+                                    {sheet.owner}
+                                </div>
+                                <div className="col-span-2 flex items-center justify-end text-slate-500 text-sm">
+                                    {new Date(sheet.modifiedTime).toLocaleDateString()}
+                                </div>
+                            </motion.button>
+                        ))
+                    ) : (
+                        <div className="py-16 text-center">
+                            <div className="bg-slate-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Search className="h-8 w-8 text-slate-300" />
                             </div>
+                            <h3 className="text-slate-900 font-medium">No sheets found</h3>
+                            <p className="text-slate-500 text-sm mt-1">Try adjusting your search query</p>
                         </div>
+                    )}
+                </div>
+            </div>
 
-                        {/* Schema Table */}
-                        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                            <div className="p-6 border-b border-slate-200">
-                                <h4 className="font-bold text-slate-900">Detected Schema</h4>
-                                <p className="text-sm text-slate-600 mt-1">
-                                    Review the detected columns and data types
-                                </p>
-                            </div>
 
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead className="bg-slate-50 border-b border-slate-200">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">Column Name</th>
-                                            <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">Data Type</th>
-                                            <th className="px-6 py-3 text-left text-sm font-medium text-slate-600">Sample Values</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        {schema.map((column, idx) => (
-                                            <tr key={idx} className="hover:bg-slate-50">
-                                                <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                                                    {column.name}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${column.type === 'number' ? 'bg-blue-100 text-blue-700' :
-                                                            column.type === 'date' ? 'bg-purple-100 text-purple-700' :
-                                                                column.type === 'boolean' ? 'bg-green-100 text-green-700' :
-                                                                    'bg-slate-100 text-slate-700'
-                                                        }`}>
-                                                        {column.type}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-slate-600">
-                                                    {column.sampleValues.slice(0, 3).join(', ')}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        {/* Preview */}
-                        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                            <div className="p-6 border-b border-slate-200">
-                                <h4 className="font-bold text-slate-900">Data Preview</h4>
-                                <p className="text-sm text-slate-600 mt-1">
-                                    First 10 rows of your data
-                                </p>
-                            </div>
-
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-sm">
-                                    <thead className="bg-slate-50">
-                                        <tr>
-                                            {schema.map((col, idx) => (
-                                                <th key={idx} className="px-4 py-3 text-left font-medium text-slate-600">
-                                                    {col.name}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        {preview.map((row, rowIdx) => (
-                                            <tr key={rowIdx} className="hover:bg-slate-50">
-                                                {row.map((cell: any, cellIdx: number) => (
-                                                    <td key={cellIdx} className="px-4 py-3 text-slate-700">
-                                                        {cell}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* Action Selection Modal */}
+            <AnalysisActionModal
+                isOpen={!!selectedSheet}
+                onClose={() => setSelectedSheet(null)}
+                contextName={selectedSheet?.name || ''}
+                contextData={{
+                    type: 'google_sheet',
+                    id: selectedSheet?.id || '',
+                    name: selectedSheet?.name || '',
+                    source: 'google'
+                }}
+            />
         </div>
     );
 }

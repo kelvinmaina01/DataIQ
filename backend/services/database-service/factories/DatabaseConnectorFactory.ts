@@ -8,15 +8,19 @@ import { IDatabaseConnector } from "../interfaces/IDatabaseConnector";
 
 @injectable()
 export class DatabaseConnectorFactory {
-    // Connectors will be injected when we implement them
+    // Connectors map
     private connectors: Map<string, IDatabaseConnector> = new Map();
+
+    constructor() {
+        console.log('[DatabaseConnectorFactory] Constructor called');
+    }
 
     /**
      * Register a connector (used by DI container)
      */
     registerConnector(type: string, connector: IDatabaseConnector): void {
         this.connectors.set(type.toLowerCase(), connector);
-        console.log(`[DatabaseConnectorFactory] Registered connector: ${type}`);
+        console.log(`[DatabaseConnectorFactory] Registered connector: ${type} (Total: ${this.connectors.size})`);
     }
 
     /**
@@ -24,6 +28,9 @@ export class DatabaseConnectorFactory {
      */
     getConnector(dbType: string): IDatabaseConnector {
         const normalizedType = dbType.toLowerCase();
+
+        console.log(`[DatabaseConnectorFactory] Requesting connector: ${dbType} (normalized: ${normalizedType})`);
+        console.log(`[DatabaseConnectorFactory] Available connectors: ${Array.from(this.connectors.keys()).join(', ')}`);
 
         // Handle type aliases
         const typeMap: Record<string, string> = {
@@ -36,6 +43,7 @@ export class DatabaseConnectorFactory {
         const connector = this.connectors.get(mappedType);
 
         if (!connector) {
+            console.error(`[DatabaseConnectorFactory] FAILED to find connector: ${mappedType}`);
             throw new Error(`Unsupported database type: ${dbType}`);
         }
 

@@ -12,6 +12,7 @@ import { cn } from '../../components/ui/utils';
 import { CONNECTORS_INFO } from '../../lib/connectors';
 import { getConnectionsByType, deleteConnection, getGoogleSheetsConnection, disconnectGoogleSheets, getMetaAdsConnection, disconnectMetaAds, getMicrosoftConnection, disconnectMicrosoft } from '../../services/connectionService';
 import { toast } from 'sonner';
+import { AnalysisActionModal } from '../../components/AnalysisActionModal';
 
 type TabType = 'browse' | 'customize' | 'learnings' | 'settings';
 
@@ -20,6 +21,7 @@ export function ConnectionDetailPage() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('browse');
     const [customInstructions, setCustomInstructions] = useState('');
+    const [showAnalysisModal, setShowAnalysisModal] = useState(false);
 
     const connector = connectorId ? CONNECTORS_INFO[connectorId] : undefined;
 
@@ -105,20 +107,17 @@ export function ConnectionDetailPage() {
                                     </div>
                                 )}
                                 <h1 className="text-lg font-semibold text-slate-900">
-                                    {isGoogleWorkspace ? 'google workspace' : connector?.name.toLowerCase()}
+                                    {isGoogleWorkspace
+                                        ? (connectorId === 'gdrive' ? 'Google Drive' : connectorId === 'gads' ? 'Google Ads' : 'Google Sheets')
+                                        : connector?.name}
                                 </h1>
                             </div>
                         </div>
                         <Button
-                            onClick={() => navigate('/dashboard/chat', {
-                                state: {
-                                    connectorId: isGoogleWorkspace ? 'google-sheets' : connector?.id,
-                                    connectorName: isGoogleWorkspace ? 'Google Workspace' : connector?.name
-                                }
-                            })}
+                            onClick={() => setShowAnalysisModal(true)}
                             className="bg-primary hover:bg-primary/90 text-white font-medium text-sm h-9 px-4 rounded-lg"
                         >
-                            Start Chat
+                            Query My Data
                         </Button>
                     </div>
                 </div>
@@ -156,12 +155,87 @@ export function ConnectionDetailPage() {
                 >
                     {/* Browse Tab */}
                     {activeTab === 'browse' && (
-                        <div className="flex items-center justify-center py-20">
-                            <div className="text-center max-w-md">
-                                <h3 className="text-base font-medium text-slate-700 mb-1">
-                                    No schema found for this connection.
-                                </h3>
-                            </div>
+                        <div className="flex flex-col items-center justify-center py-20">
+                            {isGoogleWorkspace ? (
+                                <div className="text-center max-w-md">
+                                    {connectorId === 'gdrive' ? (
+                                        <>
+                                            <div className="size-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                                                <img
+                                                    src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg"
+                                                    alt="Drive"
+                                                    className="size-8"
+                                                />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                                Browse Google Drive
+                                            </h3>
+                                            <p className="text-slate-600 mb-6">
+                                                Select a file to analyze with DataIQ's document intelligence.
+                                            </p>
+                                            <Button
+                                                onClick={() => navigate('/dashboard/google-drive')}
+                                                className="bg-[#4285F4] hover:bg-[#3367D6] text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5"
+                                                style={{ backgroundColor: '#4285F4', color: 'white' }}
+                                            >
+                                                Open Drive Explorer
+                                            </Button>
+                                        </>
+                                    ) : connectorId === 'gads' ? (
+                                        <>
+                                            <div className="size-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-100">
+                                                <img
+                                                    src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Google_Ads_logo.svg"
+                                                    alt="Ads"
+                                                    className="size-8"
+                                                />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                                Select Google Ads Account
+                                            </h3>
+                                            <p className="text-slate-600 mb-6">
+                                                Pick an account or MCC to analyze campaigns and performance data.
+                                            </p>
+                                            <Button
+                                                onClick={() => navigate('/dashboard/google-ads')}
+                                                className="bg-[#4285F4] hover:bg-[#3367D6] text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5"
+                                                style={{ backgroundColor: '#4285F4', color: 'white' }}
+                                            >
+                                                Open Account Picker
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="size-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-green-100">
+                                                <img
+                                                    src="https://upload.wikimedia.org/wikipedia/commons/3/30/Google_Sheets_logo_%282014-2020%29.svg"
+                                                    alt="Sheets"
+                                                    className="size-8"
+                                                />
+                                            </div>
+                                            <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                                Browse Google Sheets
+                                            </h3>
+                                            <p className="text-slate-600 mb-6">
+                                                Select a sheet to view its schema and analyze data in DataIQ.
+                                            </p>
+                                            <Button
+                                                onClick={() => navigate('/dashboard/google-sheets')}
+                                                className="bg-[#16a34a] hover:bg-[#15803d] text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-green-600/20 transition-all hover:-translate-y-0.5"
+                                                style={{ backgroundColor: '#16a34a', color: 'white' }}
+                                            >
+                                                Open Sheet Explorer
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="text-center max-w-md">
+                                    <h3 className="text-base font-medium text-slate-700 mb-1">
+                                        No schema found for this connection.
+                                    </h3>
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -335,7 +409,7 @@ export function ConnectionDetailPage() {
                             <div>
                                 <h3 className="text-sm font-medium text-slate-900 mb-1">Connected Account</h3>
                                 <p className="text-xs text-slate-500 mb-3">
-                                    You're connected to Google Sheets using this account
+                                    You're connected to {connectorId === 'gdrive' ? 'Google Drive' : connectorId === 'gads' ? 'Google Ads' : 'Google Sheets'} using this account
                                 </p>
                                 <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
                                     <div className="size-10 bg-green-100 rounded-full flex items-center justify-center">
@@ -352,12 +426,12 @@ export function ConnectionDetailPage() {
                             <div>
                                 <h3 className="text-sm font-medium text-slate-900 mb-1">Permissions Granted</h3>
                                 <p className="text-xs text-slate-500 mb-3">
-                                    DataIQ has read-only access to your Google Sheets
+                                    DataIQ has read-only access to your {connectorId === 'gdrive' ? 'Drive files' : connectorId === 'gads' ? 'Ads campaigns' : 'Spreadsheets'}
                                 </p>
                                 <ul className="space-y-2">
                                     <li className="flex items-start gap-2 text-sm text-slate-600">
                                         <CheckCircle2 className="size-4 text-green-600 mt-0.5 shrink-0" />
-                                        <span>View your spreadsheets</span>
+                                        <span>View your {connectorId === 'gdrive' ? 'files and folders' : connectorId === 'gads' ? 'accounts and campaigns' : 'spreadsheets'}</span>
                                     </li>
                                     <li className="flex items-start gap-2 text-sm text-slate-600">
                                         <CheckCircle2 className="size-4 text-green-600 mt-0.5 shrink-0" />
@@ -382,22 +456,35 @@ export function ConnectionDetailPage() {
 
                             {/* Disconnect */}
                             <div className="pt-2">
-                                <h3 className="text-sm font-medium text-slate-900 mb-1">Disconnect Google Sheets</h3>
+                                <h3 className="text-sm font-medium text-slate-900 mb-1">Disconnect {connectorId === 'gdrive' ? 'Google Drive' : connectorId === 'gads' ? 'Google Ads' : 'Google Sheets'}</h3>
                                 <p className="text-xs text-slate-500 mb-4">
-                                    Remove access to all your Google spreadsheets
+                                    Remove access to all your {connectorId === 'gdrive' ? 'Drive data' : connectorId === 'gads' ? 'Ads data' : 'Spreadsheets'}
                                 </p>
                                 <Button
                                     variant="outline"
                                     onClick={handleDelete}
                                     className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 font-medium text-sm h-9 px-4 rounded-lg"
                                 >
-                                    Disconnect Google Sheets
+                                    Disconnect {connectorId === 'gdrive' ? 'Google Drive' : connectorId === 'gads' ? 'Google Ads' : 'Google Sheets'}
                                 </Button>
                             </div>
                         </div>
                     )}
                 </motion.div>
-            </div>
-        </div>
+            </div >
+
+
+            <AnalysisActionModal
+                isOpen={showAnalysisModal}
+                onClose={() => setShowAnalysisModal(false)}
+                contextName={isGoogleWorkspace ? 'Google Workspace' : connector?.name || 'Data Connection'}
+                contextData={{
+                    type: isGoogleWorkspace ? 'google_workspace' : 'connector',
+                    id: isGoogleWorkspace ? 'google-sheets' : connector?.id || '',
+                    name: isGoogleWorkspace ? 'Google Workspace' : connector?.name || '',
+                    source: isGoogleWorkspace ? 'google' : 'connector'
+                }}
+            />
+        </div >
     );
 }

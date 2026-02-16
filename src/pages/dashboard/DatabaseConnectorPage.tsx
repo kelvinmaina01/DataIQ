@@ -101,11 +101,7 @@ export function DatabaseConnectorPage() {
                 credentials.connectionString = formData.connectionString;
             }
 
-            // Supabase-specific: requires URL and key
-            if (connector.id === 'supabase' && formData.supabaseUrl && formData.supabaseKey) {
-                credentials.supabaseUrl = formData.supabaseUrl;
-                credentials.supabaseKey = formData.supabaseKey;
-            }
+
 
             // Step 1: Test the connection
             console.log('[DatabaseConnectorPage] Testing connection:', connector.id);
@@ -259,26 +255,28 @@ export function DatabaseConnectorPage() {
                                         <p className="text-sm font-medium text-slate-400">Your credentials are encrypted and never stored in plain text.</p>
                                     </div>
 
-                                    {connector.fields.map((field, fieldIndex) => {
-                                        const fieldKey = field.toLowerCase().replace(/\s+/g, '');
-                                        const placeholder = connector.placeholders?.[field] || field;
+                                    {connector.fields
+                                        .filter(field => field !== 'Connection Name')
+                                        .map((field, fieldIndex) => {
+                                            const fieldKey = field.toLowerCase().replace(/\s+/g, '');
+                                            const placeholder = connector.placeholders?.[field] || field;
 
-                                        return (
-                                            <div key={`field-${fieldIndex}`}>
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{field} *</label>
-                                                    <HelpCircle className="size-3.5 text-slate-300" />
+                                            return (
+                                                <div key={`field-${fieldIndex}`}>
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{field} *</label>
+                                                        <HelpCircle className="size-3.5 text-slate-300" />
+                                                    </div>
+                                                    <Input
+                                                        type={field.toLowerCase().includes('password') ? 'password' : 'text'}
+                                                        placeholder={placeholder}
+                                                        className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
+                                                        value={formData[fieldKey] || ''}
+                                                        onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                                    />
                                                 </div>
-                                                <Input
-                                                    type={field.toLowerCase().includes('password') ? 'password' : 'text'}
-                                                    placeholder={placeholder}
-                                                    className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
-                                                    value={formData[fieldKey] || ''}
-                                                    onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
-                                                />
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
                                 </div>
                             </div>
 

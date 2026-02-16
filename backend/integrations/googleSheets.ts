@@ -6,19 +6,21 @@ const SCOPES = [
     'https://www.googleapis.com/auth/drive.readonly'
 ];
 
-// Initialize OAuth2 client
-const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-    process.env.GOOGLE_REDIRECT_URI
-);
+// Initialize OAuth2 client lazily
+const getOAuth2Client = () => {
+    return new google.auth.OAuth2(
+        process.env.VITE_GOOGLE_CLIENT_ID,
+        process.env.VITE_GOOGLE_CLIENT_SECRET,
+        process.env.VITE_GOOGLE_REDIRECT_URI
+    );
+};
 
 /**
  * Initiate OAuth flow
  * GET /api/integrations/google/auth
  */
 export const initiateGoogleAuth = (req: Request, res: Response) => {
-    const authUrl = oauth2Client.generateAuthUrl({
+    const authUrl = getOAuth2Client().generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
         prompt: 'consent' // Force consent screen to get refresh token
@@ -40,6 +42,7 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
 
     try {
         // Exchange code for tokens
+        const oauth2Client = getOAuth2Client();
         const { tokens } = await oauth2Client.getToken(code);
         oauth2Client.setCredentials(tokens);
 
@@ -80,6 +83,7 @@ export const listGoogleSheets = async (req: Request, res: Response) => {
     }
 
     try {
+        const oauth2Client = getOAuth2Client();
         oauth2Client.setCredentials({ access_token });
         const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
@@ -120,6 +124,7 @@ export const getSheetSchema = async (req: Request, res: Response) => {
     }
 
     try {
+        const oauth2Client = getOAuth2Client();
         oauth2Client.setCredentials({ access_token });
         const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
 
@@ -194,6 +199,7 @@ export const importSheetData = async (req: Request, res: Response) => {
     }
 
     try {
+        const oauth2Client = getOAuth2Client();
         oauth2Client.setCredentials({ access_token });
         const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
 

@@ -25,6 +25,10 @@ import { GoogleSheetsConnectorPage } from './pages/dashboard/GoogleSheetsConnect
 import { MetaAdsConnectorPage } from './pages/dashboard/MetaAdsConnectorPage';
 import { MicrosoftConnectorPage } from './pages/dashboard/MicrosoftConnectorPage';
 import { GoogleAuthCallback } from './pages/auth/GoogleAuthCallback';
+import { ChatPage } from './pages/dashboard/ChatPage';
+import { GoogleDrivePage } from './pages/dashboard/GoogleDrivePage';
+import { GoogleAdsPage } from './pages/dashboard/GoogleAdsPage';
+import { DocumentIntelligencePage } from './pages/dashboard/DocumentIntelligencePage';
 import { Toaster } from 'sonner';
 import {
   LayoutGrid,
@@ -88,7 +92,10 @@ export default function App() {
             <Route path="datasets" element={<DatasetsPage />} />
             <Route path="notebook" element={<BlankPage title="AI Notebook" icon={BookOpen} />} />
             <Route path="auto-analysis" element={<BlankPage title="Auto Analysis" icon={Zap} />} />
-            <Route path="chat" element={<BlankPage title="AI Chat" icon={MessagesSquare} />} />
+            <Route path="chat" element={<ChatPage />} />
+            <Route path="google-drive" element={<GoogleDrivePage />} />
+            <Route path="google-ads" element={<GoogleAdsPage />} />
+            <Route path="document-intelligence" element={<DocumentIntelligencePage />} />
             <Route path="pinned" element={<BlankPage title="Pinned Dashboards" icon={Files} />} />
             <Route path="reports" element={<BlankPage title="Reports" icon={FileText} />} />
             <Route path="file-parser" element={<BlankPage title="File Parser" icon={FileSearch} />} />

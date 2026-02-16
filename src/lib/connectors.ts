@@ -33,14 +33,14 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         description: 'Direct connection to your Supabase projects',
         logo: 'https://www.vectorlogo.zone/logos/supabase/supabase-icon.svg',
         setupTitle: 'Connect your Supabase project to DataIQ.',
-        setupDescription: "Provide your database host, name, and credentials. Ensure your database is accessible (check IP settings if needed).",
+        setupDescription: "Connects via Supabase Database Credentials (found in Project Settings > Database). Required for Schema Access.",
         fields: ['Connection Name', 'Username', 'Password', 'Host', 'Port', 'Database'],
         placeholders: {
             'Connection Name': 'My Supabase Project',
             'Username': 'postgres',
-            'Password': 'Your database password from Supabase',
-            'Host': 'db.xxxxx.supabase.co',
-            'Port': '5432',
+            'Password': 'Your database password',
+            'Host': 'db.xyz.supabase.co',
+            'Port': '5432 or 6543',
             'Database': 'postgres'
         }
     },

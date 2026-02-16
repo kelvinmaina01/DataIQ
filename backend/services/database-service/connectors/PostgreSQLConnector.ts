@@ -4,7 +4,8 @@
  */
 
 import { injectable, inject } from "tsyringe";
-import { Pool, PoolClient, PoolConfig } from "pg";
+import { Pool, PoolConfig } from "pg";
+import { randomUUID } from "crypto";
 import {
     IDatabaseConnector,
     DatabaseCredentials,
@@ -77,7 +78,7 @@ export class PostgreSQLConnector implements IDatabaseConnector {
      * Establish and store a connection
      */
     async connect(credentials: DatabaseCredentials, connectionName: string): Promise<ConnectionResult> {
-        const connectionId = `pg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const connectionId = randomUUID();
 
         console.log('[PostgreSQLConnector] Connecting:', connectionId);
 

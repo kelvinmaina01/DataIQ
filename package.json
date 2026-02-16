@@ -95,6 +95,6 @@
       "scripts": {
             "dev": "vite",
             "build": "vite build",
-            "backend:dev": "tsx backend/server.ts"
+            "backend:dev": "tsx --tsconfig tsconfig.backend.json backend/server.ts"
       }
 }
