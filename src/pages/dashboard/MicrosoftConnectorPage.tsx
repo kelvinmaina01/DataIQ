@@ -168,10 +168,13 @@ export function MicrosoftConnectorPage() {
                     <div className="text-center py-16 px-6 max-w-4xl mx-auto">
                         {/* Primary Connector Logo (large, centered) */}
                         <div className="flex items-center justify-center mb-6">
-                            <div className="size-24 bg-gradient-to-br from-[#0078D4] to-[#50E6FF] rounded-3xl shadow-lg flex items-center justify-center">
-                                <svg className="size-14 text-white" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M0 0h11.377v11.372H0zm12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zm12.623 0H24V24H12.623" />
-                                </svg>
+                            <div className="size-24 bg-white rounded-3xl shadow-xl flex items-center justify-center border border-slate-100">
+                                <div className="grid grid-cols-2 gap-1 size-12">
+                                    <div className="bg-[#f25022]" />
+                                    <div className="bg-[#7fba00]" />
+                                    <div className="bg-[#00a4ef]" />
+                                    <div className="bg-[#ffb900]" />
+                                </div>
                             </div>
                         </div>
 
@@ -185,19 +188,25 @@ export function MicrosoftConnectorPage() {
                         {/* Secondary indicators - showing both will sync */}
                         <div className="flex items-center justify-center gap-3 text-xs text-slate-500">
                             <div className="flex items-center gap-1.5">
-                                <div className="size-4 rounded bg-slate-100 flex items-center justify-center">
-                                    <svg className="size-3" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M0 0h11.377v11.372H0zm12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zm12.623 0H24V24H12.623" />
-                                    </svg>
+                                <div className="size-5 rounded-md bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                                    <div className="grid grid-cols-2 gap-0.5 size-2.5">
+                                        <div className="bg-[#f25022]" />
+                                        <div className="bg-[#7fba00]" />
+                                        <div className="bg-[#00a4ef]" />
+                                        <div className="bg-[#ffb900]" />
+                                    </div>
                                 </div>
                                 <span>OneDrive</span>
                             </div>
                             <span className="text-slate-300">+</span>
                             <div className="flex items-center gap-1.5">
-                                <div className="size-4 rounded bg-slate-100 flex items-center justify-center">
-                                    <svg className="size-3" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M0 0h11.377v11.372H0zm12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zm12.623 0H24V24H12.623" />
-                                    </svg>
+                                <div className="size-5 rounded-md bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                                    <div className="grid grid-cols-2 gap-0.5 size-2.5">
+                                        <div className="bg-[#f25022]" />
+                                        <div className="bg-[#7fba00]" />
+                                        <div className="bg-[#00a4ef]" />
+                                        <div className="bg-[#ffb900]" />
+                                    </div>
                                 </div>
                                 <span>SharePoint</span>
                             </div>
@@ -259,7 +268,8 @@ export function MicrosoftConnectorPage() {
                     <Button
                         onClick={handleConnect}
                         disabled={isLoading}
-                        className="bg-gradient-to-r from-[#0078D4] to-[#00BCF2] hover:from-[#006ABC] hover:to-[#00A8E0] text-white font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all"
+                        style={{ backgroundColor: '#0078D4', color: 'white' }}
+                        className="font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all border-none"
                     >
                         {isLoading ? (
                             <div className="flex items-center gap-2">
@@ -268,9 +278,12 @@ export function MicrosoftConnectorPage() {
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M0 0h11.377v11.372H0zm12.623 0H24v11.372H12.623zM0 12.623h11.377V24H0zm12.623 0H24V24H12.623" />
-                                </svg>
+                                <div className="grid grid-cols-2 gap-0.5 size-4">
+                                    <div className="bg-[#f25022]" />
+                                    <div className="bg-[#7fba00]" />
+                                    <div className="bg-[#00a4ef]" />
+                                    <div className="bg-[#ffb900]" />
+                                </div>
                                 Connect with Microsoft
                             </div>
                         )}

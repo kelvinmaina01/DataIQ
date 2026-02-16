@@ -21,7 +21,7 @@ import { getGoogleSheetsConnection, isGoogleTokenExpired } from '../../services/
 
 interface AdsAccount {
     id: string;
-    desriptiveName: string;
+    descriptiveName: string;
     currencyCode: string;
     timeZone: string;
     isManager?: boolean;
@@ -65,8 +65,8 @@ export function GoogleAdsPage() {
                 throw new Error('Failed to fetch accounts');
             }
         } catch (error) {
-            console.error('Error loading ads accounts:', error);
-            toast.error('Could not load Google Ads accounts');
+            console.error('CRITICAL: Error loading ads accounts:', error);
+            toast.error(`Could not load Google Ads accounts: ${error instanceof Error ? error.message : 'Unknown error'}`);
         } finally {
             setIsLoading(false);
         }
@@ -85,7 +85,7 @@ export function GoogleAdsPage() {
     const hasManagerAccount = accounts.some(acc => acc.isManager);
 
     const filteredAccounts = accounts.filter(acc =>
-        acc.desriptiveName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        acc.descriptiveName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         acc.id.includes(searchQuery)
     );
 
@@ -168,7 +168,7 @@ export function GoogleAdsPage() {
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <h3 className="font-bold text-slate-900">{account.desriptiveName}</h3>
+                                                    <h3 className="font-bold text-slate-900">{account.descriptiveName}</h3>
                                                     <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase rounded-full border border-blue-100">Manager (MCC)</span>
                                                 </div>
                                                 <p className="text-xs text-slate-500">ID: {account.id} • {account.currencyCode}</p>
@@ -202,7 +202,7 @@ export function GoogleAdsPage() {
                                                             <div className="flex items-center gap-3">
                                                                 <div className="h-2 w-2 rounded-full bg-slate-300 group-hover:bg-primary transition-colors" />
                                                                 <div>
-                                                                    <p className="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">{child.desriptiveName}</p>
+                                                                    <p className="text-sm font-semibold text-slate-700 group-hover:text-primary transition-colors">{child.descriptiveName}</p>
                                                                     <p className="text-[10px] text-slate-500">ID: {child.id} • {child.currencyCode}</p>
                                                                 </div>
                                                             </div>
@@ -226,7 +226,7 @@ export function GoogleAdsPage() {
                                             <LayoutDashboard className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-slate-900">{account.desriptiveName}</h3>
+                                            <h3 className="font-bold text-slate-900">{account.descriptiveName}</h3>
                                             <p className="text-xs text-slate-500">ID: {account.id} • {account.currencyCode}</p>
                                         </div>
                                     </div>
@@ -245,7 +245,7 @@ export function GoogleAdsPage() {
                 contextData={{
                     type: 'google_ads_account',
                     id: selectedAccount?.id || '',
-                    name: selectedAccount?.desriptiveName || '',
+                    name: selectedAccount?.descriptiveName || '',
                     source: 'google',
                     currency: selectedAccount?.currencyCode,
                     timeZone: selectedAccount?.timeZone

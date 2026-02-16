@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { auth } from '@/lib/firebase';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { auth, db } from '../../lib/firebase';
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { toast } from 'sonner';
 import {
     LayoutGrid,
@@ -71,6 +72,26 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
                 if (currentUser.emailVerified) {
+                    // Check onboarding status
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                        if (userDoc.exists()) {
+                            const userData = userDoc.data();
+                            if (!userData.onboardingCompleted && location.pathname !== '/onboarding') {
+                                navigate('/onboarding');
+                                return;
+                            }
+                        } else {
+                            // If doc doesn't exist (social login/legacy), they need to onboard
+                            if (location.pathname !== '/onboarding') {
+                                navigate('/onboarding');
+                                return;
+                            }
+                        }
+                    } catch (error) {
+                        console.error("DataIQ: Error checking onboarding status:", error);
+                    }
+
                     setUser(currentUser);
                     setLoading(false);
                 } else {
@@ -85,7 +106,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             }
         });
         return () => unsubscribe();
-    }, [navigate]);
+    }, [navigate, location.pathname]);
 
     const handleLogout = async () => {
         setLoading(true);
@@ -110,8 +131,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
         );
     }
-
-    console.log("DataIQ: DashboardLayout rendering. Path:", location.pathname);
 
     // Default values if user info is missing
     const displayName = user?.displayName || user?.email?.split('@')[0] || "User";

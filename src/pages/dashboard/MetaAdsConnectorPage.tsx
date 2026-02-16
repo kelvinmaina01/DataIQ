@@ -135,9 +135,9 @@ export function MetaAdsConnectorPage() {
                     <div className="text-center py-16 px-6 max-w-4xl mx-auto">
                         {/* Meta Logo */}
                         <div className="flex items-center justify-center mb-6">
-                            <div className="size-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl shadow-lg flex items-center justify-center">
-                                <svg className="size-14 text-white" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                            <div className="size-24 rounded-3xl shadow-xl flex items-center justify-center border border-white/10" style={{ background: 'linear-gradient(135deg, #0668E1 0%, #A43AB2 50%, #E74B3C 100%)' }}>
+                                <svg className="size-16 text-white" viewBox="0 0 450 450" fill="currentColor">
+                                    <path d="M375.3 145c-20.7-31.4-52.6-47.5-90.1-45.5-30.8 1.6-58.4 15.6-80.4 39.1-1.6 1.7-3.2 3.5-4.8 5.3-1.6-1.8-3.2-3.6-4.8-5.3-22-23.5-49.6-37.5-80.4-39.1-37.5-2-69.4 14.1-90.1 45.5-23.5 35.6-21.3 84.1 6.5 125.6 17.5 26 50.1 53 103 84.4l11.6 6.8 11.6-6.8c52.9-31.4 85.5-58.4 103-84.4 27.8-41.5 30-90 6.5-125.6zm-175.3 133c-39.2-24.3-64.8-45.6-77.1-63.7-16.7-24.6-17.5-51.2-2.3-74.2 11.6-17.6 28.7-26.1 48.3-24.2 17.6 1.7 33.7 11.5 45.3 27.8 7.3 10.3 12.8 22.8 16.5 37l9.3 35.8 9.3-35.8c3.7-14.2 9.2-26.7 16.5-37 11.6-16.3 27.7-26.1 45.3-27.8 19.6-1.9 36.7 6.6 48.3 24.2 15.2 23 14.4 49.6-2.3 74.2-12.3 18.1-37.9 39.4-77.1 63.7l-9.3 5.7-9.3-5.7z" />
                                 </svg>
                             </div>
                         </div>
@@ -206,7 +206,8 @@ export function MetaAdsConnectorPage() {
                     <Button
                         onClick={handleConnect}
                         disabled={isLoading}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all"
+                        style={{ backgroundColor: '#0668E1', color: 'white' }}
+                        className="font-semibold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all border-none"
                     >
                         {isLoading ? (
                             <div className="flex items-center gap-2">
@@ -215,8 +216,8 @@ export function MetaAdsConnectorPage() {
                             </div>
                         ) : (
                             <div className="flex items-center gap-2">
-                                <svg className="size-5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                <svg className="size-6" viewBox="0 0 450 450" fill="currentColor">
+                                    <path d="M375.3 145c-20.7-31.4-52.6-47.5-90.1-45.5-30.8 1.6-58.4 15.6-80.4 39.1-1.6 1.7-3.2 3.5-4.8 5.3-1.6-1.8-3.2-3.6-4.8-5.3-22-23.5-49.6-37.5-80.4-39.1-37.5-2-69.4 14.1-90.1 45.5-23.5 35.6-21.3 84.1 6.5 125.6 17.5 26 50.1 53 103 84.4l11.6 6.8 11.6-6.8c52.9-31.4 85.5-58.4 103-84.4 27.8-41.5 30-90 6.5-125.6zm-175.3 133c-39.2-24.3-64.8-45.6-77.1-63.7-16.7-24.6-17.5-51.2-2.3-74.2 11.6-17.6 28.7-26.1 48.3-24.2 17.6 1.7 33.7 11.5 45.3 27.8 7.3 10.3 12.8 22.8 16.5 37l9.3 35.8 9.3-35.8c3.7-14.2 9.2-26.7 16.5-37 11.6-16.3 27.7-26.1 45.3-27.8 19.6-1.9 36.7 6.6 48.3 24.2 15.2 23 14.4 49.6-2.3 74.2-12.3 18.1-37.9 39.4-77.1 63.7l-9.3 5.7-9.3-5.7z" />
                                 </svg>
                                 Connect with Meta
                             </div>

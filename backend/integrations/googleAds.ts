@@ -40,19 +40,19 @@ export const listAdsCustomers = async (req: Request, res: Response) => {
             customers: [
                 {
                     id: '111-222-3333',
-                    desriptiveName: 'Global Marketing MCC',
+                    descriptiveName: 'Global Marketing MCC',
                     currencyCode: 'USD',
                     timeZone: 'UTC',
                     isManager: true,
                     childAccounts: [
-                        { id: '444-555-6666', desriptiveName: 'US Search - Primary', currencyCode: 'USD', timeZone: 'America/New_York' },
-                        { id: '777-888-9999', desriptiveName: 'EMEA Display - Branding', currencyCode: 'EUR', timeZone: 'Europe/London' },
-                        { id: '222-333-4444', desriptiveName: 'APAC Video - Performance', currencyCode: 'SGD', timeZone: 'Asia/Singapore' }
+                        { id: '444-555-6666', descriptiveName: 'US Search - Primary', currencyCode: 'USD', timeZone: 'America/New_York' },
+                        { id: '777-888-9999', descriptiveName: 'EMEA Display - Branding', currencyCode: 'EUR', timeZone: 'Europe/London' },
+                        { id: '222-333-4444', descriptiveName: 'APAC Video - Performance', currencyCode: 'SGD', timeZone: 'Asia/Singapore' }
                     ]
                 },
                 {
                     id: '555-666-7777',
-                    desriptiveName: 'Direct Client Account',
+                    descriptiveName: 'Direct Client Account',
                     currencyCode: 'USD',
                     timeZone: 'America/Los_Angeles',
                     isManager: false
