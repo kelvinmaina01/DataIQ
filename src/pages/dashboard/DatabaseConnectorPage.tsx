@@ -14,7 +14,6 @@ import {
     Info,
     HelpCircle,
     Mail,
-    ChevronRight,
     Eye,
     EyeOff,
 } from 'lucide-react';

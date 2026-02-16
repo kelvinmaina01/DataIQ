@@ -28,7 +28,7 @@ import { GoogleAuthCallback } from './pages/auth/GoogleAuthCallback';
 import { ChatPage } from './pages/dashboard/ChatPage';
 import { GoogleDrivePage } from './pages/dashboard/GoogleDrivePage';
 import { GoogleAdsPage } from './pages/dashboard/GoogleAdsPage';
-import { DocumentIntelligencePage } from './pages/dashboard/DocumentIntelligencePage';
+
 import { Toaster } from 'sonner';
 import {
   LayoutGrid,
@@ -101,7 +101,7 @@ export default function App() {
             <Route path="document-intelligence" element={<DocumentIntelligencePage />} />
             <Route path="pinned" element={<BlankPage title="Pinned Dashboards" icon={Files} />} />
             <Route path="reports" element={<BlankPage title="Reports" icon={FileText} />} />
-            <Route path="document-intelligence" element={<DocumentIntelligencePage />} />
+
             <Route path="my-files" element={<MyFilesPage />} />
             <Route path="models" element={<BlankPage title="AI Model Hub" icon={Cpu} />} />
             <Route path="security" element={<BlankPage title="Security & Audit" icon={ShieldCheck} />} />
