@@ -216,80 +216,84 @@ export function DataProcessingPage() {
                 ) : uploadState === 'success' && processedItems.some(i => i.status === 'success') ? (
                     <motion.div
                         key="success"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="space-y-8"
+                        transition={{ duration: 0.5 }}
+                        className="max-w-4xl mx-auto py-12"
                     >
-                        <div className="text-center py-8 bg-gradient-to-b from-green-50/50 to-transparent rounded-2xl">
-                            <div className="size-16 bg-green-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-                                <CheckCircle2 className="size-8 text-green-600" />
+                        <div className="flex flex-col items-center text-center mb-16">
+                            <div className="size-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                                <CheckCircle2 className="size-10 text-emerald-600" />
                             </div>
-                            <h1 className="text-3xl font-bold text-slate-900 mb-2">Ingestion Successful</h1>
-                            <p className="text-slate-500 font-medium">Your data has been processed, normalized, and is now ready for analysis.</p>
+                            <h1 className="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Ingestion Successful</h1>
+                            <p className="text-slate-500 font-medium text-lg max-w-lg">Your data has been processed and normalized. It is now ready for analysis.</p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                        <div className="space-y-12">
                             {processedItems.map(item => (
                                 item.status === 'success' && item.result && (
-                                    <div key={item.id} className="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-                                        <div className="flex items-start justify-between mb-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="size-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                                                    <FileText className="size-6 text-blue-600" />
+                                    <div key={item.id} className="bg-slate-50/50 border border-slate-100 rounded-3xl p-10 transition-all duration-300">
+                                        <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+                                            <div className="flex items-center gap-6">
+                                                <div className="size-20 bg-white rounded-2xl flex items-center justify-center border border-slate-200 shadow-sm p-4">
+                                                    {item.connectorLogo ? (
+                                                        <img src={item.connectorLogo} alt="Connector" className="size-full object-contain" />
+                                                    ) : (
+                                                        <FileText className="size-10 text-blue-600" />
+                                                    )}
                                                 </div>
-                                                <div>
-                                                    <h4 className="font-bold text-slate-900 text-sm truncate max-w-[150px]">{item.file.name}</h4>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <span className="inline-flex items-center gap-1 text-xs font-bold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
-                                                            <CheckCircle2 className="size-3" />
-                                                            Valid
+                                                <div className="text-center md:text-left">
+                                                    <h4 className="font-bold text-slate-900 text-2xl mb-2">{item.file.name}</h4>
+                                                    <div className="flex items-center justify-center md:justify-start gap-4">
+                                                        <span className="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-700">
+                                                            <CheckCircle2 className="size-4" />
+                                                            Verified & Ready
                                                         </span>
-                                                        <span className="text-xs font-bold text-slate-400">{item.result.rowCount.toLocaleString()} Rows</span>
+                                                        <span className="text-sm font-bold text-slate-400">{item.result.rowCount.toLocaleString()} Rows</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <div className="text-2xl font-bold text-slate-900">{item.result.grade}</div>
-                                                <div className="text-xs font-bold text-slate-400 uppercase">Grade</div>
+                                            <div className="flex flex-col items-center md:items-end">
+                                                <div className="text-7xl font-black text-primary tracking-tighter">{item.result.grade}</div>
+                                                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Grade Score</div>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-3 gap-3">
-                                            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                                                <p className="text-xs font-bold text-slate-400 uppercase mb-1">Health</p>
-                                                <p className="text-lg font-bold text-slate-700">{Math.round(item.result.healthReport.validity * 100)}%</p>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                                            <div className="bg-white rounded-2xl p-6 border border-slate-100 border-b-emerald-500 border-b-4 shadow-sm">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Health</p>
+                                                <p className="text-4xl font-black text-emerald-500">{Math.round(item.result.healthReport.validity * 100)}%</p>
                                             </div>
-                                            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                                                <p className="text-xs font-bold text-slate-400 uppercase mb-1">Complete</p>
-                                                <p className="text-lg font-bold text-slate-700">{Math.round(item.result.healthReport.completeness * 100)}%</p>
+                                            <div className="bg-white rounded-2xl p-6 border border-slate-100 border-b-blue-500 border-b-4 shadow-sm">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Complete</p>
+                                                <p className="text-4xl font-black text-blue-500">{Math.round(item.result.healthReport.completeness * 100)}%</p>
                                             </div>
-                                            <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                                                <p className="text-xs font-bold text-slate-400 uppercase mb-1">Outliers</p>
-                                                <p className="text-lg font-bold text-slate-700">{item.result.columns.reduce((acc: number, col: any) => acc + (col.outlierCount || 0), 0)}</p>
+                                            <div className="bg-white rounded-2xl p-6 border border-slate-100 border-b-amber-500 border-b-4 shadow-sm">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Outliers</p>
+                                                <p className="text-4xl font-black text-amber-500">{item.result.columns.reduce((acc: number, col: any) => acc + (col.outlierCount || 0), 0)}</p>
                                             </div>
+                                        </div>
+
+                                        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8 border-t border-slate-200/60">
+                                            <Button
+                                                onClick={() => navigate('/dashboard/datasets')}
+                                                className="flex-1 max-w-[240px] h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl shadow-lg shadow-primary/20 transition-all text-lg"
+                                            >
+                                                Explore Library
+                                                <ArrowRight className="size-5 ml-2" />
+                                            </Button>
+                                            <Button
+                                                onClick={() => navigate('/dashboard/ingestion')}
+                                                variant="outline"
+                                                className="flex-1 max-w-[240px] h-14 border-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-2xl text-lg"
+                                            >
+                                                Upload More
+                                            </Button>
                                         </div>
                                     </div>
                                 )
                             ))}
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200 max-w-2xl mx-auto w-full">
-                            <Button
-                                onClick={() => navigate('/dashboard/datasets')}
-                                className="flex-1 h-12 !bg-primary hover:!bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20"
-                            >
-                                Go to Library
-                                <ArrowRight className="size-4 ml-2" />
-                            </Button>
-                            <Button
-                                onClick={() => navigate('/dashboard/ingestion')}
-                                variant="outline"
-                                className="flex-1 h-12 border-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl"
-                            >
-                                Upload More
-                            </Button>
                         </div>
                     </motion.div>
                 ) : (
@@ -336,6 +340,6 @@ export function DataProcessingPage() {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </div >
     );
 }

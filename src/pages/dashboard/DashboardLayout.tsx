@@ -54,7 +54,7 @@ const sidebarItems: SidebarItem[] = [
     { title: 'AI Chat', href: '/dashboard/chat', icon: MessagesSquare },
     { title: 'Pinned Dashboards', href: '/dashboard/pinned', icon: Files },
     { title: 'Reports', href: '/dashboard/reports', icon: FileText },
-    { title: 'File Parser', href: '/dashboard/file-parser', icon: FileSearch },
+    { title: 'Document Intelligence', href: '/dashboard/document-intelligence', icon: FileSearch },
     { title: 'My Files', href: '/dashboard/my-files', icon: FolderOpen },
     { title: 'AI Model Hub', href: '/dashboard/models', icon: Cpu },
     { title: 'Security & Audit', href: '/dashboard/security', icon: ShieldCheck },
@@ -67,6 +67,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     const location = useLocation();
     const navigate = useNavigate();
+
+    // Auto-collapse sidebar for Document Intelligence page when in extraction mode
+    useEffect(() => {
+        const isDocIntelPage = location.pathname === '/dashboard/document-intelligence';
+        const isExtractionMode = window.location.hash === '#extraction';
+        if (isDocIntelPage && isExtractionMode) {
+            setIsSidebarOpen(false);
+        }
+    }, [location]);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

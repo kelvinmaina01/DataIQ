@@ -13,10 +13,14 @@ import {
     ChevronRight,
     Info,
     HelpCircle,
-    Mail
+    Mail,
+    ChevronRight,
+    Eye,
+    EyeOff,
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
+import { Textarea } from '../../components/ui/textarea';
 import { cn } from '../../components/ui/utils';
 import { toast } from 'sonner';
 import { CONNECTORS_INFO, ConnectorInfo } from '../../lib/connectors';
@@ -28,6 +32,7 @@ export function DatabaseConnectorPage() {
     const navigate = useNavigate();
     const [view, setView] = useState<'intro' | 'config'>('intro');
     const [isLoading, setIsLoading] = useState(false);
+    const [showJson, setShowJson] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState<Record<string, string>>({});
@@ -132,11 +137,17 @@ export function DatabaseConnectorPage() {
                 </div>
             );
 
-            // Navigate to the connection detail page
-            setTimeout(() => {
-                navigate(`/dashboard/connection/${connectResult.connectionId}`);
-            }, 1000);
-
+            // Navigate to the processing page with the "virtual batch"
+            // We include method: 'Database: ID' so processing page knows to save it with specific mapping
+            navigate('/dashboard/ingestion/processing', {
+                state: {
+                    batch: [{
+                        ...connectResult,
+                        method: `Database: ${connector.id}`,
+                        connectorLogo: connector.logo
+                    }]
+                }
+            });
         } catch (error: any) {
             toast.dismiss(loadingToast);
             toast.error(
@@ -222,14 +233,18 @@ export function DatabaseConnectorPage() {
                     >
                         {/* Form Column */}
                         <div className="space-y-10">
-                            {connector.id === 'postgres' && (
+                            {connector.fields.includes('Authentication Method') && (
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-between">
                                         <label className="text-sm font-bold text-slate-900 uppercase tracking-wider">Authentication Method</label>
                                     </div>
-                                    <select className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-primary/20 transition-all outline-none">
-                                        <option>Direct Connection</option>
-                                        <option>SSH Tunnel</option>
+                                    <select
+                                        className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                                        value={formData['Authentication Method'] || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, ['Authentication Method']: e.target.value }))}
+                                    >
+                                        <option value="password">Username / Password</option>
+                                        <option value="key">OAuth / Key Pair</option>
                                     </select>
                                     <p className="text-sm font-medium text-slate-400">Choose how you want to authenticate with {connector.name}</p>
                                 </div>
@@ -244,8 +259,8 @@ export function DatabaseConnectorPage() {
                                     <Input
                                         placeholder={`e.g. ${connector.name} Production DB`}
                                         className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
-                                        value={formData.connectionName || ''}
-                                        onChange={(e) => setFormData({ ...formData, connectionName: e.target.value })}
+                                        value={formData['Connection Name'] || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, ['Connection Name']: e.target.value }))}
                                     />
                                 </div>
 
@@ -255,28 +270,61 @@ export function DatabaseConnectorPage() {
                                         <p className="text-sm font-medium text-slate-400">Your credentials are encrypted and never stored in plain text.</p>
                                     </div>
 
-                                    {connector.fields
-                                        .filter(field => field !== 'Connection Name')
-                                        .map((field, fieldIndex) => {
-                                            const fieldKey = field.toLowerCase().replace(/\s+/g, '');
-                                            const placeholder = connector.placeholders?.[field] || field;
-
-                                            return (
-                                                <div key={`field-${fieldIndex}`}>
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{field} *</label>
-                                                        <HelpCircle className="size-3.5 text-slate-300" />
-                                                    </div>
-                                                    <Input
-                                                        type={field.toLowerCase().includes('password') ? 'password' : 'text'}
-                                                        placeholder={placeholder}
-                                                        className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
-                                                        value={formData[fieldKey] || ''}
-                                                        onChange={(e) => setFormData({ ...formData, [fieldKey]: e.target.value })}
+                                    {connector.fields.filter(f => f !== 'Connection Name' && f !== 'Authentication Method').map((field) => (
+                                        <div key={field}>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">{field} *</label>
+                                                <HelpCircle className="size-3.5 text-slate-300" />
+                                            </div>
+                                            {field === 'SERVICE_ACCOUNT_JSON' ? (
+                                                <div className="relative">
+                                                    <Textarea
+                                                        placeholder="Enter your service account json"
+                                                        className="min-h-[160px] border-slate-200 rounded-xl focus:border-primary px-4 py-3 font-medium transition-all pr-12 font-mono text-xs"
+                                                        value={formData[field] || ''}
+                                                        onChange={(e) => setFormData(prev => ({ ...prev, [field]: e.target.value }))}
                                                     />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowJson(!showJson)}
+                                                        className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors"
+                                                    >
+                                                        {showJson ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+                                                    </button>
                                                 </div>
-                                            );
-                                        })}
+                                            ) : (field === 'MFA_TYPE' || field === 'Location') ? (
+                                                <select
+                                                    className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                                                    value={formData[field] || ''}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, [field]: e.target.value }))}
+                                                >
+                                                    <option value="">Enter your {field.toLowerCase()}</option>
+                                                    {field === 'MFA_TYPE' && (
+                                                        <>
+                                                            <option value="none">None</option>
+                                                            <option value="duo">Duo</option>
+                                                            <option value="google">Google Authenticator</option>
+                                                        </>
+                                                    )}
+                                                    {field === 'Location' && (
+                                                        <>
+                                                            <option value="us">US (Multi-region)</option>
+                                                            <option value="eu">EU (Multi-region)</option>
+                                                            <option value="us-central1">US Central1</option>
+                                                        </>
+                                                    )}
+                                                </select>
+                                            ) : (
+                                                <Input
+                                                    type={(field.toLowerCase().includes('password') || field === 'Private Key') ? 'password' : 'text'}
+                                                    placeholder={`Enter your ${field.toLowerCase()}`}
+                                                    className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
+                                                    value={formData[field] || ''}
+                                                    onChange={(e) => setFormData(prev => ({ ...prev, [field]: e.target.value }))}
+                                                />
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Search,
@@ -92,10 +92,38 @@ const CONNECTORS: Connector[] = [
     { id: 'wearable-stream', name: 'Wearable Webhook', description: 'Direct stream from custom wearable devices', category: 'Webhooks', icon: Webhook, type: 'Webhook', status: 'Available' },
 ];
 
+const getFileLogo = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    switch (ext) {
+        case 'csv': return 'https://cdn-icons-png.flaticon.com/512/28/28842.png';
+        case 'xlsx':
+        case 'xls': return '/logos/excel.svg';
+        case 'json': return 'https://cdn.simpleicons.org/json/000000';
+        case 'pdf': return '/logos/pdf.svg';
+        case 'docx':
+        case 'doc': return '/logos/word.svg';
+        default: return null;
+    }
+};
+
 export function DataIngestionPage() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<Category>('All');
+    const [showConnectors, setShowConnectors] = useState(false);
+    const [manualMethod, setManualMethod] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (location.state?.method) {
+            setManualMethod(location.state.method);
+            setActiveTab('Manual');
+            setShowConnectors(true);
+        } else if (location.state?.autoSelect) {
+            // Handle other auto-select logic if needed
+            setShowConnectors(true);
+        }
+    }, [location.state]);
 
     // Batch Upload State
     const [uploadState, setUploadState] = useState<UploadState>('idle');
@@ -190,7 +218,10 @@ export function DataIngestionPage() {
         // Navigate to dedicated processing page with the batch payload
         navigate('/dashboard/ingestion/processing', {
             state: {
-                batch: validEntries
+                batch: validEntries.map(entry => ({
+                    ...entry,
+                    connectorLogo: getFileLogo(entry.file.name)
+                }))
             }
         });
     };
@@ -198,9 +229,11 @@ export function DataIngestionPage() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in transition-all duration-500">
             <div className="mb-10">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Connect your <span className="text-primary">favorite datasource</span></h1>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
+                    {manualMethod ? `Upload ${manualMethod} Files` : <>Connect your <span className="text-primary">favorite datasource</span></>}
+                </h1>
                 <p className="text-slate-500 font-medium text-lg">
-                    Select a source to start gaining insights and unlocking breakthroughs.
+                    {manualMethod ? `Select or drag and drop your ${manualMethod} files to begin analysis.` : 'Select a source to start gaining insights and unlocking breakthroughs.'}
                 </p>
             </div>
 
@@ -240,10 +273,10 @@ export function DataIngestionPage() {
                     <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm">
                         <div className="flex items-center gap-3 mb-6">
                             <Upload className="size-6 text-primary" />
-                            <h2 className="text-xl font-bold text-slate-900">Upload Dataset</h2>
+                            <h2 className="text-xl font-bold text-slate-900">{manualMethod ? `Upload ${manualMethod} Dataset` : 'Upload Dataset'}</h2>
                         </div>
                         <p className="text-brand-blue font-bold mb-4 -mt-4">
-                            Upload CSV, Excel, JSON or PDF files with automatic profiling and quality assessment.
+                            {manualMethod ? `Upload your ${manualMethod} files for instant processing.` : 'Upload CSV, Excel, JSON or PDF files with automatic profiling and quality assessment.'}
                         </p>
                         <div className="flex items-center gap-3 mb-8">
                             {[

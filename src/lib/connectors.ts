@@ -94,8 +94,8 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         description: 'Connect your BigQuery data for instant AI analysis',
         logo: 'https://www.vectorlogo.zone/logos/google_bigquery/google_bigquery-icon.svg',
         setupTitle: 'Configure a connector to analyze your BigQuery data with DataIQ.',
-        setupDescription: "Service account credentials (JSON) and project ID required for integration.",
-        fields: ['Connection Name', 'Project ID', 'Client Email', 'Private Key']
+        setupDescription: "You'll need a host, port, database name, and credentials. IP whitelisting is optional. Your credentials are encrypted and never stored in plain text.",
+        fields: ['Connection Name', 'SERVICE_ACCOUNT_JSON', 'Location', 'MFA_TYPE']
     },
     'snowflake': {
         id: 'snowflake',
@@ -104,7 +104,7 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         logo: 'https://www.vectorlogo.zone/logos/snowflake/snowflake-icon.svg',
         setupTitle: 'Configure a connector to analyze your Snowflake data with DataIQ.',
         setupDescription: "Account URL and credentials required. Optimized for high-performance enterprise analytics.",
-        fields: ['Connection Name', 'Account Name', 'Username', 'Password', 'Warehouse', 'Database', 'Schema']
+        fields: ['Authentication Method', 'Connection Name', 'User', 'Password', 'Account', 'DB', 'Warehouse', 'Role', 'MFA_TYPE']
     },
     'gdrive': {
         id: 'gdrive',
@@ -132,6 +132,15 @@ export const CONNECTORS_INFO: Record<string, ConnectorInfo> = {
         setupTitle: 'Connect Google Ads to DataIQ.',
         setupDescription: "Authorize DataIQ to access your Google Ads account data. Analyze campaigns, keywords, and conversions.",
         fields: []
+    },
+    'databricks': {
+        id: 'databricks',
+        name: 'Databricks',
+        description: 'Unified analytics platform integration',
+        logo: 'https://www.vectorlogo.zone/logos/databricks/databricks-icon.svg',
+        setupTitle: 'Configure a connector to analyze your Databricks data with DataIQ.',
+        setupDescription: "Server hostname and HTTP path required. Use a Personal Access Token (PAT) for secure authentication.",
+        fields: ['Connection Name', 'Server Hostname', 'HTTP Path', 'Personal Access Token', 'Catalog', 'Schema', 'MFA_TYPE']
     }
 };
 

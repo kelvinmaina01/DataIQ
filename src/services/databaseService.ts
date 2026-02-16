@@ -32,14 +32,24 @@ export async function connectAndExtract(connectorId: string, config: any): Promi
 6,Creative Studio,hello@creativestudio.com,Basic,2023-12-10,2024-02-12,2400.00,Active
 7,Tech Innovators,dev@techin.io,Enterprise,2023-01-30,2024-02-10,125000.00,Active`;
         tableName = `${config.database || 'public'}.customers`;
-    } else if (connectorId === 'vertica' || connectorId === 'snowflake' || connectorId === 'bigquery') {
-        csvContent = `event_id,timestamp,user_id,event_type,platform,session_duration,is_converted
-ev_9021,2024-02-12 10:00:00,u_101,page_view,Web,120,false
-ev_9022,2024-02-12 10:05:00,u_101,add_to_cart,Web,45,false
-ev_9023,2024-02-12 10:10:00,u_101,purchase,Web,300,true
-ev_9024,2024-02-12 11:00:00,u_552,page_view,iOS,80,false
-ev_9025,2024-02-12 11:15:00,u_552,search,iOS,200,false`;
-        tableName = `${config.database || 'analytics'}.events_stream`;
+    } else if (connectorId === 'snowflake' || connectorId === 'bigquery' || connectorId === 'databricks') {
+        let sourceName = '';
+        if (connectorId === 'bigquery') sourceName = config['Project ID'] || 'gbq-research-prod';
+        else if (connectorId === 'snowflake') sourceName = config['Account'] || 'snowflake-enterprise';
+        else sourceName = config['Server Hostname'] || 'databricks-workspace';
+
+        csvContent = `event_id,timestamp,user_id,event_type,platform,session_duration,is_converted,revenue
+ev_9021,2024-02-12 10:00:00,u_101,page_view,Web,120,false,0.00
+ev_9022,2024-02-12 10:05:00,u_101,add_to_cart,Web,45,false,0.00
+ev_9023,2024-02-12 10:10:00,u_101,purchase,Web,300,true,149.99
+ev_9024,2024-02-12 11:00:00,u_552,page_view,iOS,80,false,0.00
+ev_9025,2024-02-12 11:15:00,u_552,search,iOS,200,false,0.00
+ev_9026,2024-02-12 11:20:00,u_552,page_view,iOS,45,false,0.00
+ev_9027,2024-02-12 11:25:00,u_303,purchase,Android,600,true,89.50`;
+
+        const schema = config.Schema || config.Catalog || 'ANALYTICS';
+        const table = connectorId === 'databricks' ? 'EVENTS_STREAM' : 'EVENTS_JSON';
+        tableName = `${sourceName}.${schema}.PUBLIC.${table}`;
     } else {
         csvContent = `id,sensor_name,reading,unit,timestamp
 1,Temp_01,22.5,Celsius,2024-02-12T12:00:00Z
