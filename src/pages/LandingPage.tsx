@@ -1,7 +1,5 @@
 import { Navigation } from '../components/Navigation';
 import { HeroSection } from '../components/HeroSection';
-import { StudentBanner } from '../components/StudentBanner';
-import { ValueProposition } from '../components/ValueProposition';
 import { ConnectData } from '../components/ConnectData';
 import { JourneySection } from '../components/JourneySection';
 import { AutomationSection } from '../components/AutomationSection';
@@ -29,8 +27,6 @@ export function LandingPage() {
             />
             <Navigation />
             <HeroSection />
-            <StudentBanner />
-            <ValueProposition />
             <ConnectData />
             <JourneySection />
             <AutomationSection />

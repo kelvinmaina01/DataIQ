@@ -386,13 +386,23 @@ export function DatabaseConnectorPage() {
                                         {[
                                             {
                                                 name: 'SOC 2 Type 2',
-                                                logo: 'https://www.vectorlogo.zone/logos/aicpa_soc2/aicpa_soc2-icon.svg',
+                                                logo: '/logos/soc2-badge.png',
                                                 color: 'bg-[#0E50F6]'
                                             },
                                             {
                                                 name: 'GDPR',
-                                                logo: 'https://www.vectorlogo.zone/logos/gdpr/gdpr-icon.svg',
+                                                logo: '/logos/gdpr-badge.png',
                                                 color: 'bg-[#003399]'
+                                            },
+                                            {
+                                                name: 'HIPAA',
+                                                logo: '/logos/hipaa-badge.png',
+                                                color: 'bg-[#058b7c]'
+                                            },
+                                            {
+                                                name: 'ISO 27001',
+                                                logo: '/logos/iso-badge.png',
+                                                color: 'bg-[#e43d30]'
                                             }
                                         ].map((badge, i) => (
                                             <div key={i} className="bg-white border border-slate-100/80 rounded-[1.5rem] p-5 flex items-center justify-between group cursor-pointer hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">

@@ -4,41 +4,41 @@ import dashboardPreview from '../assets/dashboard-preview.png';
 export function WhatIsDataIQ() {
   const features = [
     {
-      title: "Intelligent Data Analysis",
+      title: "AI-Driven Discovery",
       items: [
-        "AutoML pattern detection",
-        "Predictive modeling",
-        "Natural language insights",
-        "Multi-modal analysis"
+        "Semantic pattern recognition",
+        "Automated forecasting models",
+        "Conversational data querying",
+        "Cross-format intelligence"
       ]
     },
     {
-      title: "Research & Program Tracking",
+      title: "Lifecycle & Provenance",
       items: [
-        "Analysis workflows",
-        "Dataset versioning",
-        "Report generation",
-        "Version history (Pro)"
+        "Reproducible pipelines",
+        "Immutable data snapshots",
+        "Dynamic narrative reports",
+        "Comprehensive audit trails (Pro)"
       ]
     },
     {
-      title: "Collaboration Tools",
+      title: "Synchronized Teamwork",
       items: [
-        "Real-time chat",
-        "Threaded comments",
-        "Task assignments",
-        "Email notifications"
+        "Live collaborative sessions",
+        "Contextual discussions",
+        "Actionable workflows",
+        "Smart event triggers"
       ]
     }
   ];
 
   const workspaceFeatures = [
-    { text: "Multi-source data ingestion hub", icon: Database, color: "bg-cyan-100 text-cyan-600" },
-    { text: "Google Gemini AI integration", icon: Sparkles, color: "bg-purple-100 text-purple-600" },
-    { text: "Streaming chat assistant", icon: MessageSquare, color: "bg-cyan-100 text-cyan-600" },
-    { text: "Automated report generation", icon: FileText, color: "bg-green-100 text-green-600" },
-    { text: "Team collaboration tools", icon: Users, color: "bg-cyan-100 text-cyan-600" },
-    { text: "Workflow automation", icon: Zap, color: "bg-blue-100 text-blue-600" }
+    { text: "Unified multimodal ingestion", icon: Database, color: "bg-cyan-100 text-cyan-600" },
+    { text: "Native Gemini intelligence", icon: Sparkles, color: "bg-purple-100 text-purple-600" },
+    { text: "Context-aware reasoning engine", icon: MessageSquare, color: "bg-cyan-100 text-cyan-600" },
+    { text: "Synthesized dynamic reports", icon: FileText, color: "bg-green-100 text-green-600" },
+    { text: "Asynchronous team synergy", icon: Users, color: "bg-cyan-100 text-cyan-600" },
+    { text: "Event-driven orchestration", icon: Zap, color: "bg-blue-100 text-blue-600" }
   ];
 
   const badges = [
@@ -56,8 +56,8 @@ export function WhatIsDataIQ() {
             What is DataIQ?
           </h2>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
-            An AI-powered workspace that helps teams clean data, uncover insights,
-            collaborate, and generate reports—all in one place
+            A cohesive intelligence engine that transforms raw information into actionable strategy, 
+            bridging the gap between isolated datasets and unified decision-making.
           </p>
         </div>
 
@@ -90,11 +90,11 @@ export function WhatIsDataIQ() {
           {/* Left Side - Description */}
           <div className="animate-slide-up">
             <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-foreground">
-              Complete Data Analysis Workspace
+              End-to-End Analytics Infrastructure
             </h3>
             <p className="text-muted-foreground mb-6 sm:mb-8">
-              From data upload to insights and reporting, DataIQ gives modern teams
-              everything they need to analyze data, collaborate, and communicate results.
+              DataIQ replaces fragmented tools with a singular, fluid environment. Accelerate 
+              your path from initial ingestion to finalized, board-ready insights.
             </p>
 
             <div className="flex flex-wrap gap-3 mb-8 sm:mb-10">
