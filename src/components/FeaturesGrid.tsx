@@ -339,7 +339,7 @@ export function FeaturesGrid() {
       {/* Header */}
       <div className="text-center mb-16 space-y-4">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground max-w-3xl mx-auto leading-tight">
-          Powerful features to <span className="text-primary">simplify your <br className="hidden md:block" /> data analysis</span> experience
+          <span className="text-primary">simplify your data analysis</span> experience
         </h2>
       </div>
 

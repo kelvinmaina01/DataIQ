@@ -293,36 +293,7 @@ export function DataIngestionPage() {
                             ))}
                         </div>
 
-                        {/* Import Guidelines */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="flex items-start gap-4 p-6 bg-amber-50/50 border border-amber-200/50 rounded-2xl mb-8 relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 p-3 opacity-5">
-                                <FileText className="size-16 text-amber-900" />
-                            </div>
-                            <div className="size-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 border border-amber-200/50">
-                                <Info className="size-5 text-amber-700" />
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-amber-900 text-lg mb-4">Import Guidelines</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                                    {[
-                                        "First row should contain column headers",
-                                        "Use consistent units across measurements",
-                                        "Remove any sensitive information if possible",
-                                        "Max file size: 50MB"
-                                    ].map((text, i) => (
-                                        <div key={i} className="flex items-start gap-3 group">
-                                            <div className="mt-1.5 size-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 group-hover:scale-125 transition-transform" />
-                                            <span className="text-[15px] font-bold text-amber-900/80 leading-tight">{text}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </motion.div>
+
 
                         {uploadState === 'idle' && (
                             <DropzoneArea onFilesSelected={handleFilesSelected} />

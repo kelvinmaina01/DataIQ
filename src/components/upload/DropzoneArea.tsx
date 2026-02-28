@@ -34,7 +34,7 @@ export function DropzoneArea({ onFilesSelected }: DropzoneAreaProps) {
     return (
         <div
             {...getRootProps()}
-            className={`border-2 border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center transition-all cursor-pointer group relative overflow-hidden ${isDragActive ? 'border-primary bg-primary/5' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30'
+            className={`border-2 border-dashed rounded-[2rem] p-16 flex flex-col items-center justify-center transition-all cursor-pointer group relative overflow-hidden backdrop-blur-xl shadow-sm ${isDragActive ? 'border-primary bg-primary/5' : 'border-slate-200 bg-[#FFFDF4]/80 hover:bg-[#FFFDF4] hover:shadow-md hover:border-primary/40'
                 }`}
         >
             <input {...getInputProps()} />

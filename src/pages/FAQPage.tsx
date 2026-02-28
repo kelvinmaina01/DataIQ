@@ -268,51 +268,60 @@ export function FAQPage() {
                                 Learn more
                             </Button>
 
-                            <div className="pt-8 flex flex-wrap gap-6 items-center border-t border-gray-100">
-                                {[
-                                    {
-                                        name: 'SOC 2 Type 2',
-                                        logo: '/logos/soc2-badge.png',
-                                        color: 'bg-[#0E50F6]'
-                                    },
-                                    {
-                                        name: 'GDPR',
-                                        logo: '/logos/gdpr-badge.png',
-                                        color: 'bg-[#003399]'
-                                    },
-                                    {
-                                        name: 'HIPAA',
-                                        logo: '/logos/hipaa-badge.png',
-                                        color: 'bg-[#058b7c]'
-                                    },
-                                    {
-                                        name: 'ISO 27001',
-                                        logo: '/logos/iso-badge.png',
-                                        color: 'bg-[#e43d30]'
-                                    }
-                                ].map((badge, i) => (
-                                    <div key={i} className="flex items-center gap-3 bg-white border border-slate-100/80 rounded-[1.5rem] p-3 pr-5 group cursor-pointer hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                                        <div className="flex items-center gap-4">
-                                            <div className="size-12 rounded-full flex items-center justify-center p-2.5 shadow-sm bg-slate-50 border border-slate-100/50">
-                                                <img src={badge.logo} alt={`${badge.name} badge`} className="w-full h-full object-contain" />
-                                            </div>
-                                            <div className="font-bold text-slate-700 text-sm">{badge.name}</div>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="pt-8 flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center text-muted-foreground font-medium text-lg border-t border-gray-100">
+                                <div className="flex items-center gap-2">
+                                    <Shield className="w-5 h-5 text-green-500" />
+                                    <span>Bank-grade encryption</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Lock className="w-5 h-5 text-blue-500" />
+                                    <span>End-to-end security</span>
+                                </div>
                             </div>
                         </div>
 
                         {/* Right Side: 3D Visuals Stack */}
                         <div className="relative flex items-center justify-center py-10 lg:pl-10">
-                            {/* Lobster Robot - Main Visual (Increased Size) */}
-                            <div className="relative w-full max-w-2xl aspect-square transition-transform duration-700 hover:scale-105">
-                                <ImageWithFallback
-                                    src={lobsterRobotImg}
-                                    alt="DataIQ Lobster Assistant"
-                                    className="w-full h-full object-contain [filter:drop-shadow(0_20px_40px_rgba(29,78,216,0.25))]"
-                                />
-                                <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-4/5 h-12 bg-black/5 blur-3xl rounded-[100%] transition-opacity duration-300 pointer-events-none" />
+                            <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
+                                {/* SOC 2 */}
+                                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group flex flex-col items-center text-center">
+                                    <div className="h-28 w-28 mb-4 relative drop-shadow-md group-hover:drop-shadow-xl transition-all duration-300">
+                                        <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full group-hover:bg-blue-500/20 transition-all duration-300" />
+                                        <img src="/logos/soc2-badge.png" alt="SOC 2 Type 2 Certificate" className="w-full h-full object-contain relative z-10" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-800 mb-2">SOC 2 Type 2</h3>
+                                    <p className="text-sm font-medium text-slate-500">DataIQ ensures SOC 2 compliance.</p>
+                                </div>
+
+                                {/* GDPR */}
+                                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group flex flex-col items-center text-center mt-6 sm:mt-12">
+                                    <div className="h-28 w-28 mb-4 relative drop-shadow-md group-hover:drop-shadow-xl transition-all duration-300">
+                                        <div className="absolute inset-0 bg-blue-900/10 blur-xl rounded-full group-hover:bg-blue-900/20 transition-all duration-300" />
+                                        <img src="/logos/gdpr-badge.png" alt="GDPR Compliance" className="w-full h-full object-contain relative z-10 scale-[1.15]" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-800 mb-2 mt-2">GDPR Ready</h3>
+                                    <p className="text-sm font-medium text-slate-500">DataIQ guarantees GDPR data privacy.</p>
+                                </div>
+
+                                {/* HIPAA */}
+                                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group flex flex-col items-center text-center mt-6 sm:-mt-12">
+                                    <div className="h-28 w-28 mb-4 relative drop-shadow-md group-hover:drop-shadow-xl transition-all duration-300">
+                                        <div className="absolute inset-0 bg-teal-500/10 blur-xl rounded-full group-hover:bg-teal-500/20 transition-all duration-300" />
+                                        <img src="/logos/hipaa-badge.png" alt="HIPAA Compliance" className="w-full h-full object-contain relative z-10 scale-125 hover:scale-[1.3] transition-transform" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-800 mb-2 mt-2">HIPAA Compliant</h3>
+                                    <p className="text-sm font-medium text-slate-500">DataIQ encrypts HIPAA healthcare data.</p>
+                                </div>
+
+                                {/* ISO 27001 */}
+                                <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group flex flex-col items-center text-center mt-0 sm:mt-12">
+                                    <div className="h-28 w-28 mb-4 relative drop-shadow-md group-hover:drop-shadow-xl transition-all duration-300">
+                                        <div className="absolute inset-0 bg-red-500/10 blur-xl rounded-full group-hover:bg-red-500/20 transition-all duration-300" />
+                                        <img src="/logos/iso-badge.png" alt="ISO 27001 Certificate" className="w-full h-full object-contain relative z-10 scale-110" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-800 mb-2">ISO 27001</h3>
+                                    <p className="text-sm font-medium text-slate-500">DataIQ upholds strict ISO standards.</p>
+                                </div>
                             </div>
                         </div>
                     </div>

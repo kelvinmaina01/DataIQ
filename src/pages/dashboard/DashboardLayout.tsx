@@ -39,25 +39,49 @@ import {
 } from "../../components/ui/tooltip";
 import logoImage from '../../assets/90c5d6bf4c03d5cb5ffab3af18389097f479007b.png';
 
-interface SidebarItem {
-    title: string;
-    href: string;
-    icon: any;
+interface SidebarGroup {
+    category: string;
+    items: { title: string; href: string; icon: any }[];
 }
 
-const sidebarItems: SidebarItem[] = [
-    { title: 'Overview', href: '/dashboard', icon: LayoutGrid },
-    { title: 'Data Ingestion', href: '/dashboard/ingestion', icon: Import },
-    { title: 'Datasets', href: '/dashboard/datasets', icon: Database },
-    { title: 'AI Notebook', href: '/dashboard/notebook', icon: BookOpen },
-    { title: 'Auto Analysis', href: '/dashboard/auto-analysis', icon: Zap },
-    { title: 'AI Chat', href: '/dashboard/chat', icon: MessagesSquare },
-    { title: 'Pinned Dashboards', href: '/dashboard/pinned', icon: Files },
-    { title: 'Reports', href: '/dashboard/reports', icon: FileText },
-    { title: 'Document Intelligence', href: '/dashboard/document-intelligence', icon: FileSearch },
-    { title: 'My Files', href: '/dashboard/my-files', icon: FolderOpen },
-    { title: 'AI Model Hub', href: '/dashboard/models', icon: Cpu },
-    { title: 'Security & Audit', href: '/dashboard/security', icon: ShieldCheck },
+const sidebarGroups: SidebarGroup[] = [
+    {
+        category: "Dashboard & Assets",
+        items: [
+            { title: 'Overview', href: '/dashboard', icon: LayoutGrid },
+            { title: 'Datasets', href: '/dashboard/datasets', icon: Database },
+            { title: 'My Files', href: '/dashboard/my-files', icon: FolderOpen },
+        ]
+    },
+    {
+        category: "Data Collection",
+        items: [
+            { title: 'Data Ingestion', href: '/dashboard/ingestion', icon: Import },
+            { title: 'Document Intelligence', href: '/dashboard/document-intelligence', icon: FileSearch },
+        ]
+    },
+    {
+        category: "AI & Analysis",
+        items: [
+            { title: 'AI Chat', href: '/dashboard/chat', icon: MessagesSquare },
+            { title: 'Auto Analysis', href: '/dashboard/auto-analysis', icon: Zap },
+            { title: 'AI Notebook', href: '/dashboard/notebook', icon: BookOpen },
+            { title: 'AI Model Hub', href: '/dashboard/models', icon: Cpu },
+        ]
+    },
+    {
+        category: "Visualization",
+        items: [
+            { title: 'Pinned Dashboards', href: '/dashboard/pinned', icon: Files },
+            { title: 'Reports', href: '/dashboard/reports', icon: FileText },
+        ]
+    },
+    {
+        category: "Administration",
+        items: [
+            { title: 'Security & Audit', href: '/dashboard/security', icon: ShieldCheck },
+        ]
+    }
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -180,37 +204,46 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar">
-                        {sidebarItems.map((item) => {
-                            const isActive = location.pathname === item.href;
-                            const Icon = item.icon;
-                            return (
-                                <Tooltip key={item.href}>
-                                    <TooltipTrigger asChild>
-                                        <Link
-                                            to={item.href}
-                                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                                ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                                                : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
-                                                }`}
-                                        >
-                                            <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? '' : 'group-hover:scale-110 transition-transform duration-200'
-                                                }`} />
-                                            {isSidebarOpen && (
-                                                <span className="text-sm font-semibold tracking-tight whitespace-nowrap overflow-hidden">
+                    <nav className="flex-1 px-3 space-y-6 overflow-y-auto custom-scrollbar py-2">
+                        {sidebarGroups.map((group, groupIdx) => (
+                            <div key={groupIdx} className="space-y-1">
+                                {isSidebarOpen && (
+                                    <div className="px-4 pb-1">
+                                        <p className="text-[10px] font-bold tracking-wider text-slate-900 uppercase">{group.category}</p>
+                                    </div>
+                                )}
+                                {group.items.map((item) => {
+                                    const isActive = location.pathname === item.href;
+                                    const Icon = item.icon;
+                                    return (
+                                        <Tooltip key={item.href}>
+                                            <TooltipTrigger asChild>
+                                                <Link
+                                                    to={item.href}
+                                                    className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group ${isActive
+                                                        ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                                                        : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
+                                                        }`}
+                                                >
+                                                    <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? '' : 'group-hover:scale-110 transition-transform duration-200'
+                                                        }`} />
+                                                    {isSidebarOpen && (
+                                                        <span className="text-sm font-semibold tracking-tight whitespace-nowrap overflow-hidden">
+                                                            {item.title}
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            </TooltipTrigger>
+                                            {!isSidebarOpen && (
+                                                <TooltipContent side="right" sideOffset={10} className="font-semibold">
                                                     {item.title}
-                                                </span>
+                                                </TooltipContent>
                                             )}
-                                        </Link>
-                                    </TooltipTrigger>
-                                    {!isSidebarOpen && (
-                                        <TooltipContent side="right" sideOffset={10} className="font-semibold">
-                                            {item.title}
-                                        </TooltipContent>
-                                    )}
-                                </Tooltip>
-                            );
-                        })}
+                                        </Tooltip>
+                                    );
+                                })}
+                            </div>
+                        ))}
                     </nav>
 
                     {/* Bottom Actions */}
