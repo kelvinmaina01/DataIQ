@@ -268,26 +268,38 @@ export function FAQPage() {
                                 Learn more
                             </Button>
 
-                            {/* Compliance Badges */}
-                            <div className="pt-8 flex flex-wrap gap-8 items-center border-t border-gray-100">
-                                <div className="flex items-center gap-2 group">
-                                    <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-gray-200 group-hover:border-primary/50 transition-colors">
-                                        <FileText className="h-5 w-5 text-gray-500 group-hover:text-primary" />
+                            <div className="pt-8 flex flex-wrap gap-6 items-center border-t border-gray-100">
+                                {[
+                                    {
+                                        name: 'SOC 2 Type 2',
+                                        logo: '/logos/soc2-badge.png',
+                                        color: 'bg-[#0E50F6]'
+                                    },
+                                    {
+                                        name: 'GDPR',
+                                        logo: '/logos/gdpr-badge.png',
+                                        color: 'bg-[#003399]'
+                                    },
+                                    {
+                                        name: 'HIPAA',
+                                        logo: '/logos/hipaa-badge.png',
+                                        color: 'bg-[#058b7c]'
+                                    },
+                                    {
+                                        name: 'ISO 27001',
+                                        logo: '/logos/iso-badge.png',
+                                        color: 'bg-[#e43d30]'
+                                    }
+                                ].map((badge, i) => (
+                                    <div key={i} className="flex items-center gap-3 bg-white border border-slate-100/80 rounded-[1.5rem] p-3 pr-5 group cursor-pointer hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                                        <div className="flex items-center gap-4">
+                                            <div className="size-12 rounded-full flex items-center justify-center p-2.5 shadow-sm bg-slate-50 border border-slate-100/50">
+                                                <img src={badge.logo} alt={`${badge.name} badge`} className="w-full h-full object-contain" />
+                                            </div>
+                                            <div className="font-bold text-slate-700 text-sm">{badge.name}</div>
+                                        </div>
                                     </div>
-                                    <span className="font-semibold text-gray-600 group-hover:text-primary transition-colors">SOC2 Compliant</span>
-                                </div>
-                                <div className="flex items-center gap-2 group">
-                                    <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-gray-200 group-hover:border-primary/50 transition-colors">
-                                        <Shield className="h-5 w-5 text-gray-500 group-hover:text-primary" />
-                                    </div>
-                                    <span className="font-semibold text-gray-600 group-hover:text-primary transition-colors">GDPR Ready</span>
-                                </div>
-                                <div className="flex items-center gap-2 group">
-                                    <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-gray-200 group-hover:border-primary/50 transition-colors">
-                                        <div className="h-5 w-5 bg-gray-100 rounded-full animate-pulse-soft" />
-                                    </div>
-                                    <span className="font-semibold text-gray-600 group-hover:text-primary transition-colors">CCPA Ready</span>
-                                </div>
+                                ))}
                             </div>
                         </div>
 
