@@ -57,6 +57,7 @@ import {
 
 import { DocumentIntelligencePage } from './pages/dashboard/DocumentIntelligencePage';
 import { MyFilesPage } from './pages/dashboard/MyFilesPage';
+import { AINotebookPage } from './pages/dashboard/AINotebookPage';
 
 export default function App() {
   console.log("DataIQ: App Rendering...");
@@ -93,7 +94,7 @@ export default function App() {
             <Route path="ingestion/request" element={<ConnectorRequestPage />} />
             <Route path="google-sheets" element={<GoogleSheetsPage />} />
             <Route path="datasets" element={<DatasetsPage />} />
-            <Route path="notebook" element={<BlankPage title="AI Notebook" icon={BookOpen} />} />
+            <Route path="notebook" element={<AINotebookPage />} />
             <Route path="auto-analysis" element={<BlankPage title="Auto Analysis" icon={Zap} />} />
             <Route path="chat" element={<ChatPage />} />
             <Route path="google-drive" element={<GoogleDrivePage />} />
