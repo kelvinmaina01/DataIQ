@@ -706,9 +706,9 @@ export function AINotebookPage() {
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-white animate-in fade-in duration-500">
-      <div className="flex min-h-0 min-w-0 flex-1 flex-row">
-        {/* Main notebook column — independent vertical scroll */}
-        <div className="notebook-scrollbar relative isolate z-0 min-h-0 min-w-0 flex-1 overflow-y-auto scroll-pb-24 bg-white px-4 py-4 md:px-8">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-y-auto notebook-scrollbar scroll-pb-24">
+        {/* Main notebook column */}
+        <div className="relative isolate z-0 min-h-0 min-w-0 flex-1 bg-white px-4 py-4 md:px-8">
           {/* Sticky toolbar — opaque layer so scrolling cells never “slide under” a glass/envelope illusion */}
           {/* One horizontal row only: heading left, actions right (never stacked) */}
           <div className="sticky top-0 z-50 -mx-4 mb-8 flex min-w-0 flex-nowrap items-center justify-between gap-3 border-b border-slate-100 bg-white/95 backdrop-blur-sm px-4 pb-4 pt-0 md:-mx-8 md:px-8">
@@ -1001,10 +1001,10 @@ export function AINotebookPage() {
           initial={false}
           animate={{ width: sidebarOpen ? 280 : 0 }}
           transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-          className="notebook-scrollbar-panel relative z-10 shrink-0 border-l border-slate-200 bg-white flex min-h-0 flex-col overflow-hidden shadow-none ring-1 ring-slate-200/80"
+          className="sticky top-0 h-full relative z-10 shrink-0 bg-white flex flex-col overflow-hidden"
         >
           <div className="flex h-full min-h-0 w-[280px] flex-col">
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <div className="flex min-h-0 flex-1 flex-col">
               <div className="space-y-0.5 border-b border-slate-100 bg-slate-50/50 p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">

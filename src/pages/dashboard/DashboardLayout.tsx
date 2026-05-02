@@ -171,7 +171,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const userPhoto = user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0E50F6&color=fff`;
 
     return (
-        <div className="min-h-screen bg-white relative overflow-hidden flex">
+    return (
+        <div className="h-screen w-screen bg-white relative overflow-hidden flex">
 
             {/* Sidebar */}
             <TooltipProvider delayDuration={0}>
@@ -399,7 +400,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </div>
                 </header>
 
-                {/* Content View — notebook uses nested scroll regions; other pages scroll here */}
                 <div
                     className={
                         location.pathname === '/dashboard/notebook'

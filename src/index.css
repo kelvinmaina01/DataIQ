@@ -25,6 +25,13 @@
     font-family: var(--font-sans);
   }
 
+  html, body, #root {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
   html {
     scroll-behavior: smooth;
   }
