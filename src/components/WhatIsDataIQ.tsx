@@ -1,162 +1,102 @@
-import { CheckCircle2, Database, Sparkles, MessageSquare, FileText, Users, Zap, Layers, Bot, LineChart } from 'lucide-react';
+import { Sparkles, Network, Activity, Cpu, Shield, Workflow, LineChart } from 'lucide-react';
 import dashboardPreview from '../assets/dashboard-preview.png';
 
 export function WhatIsDataIQ() {
-  const features = [
-    {
-      title: "Intelligent Data Analysis",
-      items: [
-        "AutoML pattern detection",
-        "Predictive modeling",
-        "Natural language insights",
-        "Multi-modal analysis"
-      ]
-    },
-    {
-      title: "Research & Program Tracking",
-      items: [
-        "Analysis workflows",
-        "Dataset versioning",
-        "Report generation",
-        "Version history (Pro)"
-      ]
-    },
-    {
-      title: "Collaboration Tools",
-      items: [
-        "Real-time chat",
-        "Threaded comments",
-        "Task assignments",
-        "Email notifications"
-      ]
-    }
-  ];
-
-  const workspaceFeatures = [
-    { text: "Multi-source data ingestion hub", icon: Database, color: "bg-cyan-100 text-cyan-600" },
-    { text: "Google Gemini AI integration", icon: Sparkles, color: "bg-purple-100 text-purple-600" },
-    { text: "Streaming chat assistant", icon: MessageSquare, color: "bg-cyan-100 text-cyan-600" },
-    { text: "Automated report generation", icon: FileText, color: "bg-green-100 text-green-600" },
-    { text: "Team collaboration tools", icon: Users, color: "bg-cyan-100 text-cyan-600" },
-    { text: "Workflow automation", icon: Zap, color: "bg-blue-100 text-blue-600" }
-  ];
-
-  const badges = [
-    { label: "10+ Data Sources", icon: Layers },
-    { label: "3 AI Modes", icon: Bot },
-    { label: "Real-time Charts", icon: LineChart }
-  ];
-
   return (
-    <section className="bg-background py-12 sm:py-20 transition-colors duration-300">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        {/* What is DataIQ Header */}
-        <div className="text-center mb-12 sm:mb-16 animate-slide-up">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-foreground">
-            What is DataIQ?
+    <section className="bg-background py-16 sm:py-24 transition-colors duration-300 overflow-hidden relative">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
+        
+        <div className="text-center mb-16 animate-slide-up">
+          <h2 className="text-4xl sm:text-5xl font-extrabold mb-4 text-foreground tracking-tight">
+            The Intelligence <span className="text-primary">Engine</span>
           </h2>
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto px-4">
-            An AI-powered workspace that helps teams clean data, uncover insights,
-            collaborate, and generate reports—all in one place
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-medium">
+            Fragmented data tools are obsolete. DataIQ synthesizes raw pipelines into an interactive, omni-channel command center.
           </p>
         </div>
 
-        {/* Three Feature Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-20">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-background border border-primary/20 rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 group animate-fade-in"
-              style={{
-                animationDelay: `${index * 0.1}s`,
-                animationFillMode: 'forwards'
-              }}
-            >
-              <h3 className="text-lg sm:text-xl font-bold mb-4 sm:mb-6 text-foreground">{feature.title}</h3>
-              <ul className="space-y-2 sm:space-y-3">
-                {feature.items.map((item, i) => (
-                  <li key={i} className="text-muted-foreground flex items-start gap-2 text-sm sm:text-base">
-                    <CheckCircle2 className="size-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-16">
+            
+          {/* Card 1: Main Feature (Wide) */}
+          <div className="md:col-span-2 lg:col-span-2 bg-slate-50 border border-slate-200 rounded-[2rem] p-8 hover:shadow-lg transition-all duration-300 group">
+            <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <Network className="text-primary size-6" />
             </div>
-          ))}
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">Semantic Knowledge Graph</h3>
+            <p className="text-slate-500 font-medium leading-relaxed">
+              Auto-discovers relationships across disparate databases, converting isolated tables into a unified cognitive map capable of deep inference.
+            </p>
+          </div>
+
+          {/* Card 2: AI */}
+          <div className="md:col-span-1 lg:col-span-2 bg-primary/5 border border-primary/10 rounded-[2rem] p-8 hover:shadow-lg transition-all duration-300 group">
+            <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <Cpu className="text-primary size-6" />
+            </div>
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">Autonomous Reasoning</h3>
+            <p className="text-slate-600 font-medium leading-relaxed">
+              Deploys embedded LLMs to pro-actively query anomalies, forecast trajectories, and extract structured metrics from unstructured noise.
+            </p>
+          </div>
+
+          {/* Card 3: Workflows */}
+          <div className="md:col-span-1 lg:col-span-1 bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-all duration-300 group">
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+              <Workflow className="text-blue-600 size-5" />
+            </div>
+            <h4 className="text-lg font-bold text-slate-900 mb-2">Agentic Orchestration</h4>
+            <p className="text-sm text-slate-500 font-medium">Chain complex analytical tasks via intelligent triggers and auto-healing data pipelines.</p>
+          </div>
+
+          {/* Card 4: Auditing */}
+          <div className="md:col-span-1 lg:col-span-1 bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm hover:shadow-md transition-all duration-300 group">
+            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-4">
+              <Shield className="text-emerald-600 size-5" />
+            </div>
+            <h4 className="text-lg font-bold text-slate-900 mb-2">Immutable Provenance</h4>
+            <p className="text-sm text-slate-500 font-medium">Cryptographic state-tracking ensures every transformation and report is fully auditable and reversible.</p>
+          </div>
+
+          {/* Card 5: Real-time UI */}
+          <div className="md:col-span-1 lg:col-span-2 bg-slate-900 rounded-[2rem] p-8 shadow-xl text-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2" />
+             <div className="relative z-10 w-full h-full flex flex-col justify-between min-h-[160px]">
+                <div>
+                    <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center mb-4 border border-white/5">
+                        <Activity className="text-white size-5" />
+                    </div>
+                    <h4 className="text-xl font-bold text-white mb-2">Synchronous War Room</h4>
+                    <p className="text-sm text-slate-300 font-medium max-w-sm">Live collaborative canvases with deterministic state synchronization. Analyze together, instantly.</p>
+                </div>
+             </div>
+          </div>
+          
         </div>
 
-        {/* Complete Data Analysis Workspace Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start">
-          {/* Left Side - Description */}
-          <div className="animate-slide-up">
-            <h3 className="text-2xl sm:text-3xl font-bold mb-4 text-foreground">
-              Complete Data Analysis Workspace
-            </h3>
-            <p className="text-muted-foreground mb-6 sm:mb-8">
-              From data upload to insights and reporting, DataIQ gives modern teams
-              everything they need to analyze data, collaborate, and communicate results.
-            </p>
-
-            <div className="flex flex-wrap gap-3 mb-8 sm:mb-10">
-              {badges.map((badge, index) => {
-                const Icon = badge.icon;
-                return (
-                  <div
-                    key={index}
-                    className="bg-primary/10 border border-primary/20 rounded-full px-4 py-2 flex items-center gap-2 animate-fade-in"
-                    style={{
-                      animationDelay: `${0.2 + index * 0.1}s`,
-                      animationFillMode: 'forwards'
-                    }}
-                  >
-                    <Icon className="size-5 text-primary" />
-                    <span className="font-semibold text-sm text-primary">{badge.label}</span>
-                  </div>
-                );
-              })}
+        {/* Dynamic Presentation */}
+        <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-200/50 bg-white p-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white -z-10" />
+            <div className="rounded-[2rem] overflow-hidden relative">
+                <img
+                    src={dashboardPreview}
+                    alt="DataIQ Dashboard Interface"
+                    className="w-full h-auto object-cover"
+                />
             </div>
-
-            {/* Dashboard Preview Image */}
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50 group animate-fade-in mt-8" style={{ animationDelay: '0.4s' }}>
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <img
-                src={dashboardPreview}
-                alt="DataIQ Dashboard Interface"
-                className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
-              />
-            </div>
-          </div>
-
-          {/* Right Side - Feature List */}
-          <div className="space-y-3 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            {workspaceFeatures.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={index}
-                  className="bg-primary/5 border border-primary/10 rounded-xl p-4 flex items-center gap-4 hover:shadow-md transition-all hover:scale-[1.02] group animate-fade-in"
-                  style={{
-                    animationDelay: `${0.4 + index * 0.1}s`,
-                    animationFillMode: 'forwards'
-                  }}
-                >
-                  <div className="bg-primary/10 text-primary w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Icon className="size-5" />
-                  </div>
-                  <span className="font-medium text-foreground text-sm sm:text-base">{feature.text}</span>
-                </div>
-              );
-            })}
-          </div>
         </div>
 
         {/* CTA Button */}
-        <div className="text-center mt-12 sm:mt-16 animate-fade-in">
-          <button className="bg-primary text-primary-foreground px-8 sm:px-10 py-3 sm:py-4 rounded-full hover:opacity-90 transition-all hover:scale-105 hover:shadow-xl font-semibold inline-flex items-center gap-2 active:scale-95 shadow-md">
-            <Sparkles className="size-5" />
-            Explore the Platform
+        <div className="text-center mt-16 animate-fade-in">
+          <button className="bg-slate-900 text-white px-10 py-4 rounded-full hover:bg-slate-800 transition-all hover:scale-105 hover:shadow-xl font-bold text-lg inline-flex items-center gap-3 active:scale-95 shadow-lg">
+            <Sparkles className="size-5 text-primary" />
+            Deploy Workspace
           </button>
         </div>
+
       </div>
     </section>
   );

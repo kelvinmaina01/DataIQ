@@ -19,9 +19,17 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    strictPort: true, // Prevents Vite from falling back to 3001, which causes an infinite proxy loop
     open: true,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   },
 });

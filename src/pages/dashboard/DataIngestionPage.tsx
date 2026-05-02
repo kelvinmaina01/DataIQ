@@ -22,14 +22,7 @@ import {
     Activity,
     Stethoscope,
     Info,
-    History,
-    ExternalLink,
-    Clock,
-    ShieldCheck,
-    Lock,
-    Fingerprint,
-    Cpu,
-    Zap
+    ArrowRight
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -40,6 +33,7 @@ import { parseFile, ParseResult } from '../../services/fileParser';
 import { auth } from '../../lib/firebase';
 import { supabase, setSupabaseIdentity } from '../../../backend/supabase/supabaseClient';
 import { toast } from 'sonner';
+import { hasActiveConnection } from '../../services/connectionService';
 
 // Connector types
 type Category = 'All' | 'Manual' | 'Databases' | 'Warehouses' | 'Cloud' | 'Health' | 'Webhooks';
@@ -78,8 +72,8 @@ const CONNECTORS: Connector[] = [
     { id: 'databricks', name: 'Databricks', description: 'Unified analytics platform integration', category: 'Warehouses', logo: 'https://www.vectorlogo.zone/logos/databricks/databricks-icon.svg', type: 'Data Warehouse', status: 'Available' },
 
     // Cloud Sources
-    { id: 'gdrive', name: 'Google Drive', description: 'Analyze your Google Drive files and folders', category: 'Cloud', logo: 'https://www.vectorlogo.zone/logos/google_drive/google_drive-icon.svg', type: 'Integration', status: 'Connected' },
-    { id: 'gsheets', name: 'Google Sheets', description: 'Live connection to your Google Sheets', category: 'Cloud', logo: 'https://cdn.simpleicons.org/googlesheets/34A853', type: 'Integration', status: 'Connected' },
+    { id: 'gdrive', name: 'Google Drive', description: 'Analyze your Google Drive files and folders', category: 'Cloud', logo: 'https://www.vectorlogo.zone/logos/google_drive/google_drive-icon.svg', type: 'Integration', status: 'Available' },
+    { id: 'gsheets', name: 'Google Sheets', description: 'Live connection to your Google Sheets', category: 'Cloud', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/30/Google_Sheets_logo_%282014-2020%29.svg', type: 'Integration', status: 'Available' },
     { id: 'onedrive', name: 'Microsoft OneDrive', description: 'Analyze your Personal OneDrive files and folders', category: 'Cloud', logo: '/logos/onedrive.svg', type: 'Integration', status: 'New' },
     { id: 'sharepoint', name: 'SharePoint', description: 'Analyze your SharePoint or OneDrive for Business files', category: 'Cloud', logo: '/logos/sharepoint.svg', type: 'Integration', status: 'New' },
     { id: 'gads', name: 'Google Ads', description: 'Analyze your data and manage your campaigns in Google Ads', category: 'Cloud', logo: 'https://www.vectorlogo.zone/logos/google_ads/google_ads-icon.svg', type: 'Integration', status: 'New' },
@@ -232,128 +226,6 @@ export function DataIngestionPage() {
         });
     };
 
-    if (!showConnectors) {
-        return (
-            <div className="min-h-[calc(100vh-160px)] w-full flex items-center justify-center p-4">
-                <div
-                    className="w-full max-w-6xl aspect-[21/9] rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(14,80,246,0.3)] overflow-hidden relative group animate-fade-in flex flex-col justify-center px-12 sm:px-24 border border-white/20"
-                    style={{
-                        background: 'linear-gradient(135deg, #00D2FF 0%, #0E50F6 50%, #9D50BB 100%)'
-                    }}
-                >
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.4),transparent_70%)]" />
-
-                    {/* Orbiting Connector Logos - Scattered/Organic System */}
-                    <div className="absolute -right-20 lg:right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center pointer-events-none scale-[0.65] lg:scale-100 origin-right transition-all duration-700" style={{ width: '600px', height: '600px' }}>
-                        {/* Glow center */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-24 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center z-10 shadow-[0_0_80px_rgba(255,255,255,0.3)] animate-pulse-soft">
-                            <Database className="size-10 text-white" strokeWidth={1.5} />
-                        </div>
-
-                        {/* Orbit ring 1 (outer) */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[400px] rounded-full border border-white/20 shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]" />
-
-                        {/* Orbit ring 2 (inner) */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[240px] rounded-full border border-white/10 shadow-[inset_0_0_15px_rgba(255,255,255,0.05)]" />
-
-                        {/* Outer orbit - 8 logos */}
-                        <div className="absolute top-1/2 left-1/2 size-[400px] animate-[orbitSpin_50s_linear_infinite]">
-                            {[
-                                { src: 'https://www.vectorlogo.zone/logos/postgresql/postgresql-icon.svg', alt: 'PostgreSQL', angle: 0 },
-                                { src: 'https://www.vectorlogo.zone/logos/mongodb/mongodb-icon.svg', alt: 'MongoDB', angle: 45 },
-                                { src: 'https://www.vectorlogo.zone/logos/google_bigquery/google_bigquery-icon.svg', alt: 'BigQuery', angle: 90 },
-                                { src: 'https://www.vectorlogo.zone/logos/google_drive/google_drive-icon.svg', alt: 'Drive', angle: 135 },
-                                { src: '/logos/meta.svg', alt: 'Meta', angle: 180 },
-                                { src: 'https://www.vectorlogo.zone/logos/fitbit/fitbit-icon.svg', alt: 'Fitbit', angle: 225 },
-                                { src: '/logos/excel.svg', alt: 'Excel', angle: 270 },
-                                { src: 'https://www.vectorlogo.zone/logos/supabase/supabase-icon.svg', alt: 'Supabase', angle: 315 },
-                            ].map((item) => (
-                                <div
-                                    key={item.alt}
-                                    className="absolute size-14 rounded-xl bg-white/90 border border-white/50 flex items-center justify-center shadow-xl animate-[orbitSpinReverse_50s_linear_infinite] pointer-events-auto hover:scale-125 transition-transform"
-                                    style={{
-                                        left: `calc(50% + ${Math.cos((item.angle * Math.PI) / 180) * 200}px - 28px)`,
-                                        top: `calc(50% + ${Math.sin((item.angle * Math.PI) / 180) * 200}px - 28px)`,
-                                    }}
-                                >
-                                    <img src={item.src} alt={item.alt} className="size-10 object-contain drop-shadow-md" />
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Inner orbit - 4 logos */}
-                        <div className="absolute top-1/2 left-1/2 size-[240px] animate-[orbitSpin_30s_linear_infinite_reverse]">
-                            {[
-                                { src: '/logos/sqlserver.svg', alt: 'SQL Server', angle: 0 },
-                                { src: 'https://cdn.simpleicons.org/googlesheets/34A853', alt: 'Sheets', angle: 90 },
-                                { src: '/logos/onedrive.svg', alt: 'OneDrive', angle: 180 },
-                                { src: '/logos/iot.svg', alt: 'IoT', angle: 270 },
-                            ].map((item) => (
-                                <div
-                                    key={item.alt}
-                                    className="absolute size-11 rounded-xl bg-white/90 border border-white/50 flex items-center justify-center shadow-lg animate-[orbitSpin_30s_linear_infinite] pointer-events-auto"
-                                    style={{
-                                        left: `calc(50% + ${Math.cos((item.angle * Math.PI) / 180) * 120}px - 22px)`,
-                                        top: `calc(50% + ${Math.sin((item.angle * Math.PI) / 180) * 120}px - 22px)`,
-                                    }}
-                                >
-                                    <img src={item.src} alt={item.alt} className="size-8 object-contain drop-shadow-md" />
-                                </div>
-                            ))}
-                        </div>
-
-
-
-
-                        {/* Ambient glow rings - Fainter now to let icons pop */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[400px] rounded-full border border-white/10 opacity-30" />
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[650px] rounded-full bg-white/[0.01] blur-3xl" />
-                    </div>
-
-                    {/* CSS Keyframes for orbit - includes translate to prevent centering jump */}
-                    <style>{`
-                        @keyframes orbitSpin {
-                            from { transform: translate(-50%, -50%) rotate(0deg); }
-                            to { transform: translate(-50%, -50%) rotate(360deg); }
-                        }
-                        @keyframes orbitSpinReverse {
-                            from { transform: rotate(0deg); }
-                            to { transform: rotate(-360deg); }
-                        }
-                    `}</style>
-
-
-                    <div className="relative z-20 max-w-xl animate-slide-up">
-                        <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold uppercase tracking-[0.2em] mb-8 shadow-lg">
-                            <span className="size-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(74,222,128,1)]" />
-                            Start Your Journey
-                        </div>
-
-                        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight drop-shadow-sm">
-                            Transform raw data into <span className="text-white/90 underline decoration-white/20 underline-offset-8">scientific breakthroughs.</span>
-                        </h1>
-
-                        <p className="text-lg sm:text-xl text-white/90 font-medium mb-10 max-w-lg leading-relaxed drop-shadow-sm">
-                            Upload your datasets and let our AI-powered engine handle the heavy lifting.
-                            From quality checks to insights discovery—all automated.
-                        </p>
-
-                        <button
-                            onClick={() => setShowConnectors(true)}
-                            className="bg-white text-primary px-10 h-16 rounded-full font-bold text-lg hover:bg-slate-50 transition-colors flex items-center gap-4 w-fit group shadow-xl"
-                        >
-                            Investigate
-                            <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                                <ChevronRight className="size-5" strokeWidth={3} />
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in transition-all duration-500">
             <div className="mb-10">
@@ -421,36 +293,7 @@ export function DataIngestionPage() {
                             ))}
                         </div>
 
-                        {/* Import Guidelines */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="flex items-start gap-4 p-6 bg-amber-50/50 border border-amber-200/50 rounded-2xl mb-8 relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 p-3 opacity-5">
-                                <FileText className="size-16 text-amber-900" />
-                            </div>
-                            <div className="size-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0 border border-amber-200/50">
-                                <Info className="size-5 text-amber-700" />
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-amber-900 text-lg mb-4">Import Guidelines</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                                    {[
-                                        "First row should contain column headers",
-                                        "Use consistent units across measurements",
-                                        "Remove any sensitive information if possible",
-                                        "Max file size: 50MB"
-                                    ].map((text, i) => (
-                                        <div key={i} className="flex items-start gap-3 group">
-                                            <div className="mt-1.5 size-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)] shrink-0 group-hover:scale-125 transition-transform" />
-                                            <span className="text-[15px] font-bold text-amber-900/80 leading-tight">{text}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </motion.div>
+
 
                         {uploadState === 'idle' && (
                             <DropzoneArea onFilesSelected={handleFilesSelected} />
@@ -635,7 +478,18 @@ export function DataIngestionPage() {
                     .map((connector) => (
                         <div
                             key={connector.id}
-                            onClick={() => !connector.status?.includes('Connected') && navigate(`/dashboard/ingestion/connect/${connector.id}`)}
+                            onClick={() => {
+                                if (connector.status?.includes('Connected')) return;
+                                // Special handling for Google Workspace OAuth (Sheets, Drive, Ads)
+                                if (connector.id === 'gsheets' || connector.id === 'google-sheets' || connector.id === 'gdrive' || connector.id === 'gads') {
+                                    navigate(`/dashboard/ingestion/connect/google-sheets?source=${connector.id}`);
+                                } else if (connector.id === 'onedrive' || connector.id === 'sharepoint') {
+                                    // Special handling for Microsoft OAuth (OneDrive + SharePoint)
+                                    navigate(`/dashboard/ingestion/connect/microsoft?source=${connector.id}`);
+                                } else {
+                                    navigate(`/dashboard/ingestion/connect/${connector.id}`);
+                                }
+                            }}
                             className="group bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:border-primary/30 transition-all duration-300 relative flex flex-col h-full cursor-pointer"
                         >
                             <div className="flex items-start gap-4 mb-4">
@@ -673,20 +527,54 @@ export function DataIngestionPage() {
                                     {connector.type}
                                 </span>
 
-                                {connector.status === 'Connected' ? (
-                                    <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold ring-1 ring-green-600/10">
-                                        <CheckCircle2 className="size-3.5" />
-                                        Connected
-                                    </div>
-                                ) : (
-                                    <Button
-                                        variant="ghost"
-                                        className="h-9 px-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary rounded-lg transition-all group-hover:bg-primary group-hover:text-white"
-                                        onClick={() => navigate(`/dashboard/ingestion/connect/${connector.id}`)}
-                                    >
-                                        Connect
-                                    </Button>
-                                )}
+                                {(() => {
+                                    // Check if this connector has an active connection
+                                    const isDatabase = connector.category === 'Databases' || connector.category === 'Warehouses';
+                                    const isGoogleSheets = connector.id === 'gsheets' || connector.id === 'google-sheets' || connector.id === 'gdrive' || connector.id === 'gads';
+                                    const isConnected = (isDatabase || isGoogleSheets) && hasActiveConnection(connector.id);
+
+                                    if (isConnected) {
+                                        return (
+                                            <button
+                                                className="text-primary hover:text-primary/80 text-sm font-semibold flex items-center gap-1.5 transition-colors group"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    //  Navigate to each connector's OWN page
+                                                    navigate(`/dashboard/connection/${connector.id}`);
+                                                }}
+                                            >
+                                                Query my data
+                                                <ArrowRight className="size-4 group-hover:translate-x-0.5 transition-transform" />
+                                            </button>
+                                        );
+                                    } else if (connector.status === 'Connected') {
+                                        return (
+                                            <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold ring-1 ring-green-600/10">
+                                                <CheckCircle2 className="size-3.5" />
+                                                Connected
+                                            </div>
+                                        );
+                                    } else {
+                                        return (
+                                            <Button
+                                                variant="ghost"
+                                                className="h-9 px-4 text-xs font-bold text-primary hover:bg-primary/5 hover:text-primary rounded-lg transition-all group-hover:bg-primary group-hover:text-white"
+                                                onClick={(e: React.MouseEvent) => {
+                                                    e.stopPropagation();
+                                                    if (isGoogleSheets) {
+                                                        navigate(`/dashboard/ingestion/connect/google-sheets?source=${connector.id}`);
+                                                    } else if (connector.id === 'onedrive' || connector.id === 'sharepoint') {
+                                                        navigate(`/dashboard/ingestion/connect/microsoft?source=${connector.id}`);
+                                                    } else {
+                                                        navigate(`/dashboard/ingestion/connect/${connector.id}`);
+                                                    }
+                                                }}
+                                            >
+                                                Connect
+                                            </Button>
+                                        );
+                                    }
+                                })()}
                             </div>
                         </div>
                     ))}
@@ -723,7 +611,7 @@ export function DataIngestionPage() {
                     Request connector
                 </Button>
             </div>
-        </div>
+        </div >
     );
 }
 
