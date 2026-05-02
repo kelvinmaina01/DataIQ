@@ -403,7 +403,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <div
                     className={
                         location.pathname === '/dashboard/notebook'
-                            ? 'flex-1 min-h-0 overflow-hidden flex flex-col bg-slate-100 p-0'
+                            ? 'flex-1 min-h-0 overflow-hidden flex flex-col bg-white p-0'
                             : 'flex-1 overflow-y-auto p-8 custom-scrollbar'
                     }
                 >

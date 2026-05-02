@@ -705,13 +705,13 @@ export function AINotebookPage() {
   };
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-slate-100 animate-in fade-in duration-500">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col bg-white animate-in fade-in duration-500">
       <div className="flex min-h-0 min-w-0 flex-1 flex-row">
         {/* Main notebook column — independent vertical scroll */}
-        <div className="notebook-scrollbar relative isolate z-0 min-h-0 min-w-0 flex-1 overflow-y-auto scroll-pb-24 bg-slate-100 px-2 py-2 md:px-6">
+        <div className="notebook-scrollbar relative isolate z-0 min-h-0 min-w-0 flex-1 overflow-y-auto scroll-pb-24 bg-white px-4 py-4 md:px-8">
           {/* Sticky toolbar — opaque layer so scrolling cells never “slide under” a glass/envelope illusion */}
           {/* One horizontal row only: heading left, actions right (never stacked) */}
-          <div className="sticky top-0 z-50 -mx-2 mb-6 flex min-w-0 flex-nowrap items-center justify-between gap-3 border-b border-slate-200/90 bg-slate-100 px-2 pb-4 pt-1 shadow-[0_6px_16px_-8px_rgba(15,23,42,0.12)] md:-mx-6 md:px-6">
+          <div className="sticky top-0 z-50 -mx-4 mb-8 flex min-w-0 flex-nowrap items-center justify-between gap-3 border-b border-slate-100 bg-white/95 backdrop-blur-sm px-4 pb-4 pt-0 md:-mx-8 md:px-8">
             <div className="min-w-0 flex-1 pr-2">
               <h1 className="truncate text-xl font-bold text-slate-900">
                 Customer Churn Analysis — Q3 2024
@@ -822,11 +822,11 @@ export function AINotebookPage() {
             <div
               className={`rounded-xl border overflow-hidden transition-all shadow-none ${
                 liveStatus === 'running'
-                  ? 'border-[#0E50F6] bg-slate-50 ring-2 ring-[#0E50F6]/10'
-                  : 'border-slate-200/90 bg-slate-100/90'
+                  ? 'border-[#0E50F6] bg-blue-50/30 ring-2 ring-[#0E50F6]/10'
+                  : 'border-slate-200/80 bg-white'
               }`}
             >
-              <div className="flex items-center gap-2 border-b border-slate-200/80 bg-slate-100/90 px-3 py-2">
+              <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/50 px-3 py-2">
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#0E50F6]/10 text-[#0E50F6]">PROMPT</span>
                 <span className="text-[11px] text-slate-400">New Analysis</span>
                 <div className="flex-1" />
@@ -854,7 +854,7 @@ export function AINotebookPage() {
                   ))}
                 </div>
               )}
-              <div className="flex flex-wrap items-center gap-2 border-t border-slate-200/80 bg-slate-100/70 px-3 py-2">
+              <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 bg-white px-3 py-2">
                 {/* Hidden file input */}
                 <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls,.json,.tsv" className="hidden" onChange={handleFileUpload} />
                 <Button size="sm" onClick={runLiveCell} disabled={liveStatus === 'running'}
