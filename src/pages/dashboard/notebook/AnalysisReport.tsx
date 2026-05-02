@@ -54,16 +54,16 @@ const SectionLabel: React.FC<{ act: string; title: string }> = ({ act, title }) 
   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
     <span style={{
       fontSize: 9, fontWeight: 700, fontFamily: 'monospace', textTransform: 'uppercase',
-      letterSpacing: '1px', color: '#334155', padding: '3px 8px',
-      background: 'rgba(255,255,255,0.04)', borderRadius: 4,
-      border: '1px solid rgba(255,255,255,0.06)',
+      letterSpacing: '1px', color: '#0E50F6', padding: '3px 8px',
+      background: 'rgba(14,80,246,0.06)', borderRadius: 4,
+      border: '1px solid rgba(14,80,246,0.1)',
     }}>
       {act}
     </span>
-    <span style={{ fontSize: 12, fontWeight: 600, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+    <span style={{ fontSize: 12, fontWeight: 700, color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
       {title}
     </span>
-    <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.05)' }} />
+    <div style={{ flex: 1, height: 1, background: 'rgba(14,80,246,0.05)' }} />
   </div>
 );
 
@@ -93,7 +93,7 @@ const FindingCard: React.FC<{ finding: KeyFinding; index: number }> = ({ finding
         </span>
 
         <div style={{ flex: 1 }}>
-          <p style={{ fontSize: 13, fontWeight: 500, color: '#CBD5E1', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 13, fontWeight: 500, color: '#334155', margin: 0, lineHeight: 1.5 }}>
             {finding.finding}
           </p>
           <div style={{ display: 'flex', gap: 10, marginTop: 5, alignItems: 'center' }}>
@@ -157,7 +157,7 @@ const ActionCard: React.FC<{ action: ReportAction; index: number }> = ({ action,
         }}>
           {action.timeframe}
         </span>
-        <p style={{ fontSize: 13, color: '#CBD5E1', margin: '4px 0 4px', lineHeight: 1.55 }}>
+        <p style={{ fontSize: 13, color: '#334155', margin: '4px 0 4px', lineHeight: 1.55, fontWeight: 500 }}>
           {action.action}
         </p>
         {action.expected_impact && (
@@ -188,17 +188,15 @@ export const AnalysisReport: React.FC<Props> = ({ report, suggestedPrompts = [],
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
       style={{
-        background: 'rgba(8,15,28,0.9)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 14, padding: '20px 22px', marginTop: 8,
+        marginTop: 24,
       }}
     >
       {/* Report header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
         <span style={{ fontSize: 18 }}>📖</span>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#E2E8F0' }}>Analysis Report</div>
-          <div style={{ fontSize: 10, color: '#334155' }}>Narrator Analyst · Storytelling format</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#1E293B' }}>Analysis Report</div>
+          <div style={{ fontSize: 10, color: '#64748B' }}>Narrator Analyst · Storytelling format</div>
         </div>
         {/* Confidence badge */}
         <div style={{
@@ -214,7 +212,7 @@ export const AnalysisReport: React.FC<Props> = ({ report, suggestedPrompts = [],
       {/* ACT 1 — THE QUESTION */}
       <div style={{ marginBottom: 20 }}>
         <SectionLabel act="Act 1" title="The Question" />
-        <p style={{ fontSize: 14, color: '#94A3B8', lineHeight: 1.75, margin: 0 }}>
+        <p style={{ fontSize: 14, color: '#334155', lineHeight: 1.75, margin: 0, fontWeight: 500 }}>
           {report.question}
         </p>
       </div>
@@ -315,33 +313,51 @@ export const AnalysisReport: React.FC<Props> = ({ report, suggestedPrompts = [],
         </div>
       )}
 
-      {/* Suggested prompts */}
+      {/* Suggested prompts — Sitting alone as independent cards */}
       {suggestedPrompts.length > 0 && (
-        <div style={{ marginTop: 18 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8 }}>
-            What to investigate next →
+        <div style={{ marginTop: 24 }}>
+          <div style={{
+            fontSize: 10, fontWeight: 800, color: '#F97316', textTransform: 'uppercase',
+            letterSpacing: '0.05em', marginBottom: 12, paddingLeft: 4
+          }}>
+            Suggested Next Steps
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 12
+          }}>
             {suggestedPrompts.map((p, i) => (
               <motion.button
                 key={i}
-                initial={{ opacity: 0, x: -4 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.06 }}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.05 }}
                 onClick={() => onSuggestedPrompt?.(p)}
                 style={{
-                  background: 'rgba(37,99,235,0.05)', border: '1px solid rgba(37,99,235,0.18)',
-                  borderRadius: 8, padding: '8px 12px',
+                  background: 'white',
+                  border: '1px solid rgba(14, 80, 246, 0.1)',
+                  borderRadius: 12,
+                  padding: '16px 20px',
                   cursor: onSuggestedPrompt ? 'pointer' : 'default',
-                  textAlign: 'left', fontFamily: 'inherit',
-                  transition: 'all 0.2s ease',
+                  textAlign: 'left',
+                  fontFamily: 'inherit',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
-                whileHover={onSuggestedPrompt ? { x: 3, borderColor: 'rgba(37,99,235,0.4)' } : {}}
+                whileHover={onSuggestedPrompt ? {
+                  y: -2,
+                  boxShadow: '0 6px 15px rgba(14, 80, 246, 0.08)',
+                  borderColor: 'rgba(14, 80, 246, 0.3)'
+                } : {}}
               >
-                <span style={{ fontSize: 12, color: '#60A5FA', lineHeight: 1.5 }}>
-                  <span style={{ color: '#334155', marginRight: 6 }}>→</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#334155', lineHeight: 1.4, flex: 1, paddingRight: 12 }}>
                   {p}
                 </span>
+                <span style={{ color: '#94A3B8', fontSize: 14 }}>→</span>
               </motion.button>
             ))}
           </div>

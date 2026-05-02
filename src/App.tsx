@@ -70,7 +70,7 @@ export default function App() {
         closeButton={false}
         toastOptions={{ duration: 2000 }}
         offset={16}
-        expand={false}
+        expand={true}
       />
       <Router>
         <Routes>

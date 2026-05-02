@@ -65,7 +65,15 @@ export const notebookSessionStore = {
       .from('notebook_sessions')
       .select('id,title,preview,created_at,updated_at')
       .order('updated_at', { ascending: false });
-    if (error) throw error;
+    
+    if (error) {
+      // If table doesn't exist (PGRST116 or similar), fallback to local
+      console.error('Supabase session list error, falling back to local:', error.message);
+      const sessions = readLocalSessions()
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+        .map(({ id, title, preview, created_at, updated_at }) => ({ id, title, preview, created_at, updated_at }));
+      return sessions;
+    }
     return data || [];
   },
 
@@ -95,7 +103,22 @@ export const notebookSessionStore = {
       })
       .select('*')
       .single();
-    if (error) throw error;
+    
+    if (error) {
+      console.error('Supabase session create error, falling back to local:', error.message);
+      const sessions = readLocalSessions();
+      const now = localNow();
+      const created: NotebookSession = {
+        id: `local-${Date.now()}`,
+        title: title?.trim() || 'Untitled Session',
+        preview: null,
+        payload: { cells: [], liveResult: null, uploadedSources: [] },
+        created_at: now,
+        updated_at: now,
+      };
+      writeLocalSessions([created, ...sessions]);
+      return created;
+    }
     return data;
   },
 
@@ -112,8 +135,9 @@ export const notebookSessionStore = {
       .eq('id', id)
       .single();
     if (error) {
-      if ((error as any).code === 'PGRST116') return null;
-      throw error;
+      console.error('Supabase session get error, falling back to local:', error.message);
+      const sessions = readLocalSessions();
+      return sessions.find((s) => s.id === id) || null;
     }
     return data;
   },
@@ -151,7 +175,24 @@ export const notebookSessionStore = {
       .eq('id', id)
       .select('*')
       .single();
-    if (error) throw error;
+
+    if (error) {
+      console.error('Supabase session save error, falling back to local:', error.message);
+      const sessions = readLocalSessions();
+      const index = sessions.findIndex((s) => s.id === id);
+      if (index !== -1) {
+        sessions[index] = {
+          ...sessions[index],
+          title: title?.trim() || sessions[index].title,
+          payload,
+          preview,
+          updated_at: localNow(),
+        };
+        writeLocalSessions(sessions);
+        return sessions[index];
+      }
+      throw error;
+    }
     return data;
   },
 };

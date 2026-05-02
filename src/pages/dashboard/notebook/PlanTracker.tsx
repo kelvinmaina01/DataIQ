@@ -23,10 +23,10 @@ const STEP_TYPE_ICONS: Record<string, string> = {
 };
 
 const STEP_COLORS: Record<string, { bg: string; border: string; text: string }> = {
-  pending: { bg: 'rgba(255,255,255,0.03)', border: 'rgba(255,255,255,0.07)', text: '#475569' },
-  running: { bg: 'rgba(37,99,235,0.08)',   border: 'rgba(37,99,235,0.35)',   text: '#93C5FD' },
-  done:    { bg: 'rgba(34,197,94,0.07)',   border: 'rgba(34,197,94,0.28)',   text: '#86EFAC' },
-  error:   { bg: 'rgba(239,68,68,0.07)',   border: 'rgba(239,68,68,0.28)',   text: '#FCA5A5' },
+  pending: { bg: 'rgba(255,255,255,0.4)', border: 'rgba(14,80,246,0.05)', text: '#64748B' },
+  running: { bg: 'rgba(37,99,235,0.05)',   border: 'rgba(37,99,235,0.2)',    text: '#1E40AF' },
+  done:    { bg: 'rgba(34,197,94,0.04)',   border: 'rgba(34,197,94,0.15)',   text: '#065F46' },
+  error:   { bg: 'rgba(239,68,68,0.04)',   border: 'rgba(239,68,68,0.15)',   text: '#991B1B' },
 };
 
 function getPlanProgress(plan: PlanStep[]): number {
@@ -53,11 +53,13 @@ export const PlanTracker: React.FC<Props> = ({ plan, currentStep }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       style={{
-        background: 'rgba(10,18,35,0.85)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 12,
-        marginBottom: 10,
+        background: 'rgba(239, 246, 255, 0.95)',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(14, 80, 246, 0.15)',
+        borderRadius: 16,
+        marginBottom: 16,
         overflow: 'hidden',
+        boxShadow: '0 4px 12px rgba(14, 80, 246, 0.08)',
       }}
     >
       {/* Header */}
@@ -108,38 +110,33 @@ export const PlanTracker: React.FC<Props> = ({ plan, currentStep }) => {
                   transition: 'all 0.28s ease',
                 }}
               >
-                {/* Status indicator */}
+                {/* Status indicator — The "Real Tick Button" */}
                 <div style={{
-                  width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                  width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: isRunning ? 'rgba(37,99,235,0.18)'
-                    : isDone  ? 'rgba(34,197,94,0.18)'
-                    : isError ? 'rgba(239,68,68,0.18)'
-                    : 'rgba(255,255,255,0.05)',
+                  border: `2px solid ${isRunning ? '#3B82F6' : isDone ? '#10B981' : isError ? '#EF4444' : 'rgba(14,80,246,0.2)'}`,
+                  background: isDone ? '#10B981' : isRunning ? 'rgba(59,130,246,0.1)' : 'white',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: isRunning ? '0 0 10px rgba(59,130,246,0.3)' : 'none',
                 }}>
                   {isRunning ? (
                     <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
-                      style={{
-                        width: 12, height: 12,
-                        border: '1.5px solid #2563EB',
-                        borderTopColor: 'transparent',
-                        borderRadius: '50%',
-                      }}
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                      style={{ width: 8, height: 8, borderRadius: '50%', background: '#3B82F6' }}
                     />
                   ) : isDone ? (
-                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#34D399" strokeWidth="2">
-                      <path d="M2 6l3 3 5-5"/>
-                    </svg>
+                    <motion.svg
+                      initial={{ scale: 0, rotate: -20 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </motion.svg>
                   ) : isError ? (
-                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#F87171" strokeWidth="2">
-                      <path d="M2 2l8 8M10 2l-8 8"/>
-                    </svg>
+                    <span style={{ color: 'white', fontSize: 14, fontWeight: 'bold' }}>!</span>
                   ) : (
-                    <span style={{ fontSize: 9, fontFamily: 'monospace', color: '#334155', fontWeight: 700 }}>
-                      {String(step.step).padStart(2, '0')}
-                    </span>
+                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(14,80,246,0.3)' }} />
                   )}
                 </div>
 

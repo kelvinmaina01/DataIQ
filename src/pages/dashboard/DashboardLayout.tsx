@@ -171,10 +171,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     const userPhoto = user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=0E50F6&color=fff`;
 
     return (
-    return (
         <div className="h-screen w-screen bg-white relative overflow-hidden flex">
 
-            {/* Sidebar */}
             <TooltipProvider delayDuration={0}>
                 <aside
                     className={`${isSidebarOpen ? 'w-72' : 'w-20'
@@ -289,116 +287,117 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </div>
                 </aside>
             </TooltipProvider>
-
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
-                {/* Top Navbar */}
-                <header className="h-20 bg-white/60 backdrop-blur-md border-b border-border/50 flex items-center justify-between px-8 relative z-50">
-                    <div className="flex items-center gap-6 flex-1 max-w-2xl">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-colors"
-                        >
-                            {isSidebarOpen ? <PanelLeft className="w-5 h-5" /> : <PanelRight className="w-5 h-5" />}
-                        </Button>
+                {/* Top Navbar — hidden for notebook to allow full-page immersion */}
+                {location.pathname !== '/dashboard/notebook' && (
+                    <header className="h-20 bg-white/60 backdrop-blur-md border-b border-border/50 flex items-center justify-between px-8 relative z-50">
+                        <div className="flex items-center gap-6 flex-1 max-w-2xl">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                                className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-xl transition-colors"
+                            >
+                                {isSidebarOpen ? <PanelLeft className="w-5 h-5" /> : <PanelRight className="w-5 h-5" />}
+                            </Button>
 
-                        <div className="flex-1 max-w-2xl group">
-                            <div className="relative flex items-center bg-primary/[0.02] border border-primary/30 rounded-2xl px-4 py-2.5 group-focus-within:bg-white group-focus-within:ring-[4px] group-focus-within:ring-primary/10 group-focus-within:border-primary transition-all shadow-sm hover:bg-primary/[0.04] hover:border-primary/50">
-                                <Search className="w-5 h-5 text-primary/60 group-focus-within:text-primary transition-colors flex-shrink-0" />
-                                <input
-                                    type="text"
-                                    placeholder="Search datasets, insights, reports... (⌘ + F)"
-                                    className="flex-1 bg-transparent border-none outline-none pl-3 text-[15px] font-semibold placeholder:text-primary/30 text-foreground focus:ring-0"
-                                />
+                            <div className="flex-1 max-w-2xl group">
+                                <div className="relative flex items-center bg-primary/[0.02] border border-primary/30 rounded-2xl px-4 py-2.5 group-focus-within:bg-white group-focus-within:ring-[4px] group-focus-within:ring-primary/10 group-focus-within:border-primary transition-all shadow-sm hover:bg-primary/[0.04] hover:border-primary/50">
+                                    <Search className="w-5 h-5 text-primary/60 group-focus-within:text-primary transition-colors flex-shrink-0" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search datasets, insights, reports... (⌘ + F)"
+                                        className="flex-1 bg-transparent border-none outline-none pl-3 text-[15px] font-semibold placeholder:text-primary/30 text-foreground focus:ring-0"
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="h-8 w-px bg-border/50 mx-2"></div>
+                        <div className="flex items-center gap-4">
+                            <div className="h-8 w-px bg-border/50 mx-2"></div>
 
-                        <div className="flex items-center gap-3 pl-2 relative">
-                            <div className="text-right hidden sm:block">
-                                <p className="text-sm font-semibold text-foreground leading-tight">{displayName}</p>
-                                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{userEmail}</p>
-                            </div>
-                            <div className="relative">
-                                <Avatar
-                                    className="h-10 w-10 ring-2 ring-primary/10 transition-transform hover:scale-105 cursor-pointer"
-                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                >
-                                    <AvatarImage src={userPhoto} />
-                                    <AvatarFallback>{displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
-                                </Avatar>
+                            <div className="flex items-center gap-3 pl-2 relative">
+                                <div className="text-right hidden sm:block">
+                                    <p className="text-sm font-semibold text-foreground leading-tight">{displayName}</p>
+                                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{userEmail}</p>
+                                </div>
+                                <div className="relative">
+                                    <Avatar
+                                        className="h-10 w-10 ring-2 ring-primary/10 transition-transform hover:scale-105 cursor-pointer"
+                                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                    >
+                                        <AvatarImage src={userPhoto} />
+                                        <AvatarFallback>{displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                                    </Avatar>
 
-                                {/* Profile Popover */}
-                                {isProfileOpen && (
-                                    <>
-                                        <div
-                                            className="fixed inset-0 z-[9998]"
-                                            onClick={() => setIsProfileOpen(false)}
-                                        />
-                                        <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-border/50 overflow-hidden z-[9999] animate-in fade-in zoom-in duration-200 origin-top-right">
-                                            <div className="p-4 border-b border-border/40">
-                                                <h3 className="text-sm font-semibold text-slate-800">My Account</h3>
+                                    {/* Profile Popover */}
+                                    {isProfileOpen && (
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-[9998]"
+                                                onClick={() => setIsProfileOpen(false)}
+                                            />
+                                            <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-border/50 overflow-hidden z-[9999] animate-in fade-in zoom-in duration-200 origin-top-right">
+                                                <div className="p-4 border-b border-border/40">
+                                                    <h3 className="text-sm font-semibold text-slate-800">My Account</h3>
+                                                </div>
+
+                                                <div className="p-2">
+                                                    <button
+                                                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
+                                                        onClick={() => {
+                                                            setIsProfileOpen(false);
+                                                            navigate('/dashboard/profile');
+                                                        }}
+                                                    >
+                                                        <UserCircle className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                                                        <span>Profile</span>
+                                                    </button>
+
+                                                    <button
+                                                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
+                                                        onClick={() => {
+                                                            setIsProfileOpen(false);
+                                                            navigate('/dashboard/notifications');
+                                                        }}
+                                                    >
+                                                        <Bell className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                                                        <span>Notifications</span>
+                                                    </button>
+
+                                                    <button
+                                                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
+                                                        onClick={() => {
+                                                            setIsProfileOpen(false);
+                                                            navigate('/dashboard/settings');
+                                                        }}
+                                                    >
+                                                        <Settings className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
+                                                        <span>Settings</span>
+                                                    </button>
+                                                </div>
+
+                                                <div className="p-2 border-t border-border/40">
+                                                    <button
+                                                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-500 hover:bg-rose-50 transition-colors group"
+                                                        onClick={() => {
+                                                            setIsProfileOpen(false);
+                                                            handleLogout();
+                                                        }}
+                                                    >
+                                                        <LogOut className="w-4 h-4 text-rose-400 group-hover:text-rose-500 transition-colors" />
+                                                        <span>Sign Out</span>
+                                                    </button>
+                                                </div>
                                             </div>
-
-                                            <div className="p-2">
-                                                <button
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
-                                                    onClick={() => {
-                                                        setIsProfileOpen(false);
-                                                        navigate('/dashboard/profile');
-                                                    }}
-                                                >
-                                                    <UserCircle className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
-                                                    <span>Profile</span>
-                                                </button>
-
-                                                <button
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
-                                                    onClick={() => {
-                                                        setIsProfileOpen(false);
-                                                        navigate('/dashboard/notifications');
-                                                    }}
-                                                >
-                                                    <Bell className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
-                                                    <span>Notifications</span>
-                                                </button>
-
-                                                <button
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors group"
-                                                    onClick={() => {
-                                                        setIsProfileOpen(false);
-                                                        navigate('/dashboard/settings');
-                                                    }}
-                                                >
-                                                    <Settings className="w-4 h-4 text-slate-400 group-hover:text-primary transition-colors" />
-                                                    <span>Settings</span>
-                                                </button>
-                                            </div>
-
-                                            <div className="p-2 border-t border-border/40">
-                                                <button
-                                                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-500 hover:bg-rose-50 transition-colors group"
-                                                    onClick={() => {
-                                                        setIsProfileOpen(false);
-                                                        handleLogout();
-                                                    }}
-                                                >
-                                                    <LogOut className="w-4 h-4 text-rose-400 group-hover:text-rose-500 transition-colors" />
-                                                    <span>Sign Out</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </header>
+                    </header>
+                )}
 
                 <div
                     className={
