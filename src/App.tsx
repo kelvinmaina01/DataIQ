@@ -37,7 +37,6 @@ import {
   BookOpen,
   Zap,
   MessagesSquare,
-  Files,
   FileText,
   FileSearch,
   FolderOpen,
@@ -58,12 +57,21 @@ import {
 import { DocumentIntelligencePage } from './pages/dashboard/DocumentIntelligencePage';
 import { MyFilesPage } from './pages/dashboard/MyFilesPage';
 import { AINotebookPage } from './pages/dashboard/AINotebookPage';
+import { AnalyticsDashboardPage } from './pages/dashboard/AnalyticsDashboardPage';
 
 export default function App() {
   console.log("DataIQ: App Rendering...");
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <Toaster position="top-center" richColors />
+      <Toaster
+        position="top-right"
+        richColors
+        duration={2000}
+        closeButton={false}
+        toastOptions={{ duration: 2000 }}
+        offset={16}
+        expand={false}
+      />
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -100,7 +108,7 @@ export default function App() {
             <Route path="google-drive" element={<GoogleDrivePage />} />
             <Route path="google-ads" element={<GoogleAdsPage />} />
             <Route path="document-intelligence" element={<DocumentIntelligencePage />} />
-            <Route path="pinned" element={<BlankPage title="Pinned Dashboards" icon={Files} />} />
+            <Route path="pinned" element={<AnalyticsDashboardPage />} />
             <Route path="reports" element={<BlankPage title="Reports" icon={FileText} />} />
 
             <Route path="my-files" element={<MyFilesPage />} />

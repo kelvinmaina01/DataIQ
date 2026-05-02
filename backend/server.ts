@@ -25,6 +25,7 @@ import express from 'express';
 import cors from 'cors';
 import databaseRoutes from './routes/database';
 import integrationRoutes from './integrations/routes';
+import notebookRoutes from './notebook/routes';
 import { initializeDIContainer } from './services/database-service/di/container';
 
 // Initialize DI container
@@ -40,6 +41,8 @@ app.use(express.json());
 // Routes
 app.use('/api/integrations', integrationRoutes);
 app.use('/api/database', databaseRoutes);
+app.use('/api/notebook', notebookRoutes);
+app.use('/api/v1', notebookRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -57,6 +60,7 @@ app.listen(PORT, () => {
     console.log(`\n🚀 DataIQ Backend Server running on port ${PORT}`);
     console.log(`📡 Database API: http://localhost:${PORT}/api/database`);
     console.log(`🔗 Integrations API: http://localhost:${PORT}/api/integrations`);
+    console.log(`🧠 Notebook API: http://localhost:${PORT}/api/notebook`);
     console.log(`💚 Health Check: http://localhost:${PORT}/health\n`);
 });
 

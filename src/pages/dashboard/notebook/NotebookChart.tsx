@@ -30,7 +30,16 @@ const Tip = ({ active, payload, label }: any) => {
   );
 };
 
-export function CellChart({ chartMeta, chartData }: { chartMeta: { id: string; type: string; title: string; sub: string }; chartData: any }) {
+export function CellChart({
+  chartMeta,
+  chartData,
+  compact,
+}: {
+  chartMeta: { id: string; type: string; title: string; sub: string };
+  chartData: any;
+  /** Smaller chart area for dashboard widgets */
+  compact?: boolean;
+}) {
   const d = chartData[chartMeta.id];
   if (!d) return null;
 
@@ -75,7 +84,7 @@ export function CellChart({ chartMeta, chartData }: { chartMeta: { id: string; t
         </div>
       </div>
 
-      <div className="h-[240px] mt-3">
+      <div className={`${compact ? 'h-[180px]' : 'h-[240px]'} mt-3`}>
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'bar' ? (
             <BarChart data={d.data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>

@@ -1,301 +1,241 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Copy, Check, Pin, CheckCircle2, Download } from 'lucide-react';
-import { toast } from 'sonner';
-import { CellChart } from './NotebookChart';
-import type { CellData } from './simulations';
+import { Pin } from 'lucide-react';
+import { PlanTracker } from './PlanTracker';
+import { StreamingCodeBlock } from './StreamingCodeBlock';
+import { SandboxOutput } from './SandboxOutput';
+import { AnalysisReport } from './AnalysisReport';
+import type { LiveCell } from '../../../types/streaming';
 
-const insightColors: Record<string, { bg: string; border: string; title: string; text: string }> = {
-  rose: { bg: 'bg-rose-50', border: 'border-rose-200', title: 'text-rose-700', text: 'text-rose-600' },
-  amber: { bg: 'bg-amber-50', border: 'border-amber-200', title: 'text-amber-700', text: 'text-amber-600' },
-  blue: { bg: 'bg-blue-50', border: 'border-blue-200', title: 'text-blue-700', text: 'text-blue-600' },
-  emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', title: 'text-emerald-700', text: 'text-emerald-600' },
-  violet: { bg: 'bg-violet-50', border: 'border-violet-200', title: 'text-violet-700', text: 'text-violet-600' },
+const STAT_COLORS: Record<string, string> = {
+  red: '#F87171', green: '#34D399', blue: '#60A5FA',
+  amber: '#FCD34D', purple: '#C4B5FD', neutral: '#94A3B8',
 };
 
-const contractBadge: Record<string, string> = {
-  'Month-to-month': 'bg-amber-100 text-amber-700',
-  'Two year': 'bg-emerald-100 text-emerald-700',
-  'One year': 'bg-blue-100 text-blue-700',
+const SEV_STYLES: Record<string, { bg: string; border: string; badge: string; badgeColor: string }> = {
+  critical: { bg: 'rgba(239,68,68,0.06)', border: 'rgba(239,68,68,0.22)', badge: 'rgba(239,68,68,0.15)', badgeColor: '#FCA5A5' },
+  warning:  { bg: 'rgba(217,119,6,0.06)',  border: 'rgba(217,119,6,0.22)',  badge: 'rgba(217,119,6,0.15)',  badgeColor: '#FCD34D' },
+  positive: { bg: 'rgba(34,197,94,0.06)',  border: 'rgba(34,197,94,0.18)',  badge: 'rgba(34,197,94,0.12)',  badgeColor: '#86EFAC' },
+  info:     { bg: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.18)', badge: 'rgba(59,130,246,0.12)', badgeColor: '#93C5FD' },
+  model:    { bg: 'rgba(124,58,237,0.06)', border: 'rgba(124,58,237,0.18)', badge: 'rgba(124,58,237,0.12)', badgeColor: '#C4B5FD' },
 };
 
-const highlightCode = (code: string, lang: string) => {
-  let highlighted = code
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-    
-  if (lang === 'SQL') {
-    highlighted = highlighted
-      .replace(/\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|AS|THEN|ELSE|END|CASE|WHEN|SUM|COUNT|AVG|ROUND)\b/gi, '<span class="text-pink-400 font-bold">$1</span>')
-      .replace(/('(?:[^'\\]|\\.)*')/g, '<span class="text-amber-300">$1</span>')
-      .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="text-purple-400">$1</span>');
-  } else {
-    highlighted = highlighted
-      .replace(/(#.*?)$/gm, '<span class="text-slate-500 italic">$1</span>')
-      .replace(/("|')(?:(?=(\\?))\2.)*?\1/g, '<span class="text-amber-300">$&</span>')
-      .replace(/\b(import|from|def|return|if|else|elif|for|while|class|as|lambda)\b/g, '<span class="text-pink-400 font-bold">$1</span>')
-      .replace(/\b(print|pd|np|df|mean|sum|astype|groupby|apply|reset_index|crosstab|chi2_contingency)\b/g, '<span class="text-blue-300">$1</span>')
-      .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="text-purple-400">$1</span>');
-  }
-  return highlighted;
+const SEV_LABELS: Record<string, string> = {
+  critical: '🔴 Critical', warning: '🟡 Warning',
+  positive: '🟢 Positive', info: '🔵 Insight', model: '🟣 ML',
 };
 
-export function NotebookCellRenderer({ cell, onPin, onSuggest }: { cell: CellData; onPin?: (cellId: string, idx: number) => void; onSuggest?: (prompt: string) => void }) {
-  const [thinkingOpen, setThinkingOpen] = useState(cell.thinkingOpen);
-  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+const ROLE_EMOJIS: Record<string, string> = {
+  intake: '🔍', architect: '📐', executor: '⚡', narrator: '📖',
+};
 
-  const copyCode = (code: string, idx: number) => {
-    navigator.clipboard.writeText(code);
-    setCopiedIdx(idx);
-    setTimeout(() => setCopiedIdx(null), 2000);
-  };
+export function LiveCellRenderer({
+  cell,
+  onPin,
+  onPinChart,
+  onSuggest,
+}: {
+  cell: LiveCell;
+  onPin?: (cellId: string, idx: number) => void;
+  onPinChart?: (cellId: string, idx: number) => void;
+  onSuggest?: (prompt: string) => void;
+}) {
+  const [thinkOpen, setThinkOpen] = useState(false);
+  const isRunning = ['intake', 'planning', 'executing', 'narrating'].includes(cell.status);
 
   return (
-    <div className="relative pl-10 mb-3">
+    <div style={{ position: 'relative', paddingLeft: 40, marginBottom: 12 }}>
       {/* Gutter */}
-      <div className="absolute left-0 top-2 flex flex-col items-center gap-1">
-        <span className="text-[10px] font-mono text-slate-400 w-6 text-right">[{cell.num}]</span>
+      <div style={{ position: 'absolute', left: 0, top: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <span style={{ fontSize: 10, fontFamily: 'monospace', color: '#475569', width: 24, textAlign: 'right' }}>
+          [{cell.num ?? '?'}]
+        </span>
+        {isRunning && (
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+            style={{ width: 6, height: 6, borderRadius: '50%', background: '#3B82F6' }}
+          />
+        )}
       </div>
 
-      {/* Prompt Cell */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100 bg-slate-50/80">
-          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#0E50F6]/10 text-[#0E50F6]">PROMPT</span>
-          <span className="text-[11px] text-slate-400">{cell.label}</span>
-          <div className="flex-1" />
-          <button className="text-slate-400 hover:text-slate-600 text-xs p-1">📌</button>
-          <button className="text-slate-400 hover:text-slate-600 text-xs p-1">✕</button>
+      {/* Prompt box */}
+      <div style={{ background: 'white', border: '1px solid #E2E8F0', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.06)', marginBottom: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', borderBottom: '1px solid #F1F5F9', background: '#F8FAFC' }}>
+          <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'rgba(14,80,246,0.1)', color: '#0E50F6', fontFamily: 'monospace' }}>
+            PROMPT
+          </span>
+          <span style={{ fontSize: 11, color: '#94A3B8' }}>Analysis</span>
+          {cell.status !== 'idle' && (
+            <span style={{ marginLeft: 'auto', fontSize: 10, color: '#475569' }}>
+              {ROLE_EMOJIS[cell.currentRole ?? ''] ?? ''} {cell.currentRoleMessage ?? cell.status}
+            </span>
+          )}
         </div>
-        <div className="px-4 py-3 text-[14px] text-slate-800 leading-relaxed">{cell.prompt}</div>
+        <div style={{ padding: '10px 14px', fontSize: 14, color: '#1E293B', lineHeight: 1.7 }}>
+          {cell.prompt}
+        </div>
       </div>
 
-      {/* Output */}
-      {cell.status === 'complete' && (
-        <div className="mt-1 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-          <div className="px-4 py-3 space-y-3">
-            {/* Thinking */}
-            <div className="bg-violet-50 border border-violet-200 rounded-lg overflow-hidden">
-              <button onClick={() => setThinkingOpen(!thinkingOpen)}
-                className="w-full flex items-center gap-2 px-3 py-2 text-left">
-                {thinkingOpen ? <ChevronDown className="w-4 h-4 text-violet-400" /> : <ChevronRight className="w-4 h-4 text-violet-400" />}
-                <span className="text-xs font-semibold text-violet-600">Reasoning</span>
-                <span className="text-[10px] text-violet-400">{cell.thinking.length} thoughts{!thinkingOpen ? ' · click to expand' : ''}</span>
-              </button>
-              <AnimatePresence>
-                {thinkingOpen && (
-                  <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-                    <div className="px-3 pb-3 pt-1 border-t border-violet-100 space-y-1.5">
-                      {cell.thinking.map((t, i) => (
-                        <div key={i} className="flex gap-2 items-start text-xs text-slate-500">
-                          <div className="w-1.5 h-1.5 rounded-full bg-violet-400 mt-1.5 flex-shrink-0 opacity-60" />
-                          <span>{t}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+      {/* Thinking bubble */}
+      {cell.streamingThinking && (
+        <div style={{ marginBottom: 6 }}>
+          <button
+            onClick={() => setThinkOpen(o => !o)}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px 0', fontSize: 11, color: '#6D28D9' }}
+          >
+            <motion.span animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.4, repeat: Infinity }}>💭</motion.span>
+            <span>Thinking... {!thinkOpen && '(click to expand)'}</span>
+          </button>
+          <AnimatePresence>
+            {thinkOpen && (
+              <motion.div
+                initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
+                style={{ overflow: 'hidden', background: 'rgba(109,40,217,0.04)', border: '1px solid rgba(109,40,217,0.15)', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#7C3AED', lineHeight: 1.7 }}
+              >
+                {cell.streamingThinking}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      {/* Clarification card */}
+      {cell.status === 'clarification' && cell.clarification && (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+          style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 10, padding: '14px 16px', marginBottom: 8 }}
+        >
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#FCD34D', marginBottom: 8 }}>
+            🤔 Need a bit more info
+          </div>
+          {cell.clarification.assumption && (
+            <div style={{ fontSize: 11, color: '#92400E', marginBottom: 10 }}>
+              Best guess: {cell.clarification.assumption}
             </div>
+          )}
+          {cell.clarification.questions.map((q, i) => (
+            <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+              <span style={{ color: '#F59E0B', fontSize: 12 }}>{i + 1}.</span>
+              <span style={{ fontSize: 12, color: '#B45309' }}>{q}</span>
+            </div>
+          ))}
+        </motion.div>
+      )}
 
-            {/* Plan */}
-            {cell.plan.length > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
-                  <span className="text-xs font-semibold text-blue-600">Implementation Plan</span>
-                </div>
-                <div className="space-y-1.5">
-                  {cell.plan.map((step, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs text-slate-600">
-                      <span className="w-[18px] h-[18px] rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[9px] font-bold flex-shrink-0">✓</span>
-                      <span>{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* Plan tracker */}
+      {cell.plan.length > 0 && (
+        <PlanTracker plan={cell.plan} currentStep={cell.currentStep} />
+      )}
+
+      {/* Step outputs */}
+      {cell.plan.map(step => {
+        const code = cell.codeBlocks[step.step];
+        const sandbox = cell.sandboxOutputs[step.step];
+        return (
+          <div key={step.step}>
+            {code && (
+              <StreamingCodeBlock
+                step={step.step}
+                language={code.language}
+                title={code.title}
+                subtitle={code.subtitle}
+                code={code.code}
+                isStreaming={code.isStreaming}
+              />
             )}
+            {sandbox && <SandboxOutput stepNum={step.step} output={sandbox} />}
+          </div>
+        );
+      })}
 
-            {/* Code Blocks */}
-            {cell.codeBlocks.map((block, i) => (
-              <div key={i} className="bg-[#0D1117] rounded-lg overflow-hidden border border-slate-700/50">
-                <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.03] border-b border-white/[0.06]">
-                  {/* Macbook window dots */}
-                  <div className="flex items-center gap-1.5 mr-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
-                  </div>
-                  <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded ${
-                    block.lang === 'SQL' ? 'bg-violet-500/15 text-violet-300' : 'bg-emerald-500/12 text-emerald-300'
-                  }`}>{block.lang}</span>
-                  <span className="text-[10px] text-slate-500">{block.label}</span>
-                  <div className="flex-1" />
-                  <button onClick={() => {
-                    const blob = new Blob([block.code], { type: 'text/plain' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `script_${i}.${block.lang === 'SQL' ? 'sql' : 'py'}`;
-                    a.click();
-                  }}
-                    className="text-[10px] text-slate-500 hover:text-slate-300 px-2 py-0.5 border border-white/10 rounded flex items-center gap-1 transition-colors">
-                    <Download className="w-3 h-3" /> Download
-                  </button>
-                  <button onClick={() => copyCode(block.code, i)}
-                    className="text-[10px] text-slate-500 hover:text-slate-300 px-2 py-0.5 border border-white/10 rounded flex items-center gap-1 transition-colors">
-                    {copiedIdx === i ? <><Check className="w-3 h-3" /> Copied</> : <><Copy className="w-3 h-3" /> Copy</>}
-                  </button>
-                </div>
-                <pre className="px-4 py-3 text-[12px] leading-[1.7] font-mono text-slate-200 overflow-x-auto whitespace-pre-wrap"
-                     dangerouslySetInnerHTML={{ __html: highlightCode(block.code, block.lang) }} />
-              </div>
-            ))}
+      {/* Stats */}
+      {cell.stats.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8, marginBottom: 8 }}>
+          {cell.stats.map((s, i) => (
+            <div key={i} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 }}>{s.label}</div>
+              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'monospace', color: STAT_COLORS[s.color ?? 'neutral'] ?? '#94A3B8' }}>{s.value}</div>
+              {s.delta && <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>{s.delta}</div>}
+              {s.significance && <div style={{ fontSize: 10, color: '#334155' }}>{s.significance}</div>}
+            </div>
+          ))}
+        </div>
+      )}
 
-            {/* Data Table */}
-            {cell.tableData && (
-              <div className="border border-slate-200 rounded-lg overflow-hidden">
-                <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100 bg-slate-50">
-                  <span className="text-xs font-semibold text-slate-600">{cell.label === 'Data Preview' ? 'customers.csv' : 'Results'}</span>
-                  <span className="text-[10px] text-slate-400">showing {cell.tableData.rows.length} of 12,847 rows · {cell.tableData.headers.length} columns</span>
-                  {cell.qualityScore && (
-                    <span className="ml-auto text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded font-bold">
-                      Quality: {cell.qualityScore}
+      {/* Insights */}
+      {cell.insights.length > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 6 }}>Key Insights</div>
+          {cell.insights.map((ins, i) => {
+            const sev = ins.severity ?? 'info';
+            const st = SEV_STYLES[sev] ?? SEV_STYLES.info;
+            return (
+              <motion.div
+                key={ins.id ?? i}
+                initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.06 }}
+                style={{ background: st.bg, border: `1px solid ${st.border}`, borderRadius: 10, padding: '12px 14px', marginBottom: 7, display: 'flex', gap: 10 }}
+              >
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: st.badge, color: st.badgeColor }}>
+                      {SEV_LABELS[sev]}
                     </span>
-                  )}
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-[11px]">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-slate-100">
-                        {cell.tableData.headers.map(h => (
-                          <th key={h} className="px-3 py-2 text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {cell.tableData.rows.map((row, ri) => (
-                        <tr key={ri} className="border-b border-slate-50 hover:bg-slate-50/50">
-                          {row.map((val: string, ci: number) => {
-                            const header = cell.tableData!.headers[ci];
-                            const isChurn = header === 'Churn';
-                            const isNum = header === 'Tenure' || header === 'MonthlyCharges' || header === 'TotalCharges';
-                            const isContract = header === 'Contract';
-                            return (
-                              <td key={ci} className={`px-3 py-1.5 whitespace-nowrap font-mono ${isNum ? 'text-blue-600' : isChurn ? (val === 'Yes' ? 'text-rose-500 font-bold' : 'text-emerald-500 font-bold') : 'text-slate-600'}`}>
-                                {isContract ? (
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${contractBadge[val] || 'bg-slate-100 text-slate-600'}`}>{val}</span>
-                                ) : val}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            {cell.stats.length > 0 && (
-              <div className="grid grid-cols-4 gap-2">
-                {cell.stats.map((s, i) => (
-                  <div key={i} className="bg-slate-50 border border-slate-100 rounded-lg p-3">
-                    <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide mb-1">{s.label}</div>
-                    <div className="text-xl font-bold font-mono" style={{ color: s.color }}>{s.value}</div>
-                    <div className="text-[11px] mt-0.5" style={{ color: s.deltaColor }}>{s.delta}</div>
+                    {ins.metric && <span style={{ fontSize: 16, fontWeight: 700, color: st.badgeColor, fontFamily: 'monospace' }}>{ins.metric}</span>}
                   </div>
-                ))}
-              </div>
-            )}
-
-            {/* Charts */}
-            {cell.charts.map((ch, i) => (
-              <CellChart key={i} chartMeta={ch} chartData={cell.chartData} />
-            ))}
-
-            {/* AI Summary — narrative report */}
-            {cell.summary && (
-              <div className="rounded-xl border border-slate-200 overflow-hidden">
-                <div className="px-5 py-4 bg-gradient-to-br from-slate-50 to-blue-50/30">
-                  <div className="space-y-3">
-                    {cell.summary.paragraphs.map((p, i) => (
-                      <p key={i} className="text-[13px] leading-[1.8] text-slate-700"
-                        dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900 font-bold">$1</strong>').replace(/`(.*?)`/g, '<code class="text-xs bg-slate-200/70 px-1.5 py-0.5 rounded font-mono text-slate-700">$1</code>') }}
-                      />
-                    ))}
-                  </div>
-
-                  {/* Highlight badges */}
-                  {cell.summary.highlights && cell.summary.highlights.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-200/60">
-                      {cell.summary.highlights.map((h, i) => (
-                        <span key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold"
-                          style={{ backgroundColor: h.color + '10', borderColor: h.color + '30', color: h.color }}>
-                          <span className="font-medium text-slate-500">{h.label}:</span> {h.value}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Suggested prompts */}
-                  {cell.summary.suggestedPrompts.length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-slate-200/60">
-                      <div className="text-[10px] font-bold text-orange-500 uppercase tracking-wider mb-2">Suggested next steps</div>
-                      <div className="flex flex-wrap gap-2">
-                        {cell.summary.suggestedPrompts.map((sp, i) => (
-                          <button key={i} onClick={() => { onSuggest?.(sp); }}
-                            className="text-[11px] text-slate-500 hover:text-[#0E50F6] px-3 py-1.5 border border-slate-200 rounded-lg hover:border-[#0E50F6]/30 hover:bg-blue-50 bg-white transition-all text-left">
-                            {sp} →
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#CBD5E1', marginBottom: 4 }}>{ins.title}</div>
+                  {(ins.body ?? ins.text) && <div style={{ fontSize: 12, color: '#64748B', lineHeight: 1.65 }}>{ins.body ?? ins.text}</div>}
+                  {ins.action && <div style={{ fontSize: 11, color: '#475569', marginTop: 6 }}>→ {ins.action}</div>}
+                  {ins.impact && <div style={{ fontSize: 10, color: '#334155', marginTop: 2 }}>{ins.impact}</div>}
                 </div>
-              </div>
-            )}
+                {ins.pinnable !== false && (
+                  <button
+                    onClick={() => onPin?.(cell.id, i)}
+                    style={{
+                      alignSelf: 'flex-start', flexShrink: 0, fontSize: 10, padding: '3px 8px', borderRadius: 5, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600,
+                      background: ins.pinned ? 'rgba(14,80,246,0.1)' : 'rgba(255,255,255,0.05)',
+                      border: ins.pinned ? '1px solid rgba(14,80,246,0.3)' : '1px solid rgba(255,255,255,0.1)',
+                      color: ins.pinned ? '#60A5FA' : '#475569',
+                    }}
+                  >
+                    <Pin size={10} style={{ display: 'inline', marginRight: 3 }} />
+                    {ins.pinned ? 'Pinned' : 'Pin'}
+                  </button>
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
 
-            {/* Key Insights */}
-            {cell.insights.length > 0 && (
-              <div>
-                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Key Insights</div>
-                <div className="space-y-2">
-                  {cell.insights.map((ins, i) => {
-                    const c = insightColors[ins.color] || insightColors.blue;
-                    return (
-                      <div key={i} className={`${c.bg} border ${c.border} rounded-lg p-3 flex gap-3 items-start`}>
-                        <span className="text-base flex-shrink-0">{ins.icon}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className={`text-[13px] font-bold mb-1 ${c.title}`}>{ins.title}</div>
-                          <div className={`text-xs leading-relaxed ${c.text}`}>{ins.text}</div>
-                        </div>
-                        <button
-                          onClick={() => { onPin?.(cell.id, i); toast.success(ins.pinned ? 'Unpinned' : 'Pinned to insights!'); }}
-                          className={`flex-shrink-0 text-[10px] px-2 py-1 rounded border font-semibold whitespace-nowrap transition-colors ${
-                            ins.pinned
-                              ? 'bg-[#0E50F6]/10 border-[#0E50F6]/30 text-[#0E50F6]'
-                              : 'bg-white/60 border-slate-200 text-slate-400 hover:text-[#0E50F6] hover:border-[#0E50F6]/30'
-                          }`}
-                        >
-                          📌 {ins.pinned ? 'Pinned' : 'Pin'}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
+      {/* Final report */}
+      {cell.report && (
+        <AnalysisReport
+          report={cell.report}
+          suggestedPrompts={cell.suggestedPrompts}
+          onSuggestedPrompt={onSuggest}
+        />
+      )}
 
-          {/* Exec Status */}
-          <div className="flex items-center gap-2 px-4 py-2 border-t border-slate-100 bg-slate-50/60 text-[11px] text-slate-400">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>{cell.execMsg}</span>
-            <span className="ml-auto font-mono text-[10px] text-slate-300">{cell.execTime}</span>
-          </div>
+      {/* Error state */}
+      {cell.status === 'error' && cell.error && (
+        <div style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '12px 14px', fontSize: 12, color: '#F87171' }}>
+          ✗ {cell.error}
+        </div>
+      )}
+
+      {/* Complete footer */}
+      {cell.status === 'complete' && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', fontSize: 11, color: '#475569' }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E' }} />
+          Analysis complete · {cell.plan.filter(s => s.status === 'done').length}/{cell.plan.length} steps
         </div>
       )}
     </div>
   );
 }
+
+// ── Legacy CellData renderer (kept for mock/session cells) ─────────────────
+
+export { NotebookCellRenderer } from './LegacyNotebookCell';

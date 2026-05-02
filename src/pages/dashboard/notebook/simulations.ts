@@ -28,9 +28,23 @@ export interface CellData {
   plan: string[];
   codeBlocks: { lang: string; label: string; code: string }[];
   stats: { label: string; value: string; color: string; delta: string; deltaColor: string }[];
-  charts: { title: string; sub: string; id: string; type: 'bar'|'line'|'area'|'horizontal-bar' }[];
+  charts: {
+    title: string;
+    sub: string;
+    id: string;
+    type: 'bar' | 'line' | 'area' | 'horizontal-bar';
+    pinned?: boolean;
+    pinnedItemId?: string;
+  }[];
   chartData: Record<string, any>;
-  insights: { icon: string; color: string; title: string; text: string; pinned: boolean }[];
+  insights: {
+    icon: string;
+    color: string;
+    title: string;
+    text: string;
+    pinned: boolean;
+    pinnedItemId?: string;
+  }[];
   summary?: { paragraphs: string[]; highlights?: { label: string; value: string; color: string }[]; suggestedPrompts: string[] };
   tableData?: { headers: string[]; rows: any[][] };
   qualityScore?: string;

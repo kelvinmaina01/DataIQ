@@ -77,4 +77,77 @@
   .animate-float {
     animation: 3s ease-in-out infinite float;
   }
+
+  /** Minimal / transparent scrollbars — keeps scroll without heavy chrome */
+  .notebook-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 23, 42, 0.18) transparent;
+  }
+
+  .notebook-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .notebook-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .notebook-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(15, 23, 42, 0.15);
+    border-radius: 999px;
+  }
+
+  .notebook-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(15, 23, 42, 0.28);
+  }
+
+  .notebook-scrollbar-panel {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  }
+
+  .notebook-scrollbar-panel::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .notebook-scrollbar-panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .notebook-scrollbar-panel::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+  }
+
+  /** Data preview modal — always-visible scrollbars (h + v) for wide/tall tables */
+  .data-preview-scrollbar {
+    scrollbar-width: auto;
+    scrollbar-color: rgb(148 163 184) rgb(241 245 249);
+    scrollbar-gutter: stable;
+  }
+
+  .data-preview-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+
+  .data-preview-scrollbar::-webkit-scrollbar-track {
+    background: rgb(241 245 249);
+    border-radius: 6px;
+  }
+
+  .data-preview-scrollbar::-webkit-scrollbar-thumb {
+    background: rgb(148 163 184);
+    border-radius: 6px;
+    border: 2px solid rgb(241 245 249);
+  }
+
+  .data-preview-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgb(100 116 139);
+  }
+
+  .data-preview-scrollbar::-webkit-scrollbar-corner {
+    background: rgb(241 245 249);
+  }
 }

@@ -204,7 +204,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 px-3 space-y-6 overflow-y-auto custom-scrollbar py-2">
+                    <nav className="notebook-scrollbar flex-1 space-y-6 overflow-y-auto px-3 py-2">
                         {sidebarGroups.map((group, groupIdx) => (
                             <div key={groupIdx} className="space-y-1">
                                 {isSidebarOpen && (
@@ -399,8 +399,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                     </div>
                 </header>
 
-                {/* Content View */}
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                {/* Content View — notebook uses nested scroll regions; other pages scroll here */}
+                <div
+                    className={
+                        location.pathname === '/dashboard/notebook'
+                            ? 'flex-1 min-h-0 overflow-hidden flex flex-col bg-slate-100 p-0'
+                            : 'flex-1 overflow-y-auto p-8 custom-scrollbar'
+                    }
+                >
                     {children}
                 </div>
             </main>
