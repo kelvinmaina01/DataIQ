@@ -97,7 +97,17 @@ export function DatasetsPage() {
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-            setDatasets(data || []);
+
+            // Filter to only show manual uploads (not database/warehouse connections)
+            // Manual uploads have methods like: 'CSV', 'Excel', 'JSON', 'PDF', 'Word'
+            // Database/warehouse methods look like: 'Database: postgres', 'Database: snowflake'
+            const manualUploads = (data || []).filter((dataset: Dataset) => {
+                const method = dataset.method?.toLowerCase() || '';
+                // Exclude anything with 'database' or 'warehouse' in the method
+                return !method.includes('database') && !method.includes('warehouse');
+            });
+
+            setDatasets(manualUploads);
         } catch (error: any) {
             console.error('Error fetching datasets:', error);
             toast.error('Failed to load datasets');
@@ -144,82 +154,7 @@ export function DatasetsPage() {
     const totalStorage = datasets.reduce((acc, curr) => acc + curr.file_size, 0);
     const healthVerified = datasets.filter(d => d.quality_score > 80).length;
 
-    if (!showListing) {
-        return (
-            <div className="min-h-[calc(100vh-160px)] w-full flex items-center justify-center p-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="w-full max-w-6xl aspect-[21/9] rounded-[3rem] shadow-2xl overflow-hidden relative group flex flex-col justify-center px-12 sm:px-24 border border-white/20"
-                    style={{
-                        background: 'linear-gradient(135deg, #00D2FF 0%, #0E50F6 50%, #9D50BB 100%)'
-                    }}
-                >
-                    {/* Background Pattern */}
-                    <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.4),transparent_70%)]" />
-
-                    {/* Circular Revolving Icons */}
-                    <div className="absolute right-[10%] top-1/2 -translate-y-1/2 w-[400px] h-[400px] hidden lg:block pointer-events-none">
-                        <motion.div
-                            className="relative w-full h-full"
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                        >
-                            {[
-                                { Icon: Database, color: 'text-emerald-400', angle: 0 },
-                                { Icon: FileText, color: 'text-orange-400', angle: 72 },
-                                { Icon: BarChart4, color: 'text-amber-400', angle: 144 },
-                                { Icon: ShieldCheck, color: 'text-rose-400', angle: 216 },
-                                { Icon: Cloud, color: 'text-cyan-300', angle: 288 },
-                            ].map((item, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="absolute bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shadow-xl hover:bg-white/20 transition-colors"
-                                    style={{
-                                        left: `calc(50% + ${Math.cos((item.angle * Math.PI) / 180) * 160}px - 32px)`,
-                                        top: `calc(50% + ${Math.sin((item.angle * Math.PI) / 180) * 160}px - 32px)`,
-                                    }}
-                                    animate={{ rotate: -360 }}
-                                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                                >
-                                    <item.Icon className={`w-8 h-8 ${item.color}`} strokeWidth={1.5} />
-                                </motion.div>
-                            ))}
-                        </motion.div>
-                    </div>
-
-                    <div className="relative z-20 max-w-2xl">
-                        {/* Badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold uppercase tracking-widest mb-8 shadow-lg w-fit">
-                            <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_12px_rgba(34,211,238,1)]" />
-                            Start Your Journey
-                        </div>
-
-                        {/* Title */}
-                        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight tracking-tight drop-shadow-md">
-                            Transform raw data into <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-white">scientific breakthroughs.</span>
-                        </h1>
-
-                        {/* Subtitle */}
-                        <p className="text-lg md:text-xl text-blue-50/90 font-medium mb-10 leading-relaxed max-w-lg">
-                            Upload your datasets and let our AI-powered engine handle the heavy lifting. From quality checks to insights discovery—all automated.
-                        </p>
-
-                        {/* CTA Button */}
-                        <Button
-                            onClick={() => setShowListing(true)}
-                            className="bg-white text-blue-600 hover:bg-blue-50 hover:scale-105 active:scale-95 transition-all duration-300 h-14 px-8 rounded-full font-bold text-lg shadow-[0_8px_30px_rgba(0,0,0,0.1)] group"
-                        >
-                            Explore Your Datasets
-                            <ChevronDown className="ml-2 w-5 h-5 group-hover:rotate-[-90deg] transition-transform duration-300" />
-                        </Button>
-                    </div>
-                </motion.div>
-            </div>
-        );
-    }
+    // Banner removed to show listing directly
 
     return (
         <div className="animate-in fade-in duration-700">

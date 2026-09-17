@@ -70,6 +70,7 @@ export function SignUpPage() {
                     location: "",
                     website: "",
                     healthFocus: "Data Analytics & BI",
+                    onboardingCompleted: false,
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp()
                 });

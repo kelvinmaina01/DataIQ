@@ -8,12 +8,12 @@ import {
     Lock,
     ExternalLink,
     PlayCircle,
-    Mail,
     CheckCircle2,
     ArrowRight,
+    ChevronRight,
     Info,
     HelpCircle,
-    ChevronRight,
+    Mail,
     Eye,
     EyeOff,
 } from 'lucide-react';
@@ -22,7 +22,6 @@ import { Input } from '../../components/ui/input';
 import { Textarea } from '../../components/ui/textarea';
 import { cn } from '../../components/ui/utils';
 import { toast } from 'sonner';
-import { connectAndExtract } from '../../services/databaseService';
 import { CONNECTORS_INFO, ConnectorInfo } from '../../lib/connectors';
 
 // Connector Info now imported from ../../lib/connectors
@@ -85,35 +84,78 @@ export function DatabaseConnectorPage() {
         if (!connector) return;
 
         setIsLoading(true);
-        const loadingToast = toast.loading(`Connecting to ${connector.name}...`);
+        const loadingToast = toast.loading(`Testing connection to ${connector.name}...`);
 
         try {
-            // Simulate enterprise-grade extraction flow
-            const extractionResult = await connectAndExtract(connector.id, {
-                // In a real app, we'd pass the actual form data here
-                database: connector.name.toLowerCase(),
-                timestamp: new Date().toISOString()
-            });
+            // Import database connector service
+            const { databaseConnectorService } = await import('../../services/databaseConnectorService');
+
+            // Build credentials object based on connector type
+            const credentials: any = {
+                host: formData.host || '',
+                port: parseInt(formData.port) || 5432,
+                database: formData.database || '',
+                username: formData.username || '',
+                password: formData.password || '',
+                ssl: formData.ssl === 'true' || false
+            };
+
+            // MongoDB-specific: support connection string
+            if (connector.id === 'mongodb' && formData.connectionString) {
+                credentials.connectionString = formData.connectionString;
+            }
+
+
+
+            // Step 1: Test the connection
+            console.log('[DatabaseConnectorPage] Testing connection:', connector.id);
+            const testResult = await databaseConnectorService.testConnection(connector.id, credentials);
+
+            if (!testResult.success) {
+                throw new Error(testResult.message || 'Connection test failed');
+            }
+
+            // Step 2: Save the connection
+            console.log('[DatabaseConnectorPage] Saving connection...');
+            const connectionName = formData.connectionName || `${connector.name} Connection`;
+            const connectResult = await databaseConnectorService.connect(
+                connector.id,
+                connectionName,
+                credentials
+            );
+
+            if (!connectResult.success || !connectResult.connectionId) {
+                throw new Error(connectResult.message || 'Failed to save connection');
+            }
 
             toast.dismiss(loadingToast);
-            toast.success(`Successfully extracted data from ${connector.name}!`);
+            toast.success(
+                <div>
+                    <p className="font-bold">Connection Successful!</p>
+                    <p className="text-sm">Your {connector.name} database is now connected and ready to query.</p>
+                </div>
+            );
 
             // Navigate to the processing page with the "virtual batch"
             // We include method: 'Database: ID' so processing page knows to save it with specific mapping
             navigate('/dashboard/ingestion/processing', {
                 state: {
                     batch: [{
-                        ...extractionResult,
+                        ...connectResult,
                         method: `Database: ${connector.id}`,
                         connectorLogo: connector.logo
                     }]
                 }
             });
-        } catch (error) {
+        } catch (error: any) {
             toast.dismiss(loadingToast);
-            toast.error('Failed to connect to database. Please check your credentials.');
-            console.error('Extraction error:', error);
-        } finally {
+            toast.error(
+                <div>
+                    <p className="font-bold">Connection Failed</p>
+                    <p className="text-sm">{error.message || 'Please check your credentials and try again.'}</p>
+                </div>
+            );
+            console.error('[DatabaseConnectorPage] Connection error:', error);
             setIsLoading(false);
         }
     };
@@ -214,7 +256,7 @@ export function DatabaseConnectorPage() {
                                         <HelpCircle className="size-4 text-slate-300" />
                                     </div>
                                     <Input
-                                        placeholder="e.g. Postgres, Main DB"
+                                        placeholder={`e.g. ${connector.name} Production DB`}
                                         className="h-12 border-slate-200 rounded-xl focus:border-primary px-4 font-medium"
                                         value={formData['Connection Name'] || ''}
                                         onChange={(e) => setFormData(prev => ({ ...prev, ['Connection Name']: e.target.value }))}
@@ -344,13 +386,23 @@ export function DatabaseConnectorPage() {
                                         {[
                                             {
                                                 name: 'SOC 2 Type 2',
-                                                logo: 'https://www.vectorlogo.zone/logos/aicpa_soc2/aicpa_soc2-icon.svg',
+                                                logo: '/logos/soc2-badge.png',
                                                 color: 'bg-[#0E50F6]'
                                             },
                                             {
                                                 name: 'GDPR',
-                                                logo: 'https://www.vectorlogo.zone/logos/gdpr/gdpr-icon.svg',
+                                                logo: '/logos/gdpr-badge.png',
                                                 color: 'bg-[#003399]'
+                                            },
+                                            {
+                                                name: 'HIPAA',
+                                                logo: '/logos/hipaa-badge.png',
+                                                color: 'bg-[#058b7c]'
+                                            },
+                                            {
+                                                name: 'ISO 27001',
+                                                logo: '/logos/iso-badge.png',
+                                                color: 'bg-[#e43d30]'
                                             }
                                         ].map((badge, i) => (
                                             <div key={i} className="bg-white border border-slate-100/80 rounded-[1.5rem] p-5 flex items-center justify-between group cursor-pointer hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
