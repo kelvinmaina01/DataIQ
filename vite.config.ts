@@ -18,6 +18,7 @@ export default defineConfig({
     outDir: 'build',
   },
   server: {
+    host: true, // listen on IPv4 + IPv6 so localhost, 127.0.0.1 and [::1] all work
     port: 3000,
     strictPort: true, // Prevents Vite from falling back to 3001, which causes an infinite proxy loop
     open: true,
